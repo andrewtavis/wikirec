@@ -1,10 +1,12 @@
 <div align="center">
-  <a href="https://github.com/andrewtavis/wiki_rec"><img src="https://github.com/andrewtavis/wikirec/blob/main/resources/wiki_rec_logo.png" width="618" height="200"></a>
+  <a href="https://github.com/andrewtavis/wiki_rec"><img src="https://github.com/andrewtavis/wikirec/blob/main/resources/wikirec_logo.png" width="618" height="200"></a>
 </div>
 
 --------------------------------------
 
-### Open-source recommendation engines based on Wikipedia
+[![GitHub](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/master/LICENSE)
+
+### Open-source recommendation engines based on Wikipedia data
 
 **Jump to:** [Data](#data) • [Methods](#methods) • [Examples](#examples) • [To-Do](#to-do)
 
