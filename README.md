@@ -1,20 +1,24 @@
 <div align="center">
-  <a href="https://github.com/andrewtavis/design"><img src="https://raw.githubusercontent.com/andrewtavis/design/main/resources/wiki_book_rec_logo.png" width="1027" height="200"></a>
+  <a href="https://github.com/andrewtavis/wiki_rec"><img src="https://raw.githubusercontent.com/andrewtavis/wiki_rec/main/resources/wiki_rec_logo.png" width="610" height="200"></a>
 </div>
 
 --------------------------------------
 
-### A Latent Dirichlet Allocation and LDA BERT book recommender based on Wikipedia articles
+### Latent Dirichlet Allocation and LDA BERT recommendation engines based on Wikipedia articles
 
-**Jump to:** [Data](#data) • [Method](#method)
+**Jump to:** [Data](#data) • [Methods](#methods) • [Examples](#examples) • [To-Do](#to-do)
 
 # Data
 
-# Method
+# Methods
 
 ### LDA
 
 ### LDA with BERT embeddings
+
+# Examples
+
+# To-Do
 
 # Similar codes
 <details><summary><strong>Similar codes to this project<strong></summary>
