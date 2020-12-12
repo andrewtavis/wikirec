@@ -1,4 +1,10 @@
-### A Latent Dirichlet Allocation adn LDA BERT book recommender based on Wikipedia articles
+<div align="center">
+  <a href="https://github.com/andrewtavis/design"><img src="https://raw.githubusercontent.com/andrewtavis/design/main/resources/wiki_book_rec_logo.png" width="1027" height="200"></a>
+</div>
+
+--------------------------------------
+
+### A Latent Dirichlet Allocation and LDA BERT book recommender based on Wikipedia articles
 
 **Jump to:** [Data](#data) • [Method](#method)
 
