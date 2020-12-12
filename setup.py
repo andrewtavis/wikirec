@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setup_args = dict(
     name='wikirec',
-    version='0.0.1',
+    version='0.0.1.1',
     description='Open-source recommendation engines based on Wikipedia data',
     long_description=long_description,
     long_description_content_type="text/markdown",
