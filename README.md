@@ -4,7 +4,7 @@
 
 --------------------------------------
 
-### Latent Dirichlet Allocation and LDA BERT recommendation engines based on Wikipedia articles
+### Open-source recommendation engines based on Wikipedia
 
 **Jump to:** [Data](#data) • [Methods](#methods) • [Examples](#examples) • [To-Do](#to-do)
 
