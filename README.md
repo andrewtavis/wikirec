@@ -4,11 +4,15 @@
 
 --------------------------------------
 
+[![PyPI Version](https://badge.fury.io/py/wikirec.svg)](https://pypi.org/project/wikirec/)
+[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://pypi.org/project/wikirec/)
 [![GitHub](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/master/LICENSE)
 
 ### Open-source recommendation engines based on Wikipedia data
 
 **Jump to:** [Data](#data) • [Methods](#methods) • [Examples](#examples) • [To-Do](#to-do)
+
+**wikirec**...
 
 # Data
 
@@ -22,8 +26,8 @@
 
 # To-Do
 
-# Similar codes
-<details><summary><strong>Similar codes to this project<strong></summary>
+# Similar projects
+<details><summary><strong>Similar project to wikirec<strong></summary>
 <p>
 
 </p>
