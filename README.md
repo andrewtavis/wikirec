@@ -4,9 +4,14 @@
 
 --------------------------------------
 
-[![PyPI Version](https://badge.fury.io/py/wikirec.svg)](https://pypi.org/project/wikirec/)
-[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://pypi.org/project/wikirec/)
-[![GitHub](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/master/LICENSE)
+[![rtd](https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs)](http://wikirec.readthedocs.io/en/latest/)
+[![travis](https://img.shields.io/travis/andrewtavis/wikirec.svg?logo=travis-ci)](https://travis-ci.org/andrewtavis/wikirec)
+[![codecov](https://codecov.io/gh/andrewtavis/wikirec/branch/master/graphs/badge.svg)](https://codecov.io/gh/andrewtavis/wikirec)
+[![pyversions](https://img.shields.io/pypi/pyversions/wikirec.svg?logo=python)](https://pypi.org/project/wikirec/)
+[![pypi](https://img.shields.io/pypi/v/wikirec.svg)](https://pypi.org/project/wikirec/)
+[![pypistatus](https://img.shields.io/pypi/status/wikirec.svg)](https://pypi.org/project/wikirec/)
+[![license](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/main/LICENSE)
+[![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ### Open-source recommendation engines based on Wikipedia data
 
