@@ -18,7 +18,7 @@
 
 **Jump to:** [Data](#data) • [Methods](#methods) • [Usage](#usage) • [To-Do](#to-do)
 
-**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based on solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based solely on open-source data.
 
 # Installation via PyPi
 ```bash
@@ -73,6 +73,8 @@ import wikirec
 - Allowing a user to specify multiple articles of interest
 - Allowing a user to input their preference for something and then update their recommendations
 - Adding support for non-English versions of Wikipedia
+- Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
+- Updating and refining the [documentation](https://wikirec.readthedocs.io/en/latest/)
 
 # References
 <details><summary><strong>List of references<strong></summary>
