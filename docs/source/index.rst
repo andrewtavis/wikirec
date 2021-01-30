@@ -33,7 +33,7 @@
 .. |contributions| image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
     :target: https://github.com/andrewtavis/wikirec/blob/main/CONTRIBUTING.md
 
-Political elections, appointment, analysis and visualization in Python
+Open-source recommendation engines based on Wikipedia data
 
 Installation
 ------------
