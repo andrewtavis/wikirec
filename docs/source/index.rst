@@ -1,5 +1,5 @@
 .. image:: https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png
-    :scale: 15 %
+    :scale: 35 %
     :target: https://github.com/andrewtavis/wikirec
 ============
 
