@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://github.com/andrewtavis/wikirec"><img src="https://github.com/andrewtavis/wikirec/blob/main/resources/wikirec_logo_transparent.png" width="60%" height="60%"></a>
+  <a href="https://github.com/andrewtavis/wikirec"><img src="https://github.com/andrewtavis/wikirec/blob/main/resources/wikirec_logo_transparent.png" width="529" height="169"></a>
 </div>
 
 --------------------------------------
@@ -13,12 +13,14 @@
 [![license](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/main/LICENSE)
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/andrewtavis/wikirec/blob/main/CONTRIBUTING.md)
+[![coc](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://github.com/andrewtavis/wikirec/blob/main/.github/CODE_OF_CONDUCT.md)
 
 ### Open-source recommendation engines based on Wikipedia data
 
-**Jump to:** [Data](#data) • [Methods](#methods) • [Usage](#usage) • [To-Do](#to-do)
+[//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
+**Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Usage](#usage-) • [To-Do](#to-do-)
 
-**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based solely on open-source data - with wikirec serving both as a testing grounds and method of deployment.
 
 # Installation via PyPi
 ```bash
@@ -29,7 +31,7 @@ pip install wikirec
 import wikirec
 ```
 
-# Data
+# Data [`↩`](#jumpto)
 
 wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of media and information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
@@ -43,7 +45,7 @@ Downloading and parsing Wikipedia for the needed data is as simple as:
 import wikirec
 ```
 
-# Methods
+# Methods [`↩`](#jumpto)
 
 ### LDA
 
@@ -59,7 +61,7 @@ import wikirec
 The combination of LDA with BERT via an [wikirec.autoencoder](https://github.com/andrewtavis/kwgen/blob/main/wikirec/autoencoder.py).
 --->
 
-# Usage
+# Usage [`↩`](#jumpto)
 
 The following is an example of recommendations using wikirec:
 
@@ -67,7 +69,7 @@ The following is an example of recommendations using wikirec:
 import wikirec
 ```
 
-# To-Do
+# To-Do [`↩`](#jumpto)
 
 - Adding further methods for recommendations
 - Allowing a user to specify multiple articles of interest

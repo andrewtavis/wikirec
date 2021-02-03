@@ -1,9 +1,11 @@
 .. image:: https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png
-    :scale: 60 %
+    :width: 529
+    :height: 169
+    :align: center
     :target: https://github.com/andrewtavis/wikirec
 ============
 
-|rtd| |travis| |codecov| |pyversions| |pypi| |pypistatus| |license| |codestyle| |contributions|
+|rtd| |travis| |codecov| |pyversions| |pypi| |pypistatus| |license| |codestyle| |contributions| |coc|
 
 .. |rtd| image:: https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs
     :target: http://wikirec.readthedocs.io/en/latest/
@@ -31,6 +33,9 @@
 
 .. |contributions| image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
     :target: https://github.com/andrewtavis/wikirec/blob/main/CONTRIBUTING.md
+
+.. |coc| image:: https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg
+    :target: https://github.com/andrewtavis/wikirec/blob/main/.github/CODE_OF_CONDUCT.md
 
 Open-source recommendation engines based on Wikipedia data
 
