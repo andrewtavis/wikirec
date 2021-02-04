@@ -9,10 +9,10 @@ Contributing
 License
 -------
 
-.. literalinclude:: ../../.github/LICENSE.txt
+.. literalinclude:: ../../LICENSE.txt
   :language: text
 
 Change log
 ----------
 
-.. mdinclude:: ../../.github/CHANGELOG.md
+.. mdinclude:: ../../CHANGELOG.md
