@@ -35,7 +35,7 @@ setup_args = dict(
     url="https://github.com/andrewtavis/wikirec",
 )
 
-install_requires = ["pytest", "black"]
+install_requires = []
 
 if __name__ == "__main__":
     setup(**setup_args, install_requires=install_requires)
