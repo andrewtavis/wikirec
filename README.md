@@ -23,8 +23,17 @@
 **wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based solely on open-source data with wikirec serving to both refine and deploy models.
 
 # Installation via PyPi
+
+wikirec can be downloaded from pypi via pip our sourced directly from this repository:
+
 ```bash
 pip install wikirec
+```
+
+```bash
+git clone https://github.com/andrewtavis/wikirec.git
+cd wikirec
+python setup.py install
 ```
 
 ```python

@@ -45,6 +45,12 @@ Installation
 
     pip install wikirec
 
+.. code-block:: shell
+
+    git clone https://github.com/andrewtavis/wikirec.git
+    cd wikirec
+    python setup.py install
+
 .. code-block:: python
 
     import wikirec
