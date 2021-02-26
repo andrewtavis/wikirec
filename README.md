@@ -101,3 +101,9 @@ import wikirec
 
 </p>
 </details>
+
+# Powered By
+
+<div align="center">
+  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/master/resources/gh_images/wikipedia_logo.png" alt="wikipedia"></a>
+</div>
