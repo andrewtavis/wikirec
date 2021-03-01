@@ -33,7 +33,18 @@ setup_args = dict(
     url="https://github.com/andrewtavis/wikirec",
 )
 
-install_requires = []
+install_requires = [
+    "pytest-cov",
+    "numpy",
+    "pandas",
+    "nltk",
+    "spacy",
+    "gensim",
+    "scikit-learn",
+    "keras",
+    "sentence-transformers",
+    "tqdm",
+]
 
 if __name__ == "__main__":
     setup(**setup_args, install_requires=install_requires)
