@@ -9,7 +9,7 @@ Contents:
     _process_article,
     WikiXmlHandler,
     _iterate_and_parse_file,
-    parse_dump_to_json
+    parse_to_ndjson
 """
 
 import os
@@ -22,6 +22,7 @@ import gc
 import json
 from itertools import chain
 from functools import partial
+import warnings
 
 import subprocess
 from multiprocessing import Pool
@@ -31,8 +32,6 @@ from tqdm.auto import tqdm
 
 import mwparserfromhell
 from bs4 import BeautifulSoup
-
-import warnings
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 import tensorflow as tf
@@ -341,7 +340,7 @@ def _iterate_and_parse_file(args):
     return None
 
 
-def parse_dump_to_json(
+def parse_to_ndjson(
     topic="books",
     output_path="topic_articles",
     input_dir="wikipedia_dump",

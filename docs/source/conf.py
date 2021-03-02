@@ -54,6 +54,8 @@ autodoc_mock_imports = [
     "nltk",
     "spacy",
     "stopwordsiso",
+    "matplotlib",
+    "seaborn",
     "gensim",
     "sklearn",
     "keras",
