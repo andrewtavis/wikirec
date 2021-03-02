@@ -38,6 +38,7 @@ install_requires = [
     "numpy",
     "pandas",
     "nltk",
+    "spacy",
     "gensim",
     "scikit-learn",
     "keras",
