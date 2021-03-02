@@ -38,12 +38,12 @@ install_requires = [
     "numpy",
     "pandas",
     "nltk",
-    "spacy",
     "gensim",
     "scikit-learn",
     "keras",
     "sentence-transformers",
     "tqdm",
+    "beautifulsoup4",
 ]
 
 if __name__ == "__main__":
