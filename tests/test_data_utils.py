@@ -3,7 +3,7 @@ Data Tests
 ----------
 """
 
-from wikirec import data
+from wikirec import data_utils
 
 
 def test_download_wiki_dump():

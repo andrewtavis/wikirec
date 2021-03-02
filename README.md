@@ -20,11 +20,11 @@
 [//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
 **Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Usage](#usage-) • [To-Do](#to-do-)
 
-**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is to provide accurate content recommenders based solely on open-source data with wikirec serving to both refine and deploy models.
+**wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
 
 # Installation via PyPi
 
-wikirec can be downloaded from pypi via pip our sourced directly from this repository:
+wikirec can be downloaded from pypi via pip or sourced directly from this repository:
 
 ```bash
 pip install wikirec
@@ -42,19 +42,30 @@ import wikirec
 
 # Data [`↩`](#jumpto)
 
-wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of media and information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
+wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-<!---
-See XYZ for a full list of available Wikipedia classes.
---->
+Wikirec derives article classes from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `Infobox chosen_type` in the following example will subset all Wikipedia articles for the given type. Wikirec also provides a shortcut for types of data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, and various categories of `people` such as `athletes` and `musicians`, and `authors`.
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
 ```python
-import wikirec
+from wikirec import data_utils
+
+# This downloads the most recent stable bz2 compressed Wikipedia dump
+files = data_utils.download_wiki()
+
+# Produces an ndjson of all book articles on Wikipedia
+data_utils.parse_to_json(
+    topic="books",
+    output_path="wiki_book_articles.ndjson",
+    multicore=True,
+    verbose=True,
+)
 ```
 
 # Methods [`↩`](#jumpto)
+
+Current NLP modeling methods implemented include:
 
 ### LDA
 
@@ -64,15 +75,13 @@ import wikirec
 
 [Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based running nlp models over open source Wikipedia data. These representations are then able to be leveraged to derive topics.
 
-<!---
 ### LDA with BERT embeddings
 
-The combination of LDA with BERT via an [wikirec.autoencoder](https://github.com/andrewtavis/kwgen/blob/main/wikirec/autoencoder.py).
---->
+The combination of LDA with BERT via [wikirec.autoencoder](https://github.com/andrewtavis/kwgen/blob/main/wikirec/autoencoder.py).
 
 # Usage [`↩`](#jumpto)
 
-The following is an example of recommendations using wikirec:
+The following are examples of recommendations using wikirec:
 
 ```python
 import wikirec
@@ -84,7 +93,11 @@ import wikirec
 - Allowing a user to specify multiple articles of interest
 - Allowing a user to input their preference for something and then update their recommendations
 - Adding support for non-English versions of Wikipedia
+- Compiling other sources of open source data that can be used to augment input data
+  - Potentially writing scripts to load this data for significant topics
+<!---
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
+--->
 - Updating and refining the [documentation](https://wikirec.readthedocs.io/en/latest/)
 
 # References
