@@ -8,6 +8,7 @@ async-generator==1.10
 async-timeout==3.0.1
 attrs==20.3.0
 backcall==0.2.0
+beautifulsoup4==4.9.3
 black==19.10b0
 bleach==3.3.0
 boto==2.49.0
@@ -84,6 +85,7 @@ msgpack==0.5.6
 msgpack-numpy==0.4.7.1
 multidict==4.7.6
 murmurhash==0.28.0
+mwparserfromhell==0.6
 mypy-extensions==0.4.3
 nb-conda-kernels==2.3.1
 nbclient==0.5.3
@@ -142,6 +144,7 @@ sentencepiece==0.1.95
 setuptools==52.0.0.post20210125
 six==1.15.0
 smart-open==4.2.0
+soupsieve==2.2
 spacy==2.0.12
 tensorboard==1.13.1
 tensorflow==1.13.1

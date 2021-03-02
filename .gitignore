@@ -28,3 +28,9 @@ wikirec-dev
 ###############
 *_preview.png
 *.sketch
+_*.ipynb
+
+# Data files
+############
+*.ndjson
+*_dump

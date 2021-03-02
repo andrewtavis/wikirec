@@ -1,7 +1,5 @@
 name: wikirec-dev
 channels:
-  - conda-forge
-  - anaconda
   - defaults
 dependencies:
   - _tflow_select=2.3.0
@@ -207,6 +205,7 @@ dependencies:
   - zipp=3.4.0
   - zlib=1.2.11
   - pip:
+    - beautifulsoup4==4.9.3
     - filelock==3.0.12
     - ipython==7.10.0
     - jupyter-contrib-core==0.3.3
@@ -215,10 +214,12 @@ dependencies:
     - jupyter-latex-envs==1.4.6
     - jupyter-nbextensions-configurator==0.4.1
     - lxml==4.6.2
+    - mwparserfromhell==0.6
     - pyyaml==5.4.1
     - sacremoses==0.0.43
     - sentence-transformers==0.4.1.2
     - sentencepiece==0.1.95
+    - soupsieve==2.2
     - tokenizers==0.10.1
     - torch==1.7.1
     - transformers==4.3.3

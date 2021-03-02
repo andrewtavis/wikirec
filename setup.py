@@ -44,6 +44,7 @@ install_requires = [
     "keras",
     "sentence-transformers",
     "tqdm",
+    "beautifulsoup4",
 ]
 
 if __name__ == "__main__":
