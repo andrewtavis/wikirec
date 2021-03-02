@@ -12,7 +12,7 @@ from sentence_transformers import (
 import wikirec
 
 from wikirec import autoencoder
-from wikirec import data
+from wikirec import data_utils
 from wikirec import model
 from wikirec import topic_model
 from wikirec import utils

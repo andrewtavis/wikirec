@@ -41,6 +41,7 @@ import tensorflow as tf
 def input_conversion_dict():
     input_conversion_dict = {
         "books": "Infobox book",
+        "authors": "Infobox writer",
         "albums": "Infobox album",
         "musicians": "Infobox musical artist",
         "songs": "Infobox song",
@@ -50,14 +51,13 @@ def input_conversion_dict():
         "artists": "Infobox artist",
         "athletes": "Infobox sportsperson",
         "politicians": "Infobox officeholder",
-        "writers": "Infobox writer",
         "people": "Infobox person",
     }
 
     return input_conversion_dict
 
 
-def download_wiki_dump(target_dir="wikipedia_dump"):
+def download_wiki_dump(target_dir="wikipedia_dump", explicit_dump=False):
     """
     Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory
 
@@ -65,6 +65,11 @@ def download_wiki_dump(target_dir="wikipedia_dump"):
     ----------
         target_dir : str (default=wikipedia_dump)
             The directory in the pwd into which files should be downloaded
+
+        explicit_dump : str (default=False)
+            An explicit Wikipedia dump that the user wants to download
+
+            Note: a value of False will select the third from the last (latest stable dump)
 
     Returns
     -------
@@ -80,9 +85,12 @@ def download_wiki_dump(target_dir="wikipedia_dump"):
     soup_index = BeautifulSoup(index, "html.parser")
 
     all_dumps = [a["href"] for a in soup_index.find_all("a") if a.has_attr("href")]
-    latest_stable_dump = all_dumps[-3]
+    target_dump = all_dumps[-3]
+    if explicit_dump != False:
+        if explicit_dump in all_dumps:
+            target_dump = explicit_dump
 
-    dump_url = base_url + latest_stable_dump
+    dump_url = base_url + target_dump
     dump_html = requests.get(dump_url).text
     soup_dump = BeautifulSoup(dump_html, "html.parser")
 
@@ -335,9 +343,9 @@ def _iterate_and_parse_file(args):
 
 def parse_dump_to_json(
     topic="books",
-    output_path=None,
-    input_dir=None,
-    partitions_dir=None,
+    output_path="topic_articles",
+    input_dir="wikipedia_dump",
+    partitions_dir="partitions",
     limit=None,
     delete_parsed_files=False,
     multicore=True,
@@ -353,13 +361,13 @@ def parse_dump_to_json(
 
             Note: this corresponds to the type of infobox from Wikipedia articles
 
-        output_path : str (default=None)
+        output_path : str (default=topic_articles)
             The name of the final output ndjson file
 
-        input_dir : str (default=None)
+        input_dir : str (default=wikipedia_dump)
             The path to the directory where the data is stored
 
-        partitions_dir : str (default=None)
+        partitions_dir : str (default=partitions)
             The path to the directory where the output should be stored
 
         limit : int (default=None)
