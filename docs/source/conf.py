@@ -42,6 +42,26 @@ extensions = [
 numpydoc_show_inherited_class_members = False
 numpydoc_show_class_members = False
 
+# NOT to sort autodoc functions in alphabetical order
+autodoc_member_order = "bysource"
+
+# To avoid installing Tensorflow and all its dependencies when building doc
+# https://stackoverflow.com/a/15912502/8729698
+autodoc_mock_imports = [
+    "pytest-cov",
+    "numpy",
+    "pandas",
+    "nltk",
+    "spacy",
+    "stopwordsiso",
+    "gensim",
+    "sklearn",
+    "keras",
+    "sentence_transformers",
+    "tqdm",
+    "beautifulsoup4",
+]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -67,7 +87,7 @@ pygments_style = "sphinx"
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
+
 import sphinx_rtd_theme
 
 html_theme = "sphinx_rtd_theme"

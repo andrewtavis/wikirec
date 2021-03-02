@@ -39,6 +39,7 @@ install_requires = [
     "pandas",
     "nltk",
     "spacy",
+    "stopwordsiso",
     "gensim",
     "scikit-learn",
     "keras",

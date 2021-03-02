@@ -3,9 +3,11 @@ Fixtures
 --------
 """
 
-import numpy as np
-
 import pytest
+import numpy as np
+from sentence_transformers import (
+    SentenceTransformer,
+)  # required or the import within kwx.visuals will fail
 
 import wikirec
 
