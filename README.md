@@ -44,7 +44,7 @@ import wikirec
 
 wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-Wikirec derives article classes from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `Infobox chosen_type` in the following example will subset all Wikipedia articles for the given type. Wikirec also provides a shortcut for types of data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, and various categories of `people` such as `athletes` and `musicians`, and `authors`.
+wikirec derives article classes from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `Infobox chosen_type` to the `topic` argument in the following example will subset all Wikipedia articles for the given type. wikirec also provides a shortcut for types of data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
@@ -55,7 +55,7 @@ from wikirec import data_utils
 files = data_utils.download_wiki()
 
 # Produces an ndjson of all book articles on Wikipedia
-data_utils.parse_to_json(
+data_utils.parse_to_ndjson(
     topic="books",
     output_path="wiki_book_articles.ndjson",
     multicore=True,
@@ -77,7 +77,7 @@ Current NLP modeling methods implemented include:
 
 ### LDA with BERT embeddings
 
-The combination of LDA with BERT via [wikirec.autoencoder](https://github.com/andrewtavis/kwgen/blob/main/wikirec/autoencoder.py).
+The combination of LDA with BERT via [wikirec.autoencoder](https://github.com/andrewtavis/wikirec/blob/main/wikirec/autoencoder.py).
 
 # Usage [`↩`](#jumpto)
 

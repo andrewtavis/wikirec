@@ -9,19 +9,35 @@ Contents:
     _clean_text_strings,
     clean_and_tokenize_texts,
     prepare_data,
-    _prepare_corpus_path
+    _prepare_corpus_path,
+    check_str_similarity,
+    check_str_args,
+    graph_topic_num_evals
 """
 
 import os
 import re
+from difflib import SequenceMatcher
 import string
 import random
 from collections import defaultdict
+import warnings
+
+import numpy as np
+from tqdm.auto import tqdm
 
 import spacy
 from stopwordsiso import stopwords
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 from gensim.models import Phrases
+
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
+from sentence_transformers import SentenceTransformer
+
+from wikirec import model, topic_model
 
 
 def _combine_tokens_to_str(texts, ignore_words=None):
@@ -403,3 +419,324 @@ def _prepare_corpus_path(
                 for t_c in text_corpus
             ],
         )
+
+
+def check_str_similarity(str_1, str_2):
+    """Checks the similarity of two strings"""
+    return SequenceMatcher(None, str_1, str_2).ratio()
+
+
+def check_str_args(arguments, valid_args):
+    """
+    Checks whether a str argument is valid, and makes suggestions if not
+    """
+    if type(arguments) == str:
+        if arguments in valid_args:
+            return arguments
+
+        else:
+            suggestions = []
+            for v in valid_args:
+                similarity_score = round(
+                    check_str_similarity(str_1=arguments, str_2=v), 2
+                )
+                arg_and_score = (v, similarity_score)
+                suggestions.append(arg_and_score)
+
+            ordered_suggestions = sorted(suggestions, key=lambda x: x[1], reverse=True)
+
+            print(f"'{arguments}' is not a valid argument for the given function.")
+            print(f"The closest valid options to '{arguments}' are:")
+            for item in ordered_suggestions[:5]:
+                print(item)
+
+            raise ValueError(
+                "An invalid string has been passed to the. Please check that all match their corresponding page names on Wikidata."
+            )
+
+    elif type(arguments) == list:
+        # Check arguments, and remove them if they're invalid
+        for a in arguments:
+            check_str_args(arguments=a, valid_args=valid_args)
+
+        return arguments
+
+
+def graph_topic_num_evals(
+    method=["lda", "lda_bert"],
+    text_corpus=None,
+    clean_texts=None,
+    input_language=None,
+    num_keywords=10,
+    topic_nums_to_compare=None,
+    min_freq=2,
+    min_word_len=3,
+    sample_size=1,
+    metrics=True,
+    return_ideal_metrics=False,
+    verbose=True,
+):
+    """
+    Graphs metrics for the given models over the given number of topics
+
+    Parameters
+    ----------
+        method : str (default=lda_bert)
+            The modelling method
+
+            Options:
+                LDA: Latent Dirichlet Allocation
+
+                    - Text data is classified into a given number of categories
+                    - These categories are then used to classify individual entries given the percent they fall into categories
+
+                BERT: Bidirectional Encoder Representations from Transformers
+
+                    - Words are classified via Google Neural Networks
+                    - Word classifications are then used to derive topics
+
+                LDA_BERT: Latent Dirichlet Allocation with BERT embeddigs
+
+                    - The combination of LDA and BERT via an autoencoder
+
+        text_corpus : list, list of lists, or str
+            The text corpus over which analysis should be done
+
+            Note 1: generated using prepare_text_data
+
+            Note 2: if a str is provided, then the data will be loaded from a path
+
+        clean_texts : list
+            Text strings that are formatted for cluster models
+
+        input_language : str (default=None)
+            The spoken language in which the text is found
+
+        num_keywords : int (default=10)
+            The number of keywords that should be extracted
+
+        topic_nums_to_compare : list (default=None)
+            The number of topics to compare metrics over
+            Note: None selects all numbers from 1 to num_keywords
+
+        min_freq : int (default=2)
+            The minimum allowable frequency of a word inside the text corpus
+
+        min_word_len : int (default=3)
+            The smallest allowable length of a word
+
+        sample_size : float (default=None: sampling for non-BERT techniques)
+            The size of a sample for BERT models
+
+        metrics : str or bool (default=True: all metrics)
+            The metrics to include
+
+            Options:
+                stability: model stability based on Jaccard similarity
+
+                coherence: how much the words associated with model topics co-occur
+
+        return_ideal_metrics : bool (default=False)
+            Whether to return the ideal number of topics for the best model based on metrics
+
+        verbose : bool (default=True)
+            Whether to show a tqdm progress bar for the query
+
+    Returns
+    -------
+        ax : matplotlib axis
+            A graph of the given metrics for each of the given models based on each topic number
+    """
+    assert (
+        metrics == "stability" or metrics == "coherence" or metrics == True
+    ), "An invalid value has been passed to the 'metrics' argument - please choose from 'stability', 'coherence', or True for both."
+
+    if metrics == True:
+        metrics = ["stability", "coherence"]
+
+    if type(method) == str:
+        method = [method]
+
+    method = [m.lower() for m in method]
+
+    input_language = input_language.lower()
+
+    text_corpus, clean_texts = _prepare_corpus_path(
+        text_corpus=text_corpus,
+        clean_texts=clean_texts,
+        input_language=input_language,
+        min_freq=min_freq,
+        min_word_len=min_word_len,
+        sample_size=sample_size,
+    )
+
+    def jaccard_similarity(topic_1, topic_2):
+        """
+        Derives the Jaccard similarity of two topics
+
+        Notes
+        -----
+            Jaccard similarity:
+                - A statistic used for comparing the similarity and diversity of sample sets
+                - J(A,B) = (A ∩ B)/(A ∪ B)
+                - Goal is low Jaccard scores for coverage of the diverse elements
+        """
+        # Fix for cases where there are not enough texts for clustering models
+        if topic_1 == [] and topic_2 != []:
+            topic_1 = topic_2
+        if topic_1 != [] and topic_2 == []:
+            topic_2 = topic_1
+        if topic_1 == [] and topic_2 == []:
+            topic_1, topic_2 = ["_None"], ["_None"]
+        intersection = set(topic_1).intersection(set(topic_2))
+        num_intersect = float(len(intersection))
+
+        union = set(topic_1).union(set(topic_2))
+        num_union = float(len(union))
+
+        return num_intersect / num_union
+
+    plt.figure()  # begin figure
+    metric_vals = []  # add metric values so that figure y-axis can be scaled
+
+    # Initialize the topics numbers that models should be run for
+    if topic_nums_to_compare == None:
+        topic_nums_to_compare = list(range(num_keywords + 2))[1:]
+    else:
+        # If topic numbers are given, then add one more for comparison
+        topic_nums_to_compare = topic_nums_to_compare + [topic_nums_to_compare[-1] + 1]
+
+    bert_model = None
+    if "bert" in method or "lda_bert" in method:
+        # Multilingual BERT model trained on the top 100+ Wikipedias for semantic textual similarity
+        bert_model = SentenceTransformer("xlm-r-bert-base-nli-stsb-mean-tokens")
+
+    ideal_topic_num_dict = {}
+    for m in method:
+        topics_dict = {}
+        stability_dict = {}
+        coherence_dict = {}
+
+        disable = not verbose
+        for t_n in tqdm(topic_nums_to_compare, desc=f"{m}-topics", disable=disable,):
+            tm = topic_model.TopicModel(num_topics=t_n, method=m, bert_model=bert_model)
+            tm.fit(
+                texts=clean_texts, text_corpus=text_corpus, method=m, m_clustering=None
+            )
+
+            # Assign topics given the current number t_n
+            topics_dict[t_n] = model._order_and_subset_by_coherence(
+                model=tm, num_topics=t_n, num_keywords=num_keywords
+            )[0]
+
+            coherence_dict[t_n] = model.get_coherence(
+                model=tm,
+                text_corpus=text_corpus,
+                num_topics=t_n,
+                num_keywords=num_keywords,
+                measure="c_v",
+            )
+
+        if "stability" in metrics:
+            for j in range(0, len(topic_nums_to_compare) - 1):
+                jaccard_sims = []
+                for t1, topic1 in enumerate(  # pylint: disable=unused-variable
+                    topics_dict[topic_nums_to_compare[j]]
+                ):
+                    sims = []
+                    for t2, topic2 in enumerate(  # pylint: disable=unused-variable
+                        topics_dict[topic_nums_to_compare[j + 1]]
+                    ):
+                        sims.append(jaccard_similarity(topic1, topic2))
+
+                    jaccard_sims.append(sims)
+
+                stability_dict[topic_nums_to_compare[j]] = np.array(jaccard_sims).mean()
+
+            mean_stabilities = [
+                stability_dict[t_n] for t_n in topic_nums_to_compare[:-1]
+            ]
+            metric_vals += mean_stabilities
+
+            ax = sns.lineplot(
+                x=topic_nums_to_compare[:-1],
+                y=mean_stabilities,
+                label="{}: Average Topic Overlap".format(m.upper()),
+            )
+
+        if "coherence" in metrics:
+            coherences = [coherence_dict[t_n] for t_n in topic_nums_to_compare[:-1]]
+            metric_vals += coherences
+
+            ax = sns.lineplot(
+                x=topic_nums_to_compare[:-1],
+                y=coherences,
+                label="{}: Topic Coherence".format(m.upper()),
+            )
+
+        # If both metrics can be calculated, then an optimal number of topics can be derived
+        if "stability" in metrics and "coherence" in metrics:
+            coh_sta_diffs = [
+                coherences[i] - mean_stabilities[i]
+                for i in range(len(topic_nums_to_compare))[:-1]
+            ]
+            coh_sta_max = max(coh_sta_diffs)
+            coh_sta_max_idxs = [
+                i for i, j in enumerate(coh_sta_diffs) if j == coh_sta_max
+            ]
+            model_ideal_topic_num_index = coh_sta_max_idxs[
+                0
+            ]  # take lower topic numbers if more than one max
+            model_ideal_topic_num = topic_nums_to_compare[model_ideal_topic_num_index]
+
+            plot_model_ideal_topic_num = model_ideal_topic_num
+            if plot_model_ideal_topic_num == topic_nums_to_compare[-1] - 1:
+                # Prevents the line from not appearing on the plot
+                plot_model_ideal_topic_num = plot_model_ideal_topic_num - 0.005
+            elif plot_model_ideal_topic_num == topic_nums_to_compare[0]:
+                # Prevents the line from not appearing on the plot
+                plot_model_ideal_topic_num = plot_model_ideal_topic_num + 0.005
+
+            ax.axvline(
+                x=plot_model_ideal_topic_num,
+                label="{} Ideal Num Topics: {}".format(
+                    m.upper(), model_ideal_topic_num
+                ),
+                color="black",
+            )
+
+            ideal_topic_num_dict[m] = (model_ideal_topic_num, coh_sta_max)
+
+    # Set plot limits
+    y_max = max(metric_vals) + (0.10 * max(metric_vals))
+    ax.set_ylim([0, y_max])
+    ax.set_xlim([topic_nums_to_compare[0], topic_nums_to_compare[-1] - 1])
+
+    ax.axes.set_title("Method Metrics per Number of Topics", fontsize=25)
+    ax.set_ylabel("Metric Level", fontsize=20)
+    ax.set_xlabel("Number of Topics", fontsize=20)
+    plt.legend(fontsize=20, ncol=len(method))
+
+    # Return the ideal model and its topic number, as well as the best LDA topic number for pyLDAvis
+    if return_ideal_metrics:
+        if "lda" in method:
+            ideal_lda_num_topics = ideal_topic_num_dict["lda"][0]
+        else:
+            ideal_lda_num_topics = False
+
+        ideal_topic_num_dict = {
+            k: v[0]
+            for k, v in sorted(
+                ideal_topic_num_dict.items(), key=lambda item: item[1][1]
+            )[::-1]
+        }
+        ideal_model_and_num_topics = next(iter(ideal_topic_num_dict.items()))
+        ideal_model, ideal_num_topics = (
+            ideal_model_and_num_topics[0],
+            ideal_model_and_num_topics[1],
+        )
+
+        return ideal_model, ideal_num_topics, ideal_lda_num_topics
+
+    else:
+        return ax

@@ -45,6 +45,8 @@ else:
         "nltk",
         "spacy",
         "stopwordsiso",
+        "matplotlib",
+        "seaborn",
         "gensim",
         "scikit-learn",
         "keras",
