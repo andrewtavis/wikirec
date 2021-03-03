@@ -85,17 +85,28 @@ from wikirec import model, utils
 with open("wiki_book_articles.ndjson", "r") as fin:
     books = [json.loads(l) for l in fin]
 
-titles = [b[0].split(' (')[0] for b in books]
+titles = [re.sub(r'\(.*?\)', '', b[0]).strip() for b in books]
 texts = [b[1] for b in books]
 
 corpus = utils.clean_and_tokenize_texts(texts=texts)[0]
+
+LDA_model, sim_index, vectors = model.derive_similarities(
+    method="lda", num_topics=10, text_corpus=corpus,
+)
+
+recs = model.recommend(
+    inputs="title_or_list_of_titles",
+    model=LDA_model,
+    sim_index=sim_index,
+    vectors=vectors,
+    titles=titles,
+    n=10,
+)
 ```
 
 # To-Do [`↩`](#jumpto)
 
 - Adding further methods for recommendations
-- Allowing a user to specify multiple articles of interest
-- Allowing a user to input their preference for something and then update their recommendations
 - Adding support for non-English versions of Wikipedia
 - Compiling other sources of open source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
