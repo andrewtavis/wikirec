@@ -5,11 +5,17 @@ data
 Module for downloading and preparing data
 
 Contents:
-    download_wiki_dump,
+    input_conversion_dict,
+    download_wiki,
     _process_article,
-    WikiXmlHandler,
     _iterate_and_parse_file,
     parse_to_ndjson
+
+    WikiXmlHandler Class
+        __init__,
+        characters,
+        startElement,
+        endElement
 """
 
 import os
@@ -38,6 +44,9 @@ import tensorflow as tf
 
 
 def input_conversion_dict():
+    """
+    A dictionary of argument conversions for commonly recommended articles
+    """
     input_conversion_dict = {
         "books": "Infobox book",
         "authors": "Infobox writer",
@@ -56,7 +65,7 @@ def input_conversion_dict():
     return input_conversion_dict
 
 
-def download_wiki_dump(target_dir="wikipedia_dump", explicit_dump=False):
+def download_wiki(target_dir="wikipedia_dump", explicit_dump=False):
     """
     Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory
 
@@ -182,39 +191,6 @@ def _process_article(title, text, template="Infobox book"):
         article_data = (title, text, text_length)
 
         return article_data
-
-
-class WikiXmlHandler(xml.sax.handler.ContentHandler):
-    """Parse through XML data using SAX"""
-
-    def __init__(self):
-        xml.sax.handler.ContentHandler.__init__(self)
-        self.template = "Infobox book"
-        self._buffer = None
-        self._values = {}
-        self._current_tag = None
-        self._target_articles = []
-
-    def characters(self, content):
-        """Characters between opening and closing tags"""
-        if self._current_tag:
-            self._buffer.append(content)
-
-    def startElement(self, name, attrs):
-        """Opening tag of element"""
-        if name in ("title", "text"):
-            self._current_tag = name
-            self._buffer = []
-
-    def endElement(self, name):
-        """Closing tag of element"""
-        if name == self._current_tag:
-            self._values[name] = " ".join(self._buffer)
-
-        if name == "page":
-            target_article = _process_article(**self._values, template=self.template)
-            if target_article:
-                self._target_articles.append(target_article)
 
 
 def _iterate_and_parse_file(args):
@@ -477,3 +453,36 @@ def parse_to_ndjson(
         os.system(f"rm -rf {partitions_dir}")
 
     return
+
+
+class WikiXmlHandler(xml.sax.handler.ContentHandler):
+    """Parse through XML data using SAX"""
+
+    def __init__(self):
+        xml.sax.handler.ContentHandler.__init__(self)
+        self.template = "Infobox book"
+        self._buffer = None
+        self._values = {}
+        self._current_tag = None
+        self._target_articles = []
+
+    def characters(self, content):
+        """Characters between opening and closing tags"""
+        if self._current_tag:
+            self._buffer.append(content)
+
+    def startElement(self, name, attrs):
+        """Opening tag of element"""
+        if name in ("title", "text"):
+            self._current_tag = name
+            self._buffer = []
+
+    def endElement(self, name):
+        """Closing tag of element"""
+        if name == self._current_tag:
+            self._values[name] = " ".join(self._buffer)
+
+        if name == "page":
+            target_article = _process_article(**self._values, template=self.template)
+            if target_article:
+                self._target_articles.append(target_article)

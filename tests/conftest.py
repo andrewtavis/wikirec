@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 from sentence_transformers import (
     SentenceTransformer,
-)  # required or the import within kwx.visuals will fail
+)  # required or the import within wikirec.visuals will fail
 
 import wikirec
 
