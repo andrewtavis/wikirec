@@ -44,14 +44,14 @@ import wikirec
 
 wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-wikirec derives article classes from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `Infobox chosen_type` to the `topic` argument in the following example will subset all Wikipedia articles for the given type. wikirec also provides a shortcut for types of data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
+Article classes are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topic` argument in the following example will subset all Wikipedia articles for the given type. wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
 ```python
 from wikirec import data_utils
 
-# This downloads the most recent stable bz2 compressed Wikipedia dump
+# Downloads the most recent stable bz2 compressed Wikipedia dump
 files = data_utils.download_wiki()
 
 # Produces an ndjson of all book articles on Wikipedia
@@ -65,15 +65,15 @@ data_utils.parse_to_ndjson(
 
 # Methods [`↩`](#jumpto)
 
-Current NLP modeling methods implemented include:
+wikirec uses natural language processing models to derive topics and then find relations between Wikipedia entries given their topic structure. Current NLP modeling methods implemented include:
 
 ### LDA
 
-[Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of kwgen, documents or text entries are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics.
+[Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of wikirec, documents or text entries are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics.
 
 ### BERT
 
-[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based running nlp models over open source Wikipedia data. These representations are then able to be leveraged to derive topics.
+[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on nlp models ran over open source Wikipedia data. These representations are leveraged to derive topics that are then used to deliver recommendations.
 
 ### LDA with BERT embeddings
 
@@ -99,6 +99,7 @@ import wikirec
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 --->
 - Updating and refining the [documentation](https://wikirec.readthedocs.io/en/latest/)
+- Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
 
 # References
 <details><summary><strong>List of references<strong></summary>

@@ -73,7 +73,7 @@ def get_coherence(model, text_corpus, num_topics=10, num_keywords=10, measure="c
 
     Parameters
     ----------
-        model : kwx.topic_model.TopicModel
+        model : wikirec.topic_model.TopicModel
             A model trained on the given text corpus
 
         text_corpus : list, list of lists, or str
@@ -128,7 +128,7 @@ def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
 
     Parameters
     ----------
-        model : kwx.topic_model.TopicModel
+        model : wikirec.topic_model.TopicModel
             A model trained on the given text corpus
 
         num_topics : int (default=10)
