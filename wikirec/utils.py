@@ -345,7 +345,7 @@ def _check_str_args(arguments, valid_args):
             for item in ordered_suggestions[:5]:
                 print(item)
 
-            raise ValueError("An invalid string has been passed.")
+            return
 
     elif type(arguments) == list:
         # Check arguments, and remove them if they're invalid
@@ -360,7 +360,6 @@ def graph_lda_topic_evals(
     num_topic_words=10,
     topic_nums_to_compare=None,
     metrics=True,
-    save_optimal_model=False,
     verbose=True,
 ):
     """
@@ -386,9 +385,6 @@ def graph_lda_topic_evals(
                 stability: model stability based on Jaccard similarity
 
                 coherence: how much the words associated with model topics co-occur
-
-        save_optimal_model : bool or str (default=False)
-            Whether to save the optimal model or a path to where to save it
 
         verbose : bool (default=True)
             Whether to show a tqdm progress bar for the query

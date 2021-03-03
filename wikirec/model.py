@@ -5,9 +5,7 @@ model
 Functions for modeling text corpuses and producing recommendations
 
 Contents:
-    get_topic_words,
-    get_coherence,
-    _order_and_subset_by_coherence,
+    derive_similarities,
     recommend
 """
 
@@ -22,17 +20,11 @@ from gensim.models import LdaModel, CoherenceModel
 from wikirec import utils
 
 
-def recommend(
-    method="lda",
-    inputs=None,
-    texts_clean=None,
-    text_corpus=None,
-    titles=None,
-    clean_texts=None,
-    n=10,
+def derive_similarities(
+    method="lda", num_topics=10, text_corpus=None,
 ):
     """
-    Recommends similar items given an input or list of inputs of interest
+    Derives similarities between the entries in the text corpus
 
     Parameters
     ----------
@@ -50,22 +42,22 @@ def recommend(
                     - Words are classified via Google Neural Networks
                     - Word classifications are then used to derive similarities
 
-        inputs : str or list (default=None)
-            The name of an item or items of interest
+        num_topics : int (default=10)
+            The number of topics for LDA models
 
-        text_corpus : list or list of lists
+        text_corpus : list or list of lists (default=None)
             The text corpus over which analysis should be done
-
-        titles : lists (default=None)
-            The titles of the articles
-
-        n : int (default=10)
-            The number of items to recommend
 
     Returns
     -------
-        recommendations : list
-            Those items that are most similar to the inputs
+        model : gensim.models.LdaModel or BERT
+            The model with which recommendations should be made
+
+        sim_index : gensim.similarities.docsim.MatrixSimilarity or BERT
+            An index of similarities for all items
+
+        vectors : gensim.interfaces.TransformedCorpus or BERT
+            The similarity vectors for the corpus from the given model
     """
     method = method.lower()
 
@@ -77,31 +69,82 @@ def recommend(
         valid_methods
     )
 
-    dictionary = corpora.Dictionary(text_corpus)
-    bow_corpus = [dictionary.doc2bow(text) for text in text_corpus]
+    if method == "lda":
+        dictionary = corpora.Dictionary(text_corpus)
+        bow_corpus = [dictionary.doc2bow(text) for text in text_corpus]
 
-    sim_index = similarities.MatrixSimilarity(bow_corpus)
+        model = LdaModel(
+            bow_corpus,
+            num_topics=num_topics,
+            random_state=42,
+            update_every=1,
+            passes=10,
+            id2word=dictionary,
+        )
 
-    books_checked = 0
-    for i in range(len(text_corpus)):
-        recommendation_scores = []
-        if titles[i] == inputs:
-            lda_vectors = text_corpus[i]
-            sims = sim_index[lda_vectors]
-            sims = list(enumerate(sims))
-            for sim in sims:
-                book_num = sim[0]
-                score = [texts_clean[book_num][0], sim[1]]
-                recommendation_scores.append(score)
+        sim_index = similarities.MatrixSimilarity(model[bow_corpus])
 
-            recommendation = sorted(
-                recommendation_scores, key=lambda x: x[1], reverse=True
-            )
-            return recommendation[1:n]
+        vectors = model[bow_corpus]
 
-        else:
-            books_checked += 1
+    return model, sim_index, vectors
 
-        if books_checked == len(texts_clean):
-            print(f"{inputs} not available")
-            utils._check_str_args(arguments=inputs, valid_args=titles)
+
+def recommend(
+    inputs=None, model=None, sim_index=None, vectors=None, titles=None, n=10,
+):
+    """
+    Recommends similar items given an input or list of inputs of interest
+
+    Parameters
+    ----------
+        inputs : str or list (default=None)
+            The name of an item or items of interest
+
+        model : gensim.models.LdaModel or BERT
+            The model with which recommendations should be made
+
+        sim_index : gensim.similarities.docsim.MatrixSimilarity or BERT
+            An index of similarities for all items
+
+        vectors : gensim.interfaces.TransformedCorpus or BERT
+            The similarity vectors for the corpus from the given model
+
+        titles : lists (default=None)
+            The titles of the articles
+
+        n : int (default=10)
+            The number of items to recommend
+
+    Returns
+    -------
+        recommendations : list of lists
+            Those items that are most similar to the inputs and their similarity scores
+    """
+    if type(inputs) == str:
+        inputs = [inputs]
+
+    sims = None
+    for inpt in inputs:
+        checked = 0
+        for i in range(len(titles)):
+            if titles[i] == inpt:
+                if sims is None:
+                    sims = sim_index[vectors[i]]
+                else:
+                    sims = [
+                        np.mean([sims[j], sim_index[vectors[i]][j]])
+                        for j in range(len(sims))
+                    ]
+
+            else:
+                checked += 1
+                if checked == len(titles):
+                    print(f"{inputs} not available")
+                    utils._check_str_args(arguments=inputs, valid_args=titles)
+
+    titles_and_scores = [[titles[i], sims[i]] for i in range(len(titles))]
+
+    recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=True)
+    recommendations = [r for r in recommendations if r[0] not in inputs][:n]
+
+    return recommendations
