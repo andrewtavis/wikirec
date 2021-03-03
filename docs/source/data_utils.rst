@@ -1,7 +1,7 @@
 data_utils
 ==========
 
-The :py:mod:`data_data_utils` module provides needed functions for data loading and parsing
+The :py:mod:`data_utils` module provides needed functions for data loading and parsing
 
 **Functions**
 
