@@ -75,16 +75,20 @@ wikirec uses natural language processing models to derive topics and then find r
 
 [Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on nlp models ran over open source Wikipedia data. These representations are leveraged to derive topics that are then used to deliver recommendations.
 
-### LDA with BERT embeddings
-
-The combination of LDA with BERT via [wikirec.autoencoder](https://github.com/andrewtavis/wikirec/blob/main/wikirec/autoencoder.py).
-
 # Usage [`↩`](#jumpto)
 
-The following are examples of recommendations using wikirec:
+The following is an example of recommendations using wikirec:
 
 ```python
-import wikirec
+from wikirec import model, utils
+
+with open("wiki_book_articles.ndjson", "r") as fin:
+    books = [json.loads(l) for l in fin]
+
+titles = [b[0].split(' (')[0] for b in books]
+texts = [b[1] for b in books]
+
+corpus = utils.clean_and_tokenize_texts(texts=texts)[0]
 ```
 
 # To-Do [`↩`](#jumpto)
@@ -95,9 +99,7 @@ import wikirec
 - Adding support for non-English versions of Wikipedia
 - Compiling other sources of open source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
-<!---
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
---->
 - Updating and refining the [documentation](https://wikirec.readthedocs.io/en/latest/)
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
 

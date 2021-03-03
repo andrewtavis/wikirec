@@ -10,7 +10,7 @@ Contents:
     clean_and_tokenize_texts,
     _check_str_similarity,
     _check_str_args,
-    graph_topic_num_evals,
+    graph_lda_topic_evals,
     english_names_list
 """
 
@@ -20,7 +20,6 @@ from difflib import SequenceMatcher
 import string
 import random
 from collections import defaultdict
-import warnings
 
 import numpy as np
 from tqdm.auto import tqdm
@@ -31,12 +30,10 @@ from stopwordsiso import stopwords
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from gensim.models import Phrases
+from gensim import corpora
+from gensim.models import CoherenceModel, Phrases, LdaModel
 
-warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
-from sentence_transformers import SentenceTransformer
-
-from wikirec import model, topic_model
+from wikirec import model
 
 
 def _combine_tokens_to_str(texts, ignore_words=None):
@@ -141,6 +138,7 @@ def clean_and_tokenize_texts(
     max_text_len=None,
     remove_names=False,
     sample_size=1,
+    verbose=True,
 ):
     """
     Cleans and tokenizes a text body to prepare it for analysis
@@ -165,6 +163,9 @@ def clean_and_tokenize_texts(
         sample_size : float (default=1)
             The amount of data to be randomly sampled
 
+        verbose : bool (default=True)
+            Whether to show a tqdm progress bar for the query
+
     Returns
     -------
         text_corpus, clean_texts, selection_idxs : list or list of lists, list, list
@@ -173,7 +174,8 @@ def clean_and_tokenize_texts(
     if type(texts) == str:
         texts = [texts]
 
-    pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps")
+    disable = not verbose
+    pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps", disable=disable)
     # Remove spaces that are greater that one in length
     texts_no_large_spaces = []
     for t in texts:
@@ -353,16 +355,12 @@ def _check_str_args(arguments, valid_args):
         return arguments
 
 
-def graph_topic_num_evals(
-    method=["lda", "lda_bert"],
+def graph_lda_topic_evals(
     text_corpus=None,
-    clean_texts=None,
     num_topic_words=10,
     topic_nums_to_compare=None,
-    min_freq=2,
-    min_word_len=3,
-    sample_size=1,
     metrics=True,
+    save_optimal_model=False,
     verbose=True,
 ):
     """
@@ -370,29 +368,8 @@ def graph_topic_num_evals(
 
     Parameters
     ----------
-        method : str (default=lda_bert)
-            The modelling method
-
-            Options:
-                LDA: Latent Dirichlet Allocation
-
-                    - Text data is classified into a given number of categories
-                    - These categories are then used to classify individual entries given the percent they fall into categories
-
-                BERT: Bidirectional Encoder Representations from Transformers
-
-                    - Words are classified via Google Neural Networks
-                    - Word classifications are then used to derive topics
-
-                LDA_BERT: Latent Dirichlet Allocation with BERT embeddigs
-
-                    - The combination of LDA and BERT via an autoencoder
-
         text_corpus : list or list of lists
             The text corpus over which analysis should be done
-
-        clean_texts : list
-            Text strings that are formatted for cluster models
 
         num_topic_words : int (default=10)
             The number of keywords that should be extracted
@@ -402,15 +379,6 @@ def graph_topic_num_evals(
 
             Note: None selects all numbers from 1 to num_topic_words
 
-        min_freq : int (default=2)
-            The minimum allowable frequency of a word inside the text corpus
-
-        min_word_len : int (default=3)
-            The smallest allowable length of a word
-
-        sample_size : float (default=None: sampling for non-BERT techniques)
-            The size of a sample for BERT models
-
         metrics : str or bool (default=True: all metrics)
             The metrics to include
 
@@ -418,6 +386,9 @@ def graph_topic_num_evals(
                 stability: model stability based on Jaccard similarity
 
                 coherence: how much the words associated with model topics co-occur
+
+        save_optimal_model : bool or str (default=False)
+            Whether to save the optimal model or a path to where to save it
 
         verbose : bool (default=True)
             Whether to show a tqdm progress bar for the query
@@ -433,11 +404,6 @@ def graph_topic_num_evals(
 
     if metrics == True:
         metrics = ["stability", "coherence"]
-
-    if type(method) == str:
-        method = [method]
-
-    method = [m.lower() for m in method]
 
     def jaccard_similarity(topic_1, topic_2):
         """
@@ -468,123 +434,100 @@ def graph_topic_num_evals(
     plt.figure()  # begin figure
     metric_vals = []  # add metric values so that figure y-axis can be scaled
 
-    # Initialize the topics numbers that models should be run for
+    dirichlet_dict = corpora.Dictionary(text_corpus)
+    bow_corpus = [dirichlet_dict.doc2bow(text) for text in text_corpus]
+
+    # Add an extra topic so that metrics can be calculated all inputs
     if topic_nums_to_compare == None:
-        topic_nums_to_compare = list(range(num_topic_words + 2))[1:]
+        topic_nums_to_compare = list(range(num_topic_words + 1)[1:])
     else:
-        # If topic numbers are given, then add one more for comparison
-        topic_nums_to_compare = topic_nums_to_compare + [topic_nums_to_compare[-1] + 1]
+        topic_nums_to_compare.append(topic_nums_to_compare[-1] + 1)
 
-    bert_model = None
-    if "bert" in method or "lda_bert" in method:
-        # Multilingual BERT model trained on the top 100+ Wikipedias for semantic textual similarity
-        bert_model = SentenceTransformer("xlm-r-bert-base-nli-stsb-mean-tokens")
+    LDA_models = {}
+    LDA_topics = {}
+    disable = not verbose
+    for i in tqdm(
+        iterable=topic_nums_to_compare, desc="LDA models ran", disable=disable
+    ):
+        LDA_models[i] = LdaModel(
+            corpus=bow_corpus,
+            id2word=dirichlet_dict,
+            num_topics=i,
+            update_every=1,
+            chunksize=len(bow_corpus),
+            passes=20,
+            alpha="auto",
+            random_state=None,
+        )
 
-    ideal_topic_num_dict = {}
-    for m in method:
-        topics_dict = {}
-        stability_dict = {}
-        coherence_dict = {}
+        shown_topics = LDA_models[i].show_topics(
+            num_topics=i, num_words=num_topic_words, formatted=False
+        )
+        LDA_topics[i] = [[word[0] for word in topic[1]] for topic in shown_topics]
 
-        disable = not verbose
-        for t_n in tqdm(topic_nums_to_compare, desc=f"{m}-topics", disable=disable,):
-            tm = topic_model.TopicModel(num_topics=t_n, method=m, bert_model=bert_model)
-            tm.fit(
-                texts=clean_texts, text_corpus=text_corpus, method=m, m_clustering=None
-            )
+    LDA_stability = {}
+    for i in range(0, len(topic_nums_to_compare) - 1):
+        jaccard_sims = []
+        for t1, topic1 in enumerate(  # pylint: disable=unused-variable
+            LDA_topics[topic_nums_to_compare[i]]
+        ):
+            sims = []
+            for t2, topic2 in enumerate(  # pylint: disable=unused-variable
+                LDA_topics[topic_nums_to_compare[i + 1]]
+            ):
+                sims.append(jaccard_similarity(topic1, topic2))
 
-            # Assign topics given the current number t_n
-            topics_dict[t_n] = model._order_and_subset_by_coherence(
-                model=tm, num_topics=t_n, num_topic_words=num_topic_words
-            )[0]
+            jaccard_sims.append(sims)
 
-            coherence_dict[t_n] = model.get_coherence(
-                model=tm,
-                text_corpus=text_corpus,
-                num_topics=t_n,
-                num_topic_words=num_topic_words,
-                measure="c_v",
-            )
+        LDA_stability[topic_nums_to_compare[i]] = jaccard_sims
 
-        if "stability" in metrics:
-            for j in range(0, len(topic_nums_to_compare) - 1):
-                jaccard_sims = []
-                for t1, topic1 in enumerate(  # pylint: disable=unused-variable
-                    topics_dict[topic_nums_to_compare[j]]
-                ):
-                    sims = []
-                    for t2, topic2 in enumerate(  # pylint: disable=unused-variable
-                        topics_dict[topic_nums_to_compare[j + 1]]
-                    ):
-                        sims.append(jaccard_similarity(topic1, topic2))
+    mean_stabilities = [
+        np.array(LDA_stability[i]).mean() for i in topic_nums_to_compare[:-1]
+    ]
 
-                    jaccard_sims.append(sims)
+    coherences = [
+        CoherenceModel(
+            model=LDA_models[i],
+            texts=text_corpus,
+            dictionary=dirichlet_dict,
+            coherence="c_v",
+        ).get_coherence()
+        for i in topic_nums_to_compare[:-1]
+    ]
 
-                stability_dict[topic_nums_to_compare[j]] = np.array(jaccard_sims).mean()
+    coh_sta_diffs = [
+        coherences[i] - mean_stabilities[i] for i in range(num_topic_words)[:-1]
+    ]  # limit topic numbers to the number of keywords
+    coh_sta_max = max(coh_sta_diffs)
+    coh_sta_max_idxs = [i for i, j in enumerate(coh_sta_diffs) if j == coh_sta_max]
+    ideal_topic_num_index = coh_sta_max_idxs[
+        0
+    ]  # choose less topics in case there's more than one max
+    ideal_topic_num = topic_nums_to_compare[ideal_topic_num_index]
 
-            mean_stabilities = [
-                stability_dict[t_n] for t_n in topic_nums_to_compare[:-1]
-            ]
-            metric_vals += mean_stabilities
+    ax = sns.lineplot(
+        x=topic_nums_to_compare[:-1], y=mean_stabilities, label="Average Topic Overlap"
+    )
+    ax = sns.lineplot(
+        x=topic_nums_to_compare[:-1], y=coherences, label="Topic Coherence"
+    )
 
-            ax = sns.lineplot(
-                x=topic_nums_to_compare[:-1],
-                y=mean_stabilities,
-                label="{}: Average Topic Overlap".format(m.upper()),
-            )
-
-        if "coherence" in metrics:
-            coherences = [coherence_dict[t_n] for t_n in topic_nums_to_compare[:-1]]
-            metric_vals += coherences
-
-            ax = sns.lineplot(
-                x=topic_nums_to_compare[:-1],
-                y=coherences,
-                label="{}: Topic Coherence".format(m.upper()),
-            )
-
-        # If both metrics can be calculated, then an optimal number of topics can be derived
-        if "stability" in metrics and "coherence" in metrics:
-            coh_sta_diffs = [
-                coherences[i] - mean_stabilities[i]
-                for i in range(len(topic_nums_to_compare))[:-1]
-            ]
-            coh_sta_max = max(coh_sta_diffs)
-            coh_sta_max_idxs = [
-                i for i, j in enumerate(coh_sta_diffs) if j == coh_sta_max
-            ]
-            model_ideal_topic_num_index = coh_sta_max_idxs[
-                0
-            ]  # take lower topic numbers if more than one max
-            model_ideal_topic_num = topic_nums_to_compare[model_ideal_topic_num_index]
-
-            plot_model_ideal_topic_num = model_ideal_topic_num
-            if plot_model_ideal_topic_num == topic_nums_to_compare[-1] - 1:
-                # Prevents the line from not appearing on the plot
-                plot_model_ideal_topic_num = plot_model_ideal_topic_num - 0.005
-            elif plot_model_ideal_topic_num == topic_nums_to_compare[0]:
-                # Prevents the line from not appearing on the plot
-                plot_model_ideal_topic_num = plot_model_ideal_topic_num + 0.005
-
-            ax.axvline(
-                x=plot_model_ideal_topic_num,
-                label="{} Ideal Num Topics: {}".format(
-                    m.upper(), model_ideal_topic_num
-                ),
-                color="black",
-            )
-
-            ideal_topic_num_dict[m] = (model_ideal_topic_num, coh_sta_max)
+    ax.axvline(x=ideal_topic_num, label="Ideal Number of Topics", color="black")
+    ax.axvspan(
+        xmin=ideal_topic_num - 1, xmax=ideal_topic_num + 1, alpha=0.5, facecolor="grey"
+    )
 
     # Set plot limits
-    y_max = max(metric_vals) + (0.10 * max(metric_vals))
+    y_max = max(max(mean_stabilities), max(coherences)) + (
+        0.10 * max(max(mean_stabilities), max(coherences))
+    )
     ax.set_ylim([0, y_max])
     ax.set_xlim([topic_nums_to_compare[0], topic_nums_to_compare[-1] - 1])
 
     ax.axes.set_title("Method Metrics per Number of Topics", fontsize=25)
     ax.set_ylabel("Metric Level", fontsize=20)
     ax.set_xlabel("Number of Topics", fontsize=20)
-    plt.legend(fontsize=20, ncol=len(method))
+    plt.legend(fontsize=20)
 
     return ax
 
