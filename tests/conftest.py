@@ -11,10 +11,8 @@ from sentence_transformers import (
 
 import wikirec
 
-from wikirec import autoencoder
 from wikirec import data_utils
 from wikirec import model
-from wikirec import topic_model
 from wikirec import utils
 
 np.random.seed(42)

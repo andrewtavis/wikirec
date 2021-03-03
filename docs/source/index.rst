@@ -60,8 +60,6 @@ Installation
    :caption: Contents:
 
    model
-   topic_model
-   autoencoder
    data_utils
    utils
    notes

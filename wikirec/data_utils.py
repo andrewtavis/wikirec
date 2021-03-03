@@ -19,15 +19,12 @@ Contents:
 """
 
 import os
-import sys
 import time
 import xml.sax
 import requests
-import bz2
 import gc
 import json
 from itertools import chain
-from functools import partial
 import warnings
 
 import subprocess
@@ -186,9 +183,8 @@ def _process_article(title, text, template="Infobox book"):
 
     if len(matching_templates) >= 1:
         text = wikicode.strip_code().strip()
-        text_length = len(wikicode.strip_code().strip())
 
-        article_data = (title, text, text_length)
+        article_data = (title, text)
 
         return article_data
 
@@ -386,7 +382,7 @@ def parse_to_ndjson(
         output_file_name = output_path + ".ndjson"
 
     else:
-        if output_path[: -len(".ndjson")] != ".ndjson":
+        if output_path[-len(".ndjson") :] != ".ndjson":
             output_file_name = output_path + ".ndjson"
         else:
             output_file_name = output_path
