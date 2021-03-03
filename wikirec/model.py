@@ -22,13 +22,13 @@ from gensim.models import CoherenceModel
 from wikirec import utils, topic_model
 
 
-def get_topic_words(text_corpus, labels, num_topics=None, num_keywords=None):
+def get_topic_words(text_corpus, labels, num_topics=None, num_topic_words=None):
     """
     Get top words within each topic for cluster models
 
     Parameters
     ----------
-        text_corpus : list, list of lists, or str
+        text_corpus : list or list of lists
             The text corpus over which analysis should be done
 
         labels : list
@@ -37,7 +37,7 @@ def get_topic_words(text_corpus, labels, num_topics=None, num_keywords=None):
         num_topics : int (default=None)
             The number of categories for LDA and BERT based approaches
 
-        num_keywords : int (default=None)
+        num_topic_words : int (default=None)
             The number of keywords that should be extracted
 
     Returns
@@ -58,7 +58,7 @@ def get_topic_words(text_corpus, labels, num_topics=None, num_keywords=None):
     )
 
     topics = list(
-        map(lambda x: list(map(lambda x: x[0], x[:num_keywords])), word_counts)
+        map(lambda x: list(map(lambda x: x[0], x[:num_topic_words])), word_counts)
     )
 
     non_blank_topic_idxs = [i for i, t in enumerate(topics) if t != []]
@@ -67,7 +67,7 @@ def get_topic_words(text_corpus, labels, num_topics=None, num_keywords=None):
     return topics, non_blank_topic_idxs
 
 
-def get_coherence(model, text_corpus, num_topics=10, num_keywords=10, measure="c_v"):
+def get_coherence(model, text_corpus, num_topics=10, num_topic_words=10, measure="c_v"):
     """
     Gets model coherence from gensim.models.coherencemodel
 
@@ -76,13 +76,13 @@ def get_coherence(model, text_corpus, num_topics=10, num_keywords=10, measure="c
         model : wikirec.topic_model.TopicModel
             A model trained on the given text corpus
 
-        text_corpus : list, list of lists, or str
+        text_corpus : list or list of lists
             The text corpus over which analysis should be done
 
         num_topics : int (default=10)
             The number of categories for LDA and BERT based approaches
 
-        num_keywords : int (default=10)
+        num_topic_words : int (default=10)
             The number of keywords that should be extracted
 
         measure : str (default=c_v)
@@ -106,7 +106,7 @@ def get_coherence(model, text_corpus, num_topics=10, num_keywords=10, measure="c
             text_corpus=text_corpus,
             labels=model.cluster_model.labels_,
             num_topics=num_topics,
-            num_keywords=num_keywords,
+            num_topic_words=num_topic_words,
         )[0]
 
         cm = CoherenceModel(
@@ -122,7 +122,7 @@ def get_coherence(model, text_corpus, num_topics=10, num_keywords=10, measure="c
     return coherence
 
 
-def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
+def _order_and_subset_by_coherence(model, num_topics=10, num_topic_words=10):
     """
     Orders topics based on their average coherence across the text corpus
 
@@ -134,7 +134,7 @@ def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
         num_topics : int (default=10)
             The number of categories for LDA and BERT based approaches
 
-        num_keywords : int (default=10)
+        num_topic_words : int (default=10)
             The number of keywords that should be extracted
 
     Returns
@@ -145,7 +145,7 @@ def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
     # Derive average topics across texts for a given method
     if model.method == "lda":
         shown_topics = model.lda_model.show_topics(
-            num_topics=num_topics, num_words=num_keywords, formatted=False
+            num_topics=num_topics, num_words=num_topic_words, formatted=False
         )
 
         topic_words = [[word[0] for word in topic[1]] for topic in shown_topics]
@@ -168,12 +168,12 @@ def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
         ]
 
     elif model.method == "bert" or model.method == "lda_bert":
-        # The topics in cluster models are not guranteed to be the size of num_keywords
+        # The topics in cluster models are not guranteed to be the size of num_topic_words
         topic_words, non_blank_topic_idxs = get_topic_words(
             text_corpus=model.text_corpus,
             labels=model.cluster_model.labels_,
             num_topics=num_topics,
-            num_keywords=num_keywords,
+            num_topic_words=num_topic_words,
         )
 
         # Create a dictionary of the assignment counts for the topics
@@ -207,15 +207,15 @@ def _order_and_subset_by_coherence(model, num_topics=10, num_keywords=10):
 
     # Create selection indexes for each topic given its average coherence and how many keywords are wanted
     selection_indexes = [
-        list(range(int(math.floor(num_keywords * a))))
-        if math.floor(num_keywords * a) > 0
+        list(range(int(math.floor(num_topic_words * a))))
+        if math.floor(num_topic_words * a) > 0
         else [0]
         for i, a in enumerate(ordered_topic_averages)
     ]
 
     total_indexes = sum([len(i) for i in selection_indexes])
     s_i = 0
-    while total_indexes < num_keywords:
+    while total_indexes < num_topic_words:
         selection_indexes[s_i] = selection_indexes[s_i] + [
             selection_indexes[s_i][-1] + 1
         ]
@@ -269,12 +269,8 @@ def recommend(
         texts_clean : list (default=None)
             The texts from which recommendations can be made
 
-        text_corpus : list, list of lists, or str
+        text_corpus : list or list of lists
             The text corpus over which analysis should be done
-
-            Note 1: generated using prepare_text_data
-
-            Note 2: if a str is provided, then the data will be loaded from a path
 
         clean_texts : list
             Text strings that are formatted for cluster models
@@ -350,7 +346,7 @@ def recommend(
             print('Sorry, but it looks like "{}" is not available.'.format(inputs))
             for x in range(len(texts_clean)):
                 other_book = texts_clean[x][0]
-                book_silimarity = round(utils.check_str_args(other_book, inputs), 2)
+                book_silimarity = round(utils._check_str_args(other_book, inputs), 2)
                 similarity_score = [other_book, book_silimarity]
                 book_suggestions.append(similarity_score)
 

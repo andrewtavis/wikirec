@@ -2,7 +2,7 @@
 topic_model
 -----------
 
-The unsupervised learning topic model for keyword extraction
+The unsupervised learning topic model for recommendation generation
 
 Contents:
     TopicModel Class:
@@ -69,7 +69,7 @@ class TopicModel:
             texts : list
                 Text strings that are formatted for cluster models
 
-            text_corpus : list, list of lists, or str
+            text_corpus : list or list of lists
                 The text corpus over which analysis should be done
 
             method : str
@@ -164,7 +164,7 @@ class TopicModel:
             texts : list
                 Text strings that are formatted for cluster models
 
-            text_corpus : list, list of lists, or str
+            text_corpus : list or list of lists
                 The text corpus over which analysis should be done
 
             method : str

@@ -8,11 +8,10 @@ Contents:
     _combine_tokens_to_str,
     _clean_text_strings,
     clean_and_tokenize_texts,
-    prepare_data,
-    _prepare_corpus_path,
-    check_str_similarity,
-    check_str_args,
-    graph_topic_num_evals
+    _check_str_similarity,
+    _check_str_args,
+    graph_topic_num_evals,
+    english_names_list
 """
 
 import os
@@ -136,7 +135,12 @@ def lemmatize(tokens, nlp=None):
 
 
 def clean_and_tokenize_texts(
-    texts, input_language=None, min_freq=2, min_word_len=3, sample_size=1
+    texts,
+    min_freq=2,
+    min_word_len=3,
+    max_text_len=None,
+    remove_names=False,
+    sample_size=1,
 ):
     """
     Cleans and tokenizes a text body to prepare it for analysis
@@ -146,14 +150,17 @@ def clean_and_tokenize_texts(
         texts : str or list
             The texts to be cleaned and tokenized
 
-        input_language : str (default=None)
-            The English name of the language in which the texts are found
-
         min_freq : int (default=2)
             The minimum allowable frequency of a word inside the text corpus
 
         min_word_len : int (default=3)
             The smallest allowable length of a word
+
+        max_text_len : int (default=None)
+            The maximum allowable length of a text
+
+        remove_names : bool (default=False)
+            Whether to remove the most common English names
 
         sample_size : float (default=1)
             The amount of data to be randomly sampled
@@ -163,48 +170,51 @@ def clean_and_tokenize_texts(
         text_corpus, clean_texts, selection_idxs : list or list of lists, list, list
             The texts formatted for text analysis both as tokens and strings, as well as the indexes for selected entries
     """
-    input_language = input_language.lower()
-
     if type(texts) == str:
         texts = [texts]
 
+    pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps")
     # Remove spaces that are greater that one in length
     texts_no_large_spaces = []
-    for r in texts:
+    for t in texts:
         for i in range(
             25, 0, -1
         ):  # loop backwards to assure that smaller spaces aren't made
             large_space = str(i * " ")
-            if large_space in r:
-                r = r.replace(large_space, " ")
+            if large_space in t:
+                t = t.replace(large_space, " ")
 
-        texts_no_large_spaces.append(r)
+        texts_no_large_spaces.append(t)
+
+    texts_no_websites = []
+    for t in texts_no_large_spaces:
+        websites = [word for word in t if word[:4] == "http"]
+
+        for w in websites:
+            t = t.replace(w, "")
+
+        texts_no_websites.append(t)
+    pbar.update()
 
     texts_no_random_punctuation = []
     # Prevent words from being combined when a user types word/word or word-word
     for r in texts_no_large_spaces:
         r = r.replace("/", " ")
         r = r.replace("-", " ")
-        if input_language == "fr":
-            # Get rid of the 'of' abbreviation for French
-            r = r.replace("d'", "")
+        r = r.replace(":", " ")  # split categories
+        r = re.sub("==[^>]+==", "", r)  # remove headers
+        r = re.sub("< !--[^>]+-- >", "", r)  # remove comments
 
         texts_no_random_punctuation.append(r)
 
-    # Remove punctuation
     texts_no_punctuation = []
     for r in texts_no_random_punctuation:
         texts_no_punctuation.append(
             r.translate(str.maketrans("", "", string.punctuation + "–" + "’"))
         )
+    pbar.update()
 
-    # Remove stopwords and tokenize
-    if stopwords(input_language) != set():  # the input language has stopwords
-        stop_words = stopwords(input_language)
-    # Stemming and normal stopwords are still full language names
-    else:
-        stop_words = []
-
+    stop_words = stopwords("en")
     tokenized_texts = [
         [
             word
@@ -214,12 +224,13 @@ def clean_and_tokenize_texts(
         for text in texts_no_punctuation
     ]
     tokenized_texts = [t for t in tokenized_texts if t != []]
+    pbar.update()
 
     # Add bigrams (first_second word combinations that appear often together)
     tokens_with_bigrams = []
     bigrams = Phrases(
         sentences=tokenized_texts, min_count=3, threshold=5.0
-    )  # minimum count for a bigram to be included is 3
+    )  # minimum count for a bigram to be included is 3, and half the normal threshold
     for i, t in enumerate(tokenized_texts):
         for token in bigrams[t]:
             if "_" in token:
@@ -228,21 +239,27 @@ def clean_and_tokenize_texts(
 
         tokens_with_bigrams.append(t)
 
-    # Lemmatize or stem words (try the former first, then the latter)
-    nlp = None
+    # Remove names after bigrams have been created
+    if remove_names:
+        tokens_with_bigrams = [
+            [t for t in text if t not in [n.lower() for n in english_names_list()]]
+            for text in tokens_with_bigrams
+        ]
+    pbar.update()
+
     try:
-        nlp = spacy.load(input_language)
+        nlp = spacy.load("en_core_web_sm")
         lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
 
     except OSError:
         try:
-            os.system("python -m spacy download {}".format(input_language))
-            nlp = spacy.load(input_language)
+            os.system("python -m spacy download en_core_web_sm")
+            nlp = spacy.load("en_core_web_sm")
             lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
         except:
             pass
+    pbar.update()
 
-    # Remove words that don't appear enough or are too small
     token_frequencies = defaultdict(int)
     for tokens in lemmatized_tokens:
         for t in list(set(tokens)):
@@ -253,6 +270,11 @@ def clean_and_tokenize_texts(
     if min_freq == None or min_freq == False:
         min_freq = 0
 
+    assert (
+        type(min_word_len) == int
+    ), "The 'min_word_len' argument must be an integer if used"
+    assert type(min_freq) == int, "The 'min_freq' argument must be an integer if used"
+
     min_len_freq_tokens = []
     for tokens in lemmatized_tokens:
         min_len_freq_tokens.append(
@@ -262,13 +284,19 @@ def clean_and_tokenize_texts(
                 if len(t) >= min_word_len and token_frequencies[t] >= min_freq
             ]
         )
+    pbar.update()
 
-    # Derive those texts that still have valid words
-    non_empty_token_indexes = [i for i, t in enumerate(min_len_freq_tokens) if t != []]
-    text_corpus = [min_len_freq_tokens[i] for i in non_empty_token_indexes]
-    clean_texts = [_clean_text_strings(s=texts[i]) for i in non_empty_token_indexes]
+    non_empty_texts = [t for t in min_len_freq_tokens if t != []]
+    clean_texts = [
+        _clean_text_strings(s=_combine_tokens_to_str(t)) for t in non_empty_texts
+    ]
 
-    # Sample words, if necessary
+    if max_text_len != None and type(max_text_len) == int:
+        text_corpus = [t[:max_text_len] for t in non_empty_texts]
+    else:
+        text_corpus = non_empty_texts
+
+    # Sample texts if desired
     if sample_size != 1:
         selected_idxs = [
             i
@@ -281,152 +309,17 @@ def clean_and_tokenize_texts(
 
     text_corpus = [text_corpus[i] for i in selected_idxs]
     clean_texts = [clean_texts[i] for i in selected_idxs]
+    pbar.update()
 
     return text_corpus, clean_texts, selected_idxs
 
 
-def prepare_data(
-    data=None,
-    target_cols=None,
-    input_language=None,
-    min_freq=2,
-    min_word_len=3,
-    sample_size=1,
-):
-    """
-    Prepares input data for analysis
-
-    Parameters
-    ----------
-        data : pd.DataFrame or csv/xlsx path
-            The data in df or path form
-
-        target_cols : str or list (default=None)
-            The columns in the csv/xlsx or dataframe that contain the text data to be modeled
-
-        input_language : str (default=None)
-            The English name of the language in which the texts are found
-
-        min_freq : int (default=2)
-            The minimum allowable frequency of a word inside the text corpus
-
-        min_word_len : int (default=3)
-            The smallest allowable length of a word
-
-        sample_size : float (default=1)
-            The amount of data to be randomly sampled
-
-    Returns
-    -------
-        text_corpus, clean_texts, selected_idxs : list or list of lists, list, list
-            The texts formatted for text analysis both as tokens and strings, as well as the indexes for selected entries
-    """
-    input_language = input_language.lower()
-
-    if type(target_cols) == str:
-        target_cols = [target_cols]
-
-    df_texts = data
-
-    # Select columns from which texts should come
-    raw_texts = []
-
-    for i in df_texts.index:
-        text = ""
-        for c in target_cols:
-            if type(df_texts.loc[i, c]) == str:
-                text += " " + df_texts.loc[i, c]
-
-        text = text[1:]  # remove first blank space
-        raw_texts.append(text)
-
-    text_corpus, clean_texts, selected_idxs = clean_and_tokenize_texts(
-        texts=raw_texts,
-        input_language=input_language,
-        min_freq=min_freq,
-        min_word_len=min_word_len,
-        sample_size=sample_size,
-    )
-
-    return text_corpus, clean_texts, selected_idxs
-
-
-def _prepare_corpus_path(
-    text_corpus=None,
-    clean_texts=None,
-    target_cols=None,
-    input_language=None,
-    min_freq=2,
-    min_word_len=3,
-    sample_size=1,
-):
-    """
-    Checks a text corpus to see if it's a path, and prepares the data if so
-
-    Parameters
-    ----------
-        text_corpus : str or list or list of lists
-            A path or text corpus over which analysis should be done
-
-        clean_texts : str
-            The texts formatted for analysis as strings
-
-        target_cols : str or list (default=None)
-            The columns in the csv/xlsx or dataframe that contain the text data to be modeled
-
-        input_language : str (default=None)
-            The English name of the language in which the texts are found
-
-        min_freq : int (default=2)
-            The minimum allowable frequency of a word inside the text corpus
-
-        min_word_len : int (default=3)
-            The smallest allowable length of a word
-
-        sample_size : float (default=1)
-            The amount of data to be randomly sampled
-
-    Returns
-    -------
-        text_corpus : list or list of lists
-            A prepared text corpus for the data in the given path
-    """
-    if type(text_corpus) == str:
-        try:
-            os.path.exists(text_corpus)  # a path has been provided
-            text_corpus, clean_texts = prepare_data(
-                data=text_corpus,
-                target_cols=target_cols,
-                input_language=input_language,
-                min_freq=min_freq,
-                min_word_len=min_word_len,
-                sample_size=sample_size,
-            )[:2]
-
-            return text_corpus, clean_texts
-
-        except:
-            pass
-
-    if clean_texts != None:
-        return text_corpus, clean_texts
-
-    else:
-        return (
-            text_corpus,
-            [
-                _clean_text_strings(_combine_tokens_to_str(texts=t_c))
-                for t_c in text_corpus
-            ],
-        )
-
-
-def check_str_similarity(str_1, str_2):
+def _check_str_similarity(str_1, str_2):
     """Checks the similarity of two strings"""
     return SequenceMatcher(None, str_1, str_2).ratio()
 
 
-def check_str_args(arguments, valid_args):
+def _check_str_args(arguments, valid_args):
     """
     Checks whether a str argument is valid, and makes suggestions if not
     """
@@ -438,7 +331,7 @@ def check_str_args(arguments, valid_args):
             suggestions = []
             for v in valid_args:
                 similarity_score = round(
-                    check_str_similarity(str_1=arguments, str_2=v), 2
+                    _check_str_similarity(str_1=arguments, str_2=v), 2
                 )
                 arg_and_score = (v, similarity_score)
                 suggestions.append(arg_and_score)
@@ -450,14 +343,12 @@ def check_str_args(arguments, valid_args):
             for item in ordered_suggestions[:5]:
                 print(item)
 
-            raise ValueError(
-                "An invalid string has been passed to the. Please check that all match their corresponding page names on Wikidata."
-            )
+            raise ValueError("An invalid string has been passed.")
 
     elif type(arguments) == list:
         # Check arguments, and remove them if they're invalid
         for a in arguments:
-            check_str_args(arguments=a, valid_args=valid_args)
+            _check_str_args(arguments=a, valid_args=valid_args)
 
         return arguments
 
@@ -466,14 +357,12 @@ def graph_topic_num_evals(
     method=["lda", "lda_bert"],
     text_corpus=None,
     clean_texts=None,
-    input_language=None,
-    num_keywords=10,
+    num_topic_words=10,
     topic_nums_to_compare=None,
     min_freq=2,
     min_word_len=3,
     sample_size=1,
     metrics=True,
-    return_ideal_metrics=False,
     verbose=True,
 ):
     """
@@ -499,25 +388,19 @@ def graph_topic_num_evals(
 
                     - The combination of LDA and BERT via an autoencoder
 
-        text_corpus : list, list of lists, or str
+        text_corpus : list or list of lists
             The text corpus over which analysis should be done
-
-            Note 1: generated using prepare_text_data
-
-            Note 2: if a str is provided, then the data will be loaded from a path
 
         clean_texts : list
             Text strings that are formatted for cluster models
 
-        input_language : str (default=None)
-            The spoken language in which the text is found
-
-        num_keywords : int (default=10)
+        num_topic_words : int (default=10)
             The number of keywords that should be extracted
 
         topic_nums_to_compare : list (default=None)
             The number of topics to compare metrics over
-            Note: None selects all numbers from 1 to num_keywords
+
+            Note: None selects all numbers from 1 to num_topic_words
 
         min_freq : int (default=2)
             The minimum allowable frequency of a word inside the text corpus
@@ -535,9 +418,6 @@ def graph_topic_num_evals(
                 stability: model stability based on Jaccard similarity
 
                 coherence: how much the words associated with model topics co-occur
-
-        return_ideal_metrics : bool (default=False)
-            Whether to return the ideal number of topics for the best model based on metrics
 
         verbose : bool (default=True)
             Whether to show a tqdm progress bar for the query
@@ -558,17 +438,6 @@ def graph_topic_num_evals(
         method = [method]
 
     method = [m.lower() for m in method]
-
-    input_language = input_language.lower()
-
-    text_corpus, clean_texts = _prepare_corpus_path(
-        text_corpus=text_corpus,
-        clean_texts=clean_texts,
-        input_language=input_language,
-        min_freq=min_freq,
-        min_word_len=min_word_len,
-        sample_size=sample_size,
-    )
 
     def jaccard_similarity(topic_1, topic_2):
         """
@@ -601,7 +470,7 @@ def graph_topic_num_evals(
 
     # Initialize the topics numbers that models should be run for
     if topic_nums_to_compare == None:
-        topic_nums_to_compare = list(range(num_keywords + 2))[1:]
+        topic_nums_to_compare = list(range(num_topic_words + 2))[1:]
     else:
         # If topic numbers are given, then add one more for comparison
         topic_nums_to_compare = topic_nums_to_compare + [topic_nums_to_compare[-1] + 1]
@@ -626,14 +495,14 @@ def graph_topic_num_evals(
 
             # Assign topics given the current number t_n
             topics_dict[t_n] = model._order_and_subset_by_coherence(
-                model=tm, num_topics=t_n, num_keywords=num_keywords
+                model=tm, num_topics=t_n, num_topic_words=num_topic_words
             )[0]
 
             coherence_dict[t_n] = model.get_coherence(
                 model=tm,
                 text_corpus=text_corpus,
                 num_topics=t_n,
-                num_keywords=num_keywords,
+                num_topic_words=num_topic_words,
                 measure="c_v",
             )
 
@@ -717,26 +586,214 @@ def graph_topic_num_evals(
     ax.set_xlabel("Number of Topics", fontsize=20)
     plt.legend(fontsize=20, ncol=len(method))
 
-    # Return the ideal model and its topic number, as well as the best LDA topic number for pyLDAvis
-    if return_ideal_metrics:
-        if "lda" in method:
-            ideal_lda_num_topics = ideal_topic_num_dict["lda"][0]
-        else:
-            ideal_lda_num_topics = False
+    return ax
 
-        ideal_topic_num_dict = {
-            k: v[0]
-            for k, v in sorted(
-                ideal_topic_num_dict.items(), key=lambda item: item[1][1]
-            )[::-1]
-        }
-        ideal_model_and_num_topics = next(iter(ideal_topic_num_dict.items()))
-        ideal_model, ideal_num_topics = (
-            ideal_model_and_num_topics[0],
-            ideal_model_and_num_topics[1],
-        )
 
-        return ideal_model, ideal_num_topics, ideal_lda_num_topics
+def english_names_list():
+    """
+    A list of the most common English first names
+    """
+    en_list = [
+        "Mary",
+        "Patricia",
+        "Jennifer",
+        "Linda",
+        "Elizabeth",
+        "Barbara",
+        "Susan",
+        "Jessica",
+        "Sarah",
+        "Karen",
+        "Nancy",
+        "Lisa",
+        "Margaret",
+        "Betty",
+        "Sandra",
+        "Ashley",
+        "Dorothy",
+        "Kimberly",
+        "Emily",
+        "Donna",
+        "Michelle",
+        "Carol",
+        "Amanda",
+        "Melissa",
+        "Deborah",
+        "Stephanie",
+        "Rebecca",
+        "Laura",
+        "Sharon",
+        "Cynthia",
+        "Kathleen",
+        "Amy",
+        "Shirley",
+        "Angela",
+        "Helen",
+        "Anna",
+        "Brenda",
+        "Pamela",
+        "Nicole",
+        "Samantha",
+        "Katherine",
+        "Emma",
+        "Ruth",
+        "Christine",
+        "Catherine",
+        "Debra",
+        "Rachel",
+        "Carolyn",
+        "Janet",
+        "Virginia",
+        "Maria",
+        "Heather",
+        "Diane",
+        "Julie",
+        "Joyce",
+        "Victoria",
+        "Kelly",
+        "Christina",
+        "Lauren",
+        "Joan",
+        "Evelyn",
+        "Olivia",
+        "Judith",
+        "Megan",
+        "Cheryl",
+        "Martha",
+        "Andrea",
+        "Frances",
+        "Hannah",
+        "Jacqueline",
+        "Ann",
+        "Gloria",
+        "Jean",
+        "Kathryn",
+        "Alice",
+        "Teresa",
+        "Sara",
+        "Janice",
+        "Doris",
+        "Madison",
+        "Julia",
+        "Grace",
+        "Judy",
+        "Abigail",
+        "Marie",
+        "Denise",
+        "Beverly",
+        "Amber",
+        "Theresa",
+        "Marilyn",
+        "Danielle",
+        "Diana",
+        "Brittany",
+        "Natalie",
+        "Sophia",
+        "Rose",
+        "Isabella",
+        "Alexis",
+        "Kayla",
+        "Charlotte",
+        "James",
+        "John",
+        "Robert",
+        "Michael",
+        "William",
+        "David",
+        "Richard",
+        "Joseph",
+        "Thomas",
+        "Charles",
+        "Christopher",
+        "Daniel",
+        "Matthew",
+        "Anthony",
+        "Donald",
+        "Mark",
+        "Paul",
+        "Steven",
+        "Andrew",
+        "Kenneth",
+        "Joshua",
+        "Kevin",
+        "Brian",
+        "George",
+        "Edward",
+        "Ronald",
+        "Timothy",
+        "Jason",
+        "Jeffrey",
+        "Ryan",
+        "Jacob",
+        "Gary",
+        "Nicholas",
+        "Eric",
+        "Jonathan",
+        "Stephen",
+        "Larry",
+        "Justin",
+        "Scott",
+        "Brandon",
+        "Benjamin",
+        "Samuel",
+        "Frank",
+        "Gregory",
+        "Raymond",
+        "Alexander",
+        "Patrick",
+        "Jack",
+        "Dennis",
+        "Jerry",
+        "Tyler",
+        "Aaron",
+        "Jose",
+        "Henry",
+        "Adam",
+        "Douglas",
+        "Nathan",
+        "Peter",
+        "Zachary",
+        "Kyle",
+        "Walter",
+        "Harold",
+        "Jeremy",
+        "Ethan",
+        "Carl",
+        "Keith",
+        "Roger",
+        "Gerald",
+        "Christian",
+        "Terry",
+        "Sean",
+        "Arthur",
+        "Austin",
+        "Noah",
+        "Lawrence",
+        "Jesse",
+        "Joe",
+        "Bryan",
+        "Billy",
+        "Jordan",
+        "Albert",
+        "Dylan",
+        "Bruce",
+        "Willie",
+        "Gabriel",
+        "Alan",
+        "Juan",
+        "Logan",
+        "Wayne",
+        "Ralph",
+        "Roy",
+        "Eugene",
+        "Randy",
+        "Vincent",
+        "Russell",
+        "Louis",
+        "Philip",
+        "Bobby",
+        "Johnny",
+        "Bradley",
+    ]
 
-    else:
-        return ax
+    return en_list
