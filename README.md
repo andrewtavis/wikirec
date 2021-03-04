@@ -18,7 +18,7 @@
 ### Open-source recommendation engines based on Wikipedia data
 
 [//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
-**Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Usage](#usage-) • [To-Do](#to-do-)
+**Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [To-Do](#to-do-)
 
 **wikirec** is a framework that allows users to parse Wikipedia for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
 
@@ -42,9 +42,9 @@ import wikirec
 
 # Data [`↩`](#jumpto)
 
-wikirec allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia texts of a given document type including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-Article classes are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topic` argument in the following example will subset all Wikipedia articles for the given type. wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
+Article classes are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topic` argument of `data_utils.parse_to_ndjson` in the following example will subset all Wikipedia articles for the given type. wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
@@ -63,32 +63,28 @@ data_utils.parse_to_ndjson(
 )
 ```
 
-# Methods [`↩`](#jumpto)
-
-wikirec uses natural language processing models to derive topics and then find relations between Wikipedia entries given their topic structure. Current NLP modeling methods implemented include:
-
-### LDA
-
-[Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of wikirec, documents or text entries are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics.
-
-### BERT
-
-[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on nlp models ran over open source Wikipedia data. These representations are leveraged to derive topics that are then used to deliver recommendations.
-
-# Usage [`↩`](#jumpto)
-
-The following is an example of recommendations using wikirec:
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) also provides a standardized cleaning process for the loaded articles:
 
 ```python
-from wikirec import model, utils
-
 with open("wiki_book_articles.ndjson", "r") as fin:
     books = [json.loads(l) for l in fin]
 
 titles = [re.sub(r'\(.*?\)', '', b[0]).strip() for b in books]
 texts = [b[1] for b in books]
 
-corpus = utils.clean_and_tokenize_texts(texts=texts)[0]
+corpus = data_utils.clean_and_tokenize_texts(texts=texts)[0]
+```
+
+# Methods [`↩`](#jumpto)
+
+wikirec uses natural language processing models to derive topics and then find relations between Wikipedia entries. Current NLP modeling methods implemented include:
+
+### LDA
+
+[Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of wikirec, Wikipedia articles are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics. These topic-word relations are then used to determine article similarities and then make recommendations.
+
+```python
+from wikirec import model
 
 LDA_model, sim_index, vectors = model.derive_similarities(
     method="lda", num_topics=10, text_corpus=corpus,
@@ -97,6 +93,29 @@ LDA_model, sim_index, vectors = model.derive_similarities(
 recs = model.recommend(
     inputs="title_or_list_of_titles",
     model=LDA_model,
+    sim_index=sim_index,
+    vectors=vectors,
+    titles=titles,
+    n=10,
+)
+```
+
+### BERT
+
+[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on nlp models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
+
+(WIP): the following is `pseudocode`:
+
+```python
+from wikirec import model
+
+BERT_model, sim_index, vectors = model.derive_similarities(
+    method="bert", text_corpus=corpus,
+)
+
+recs = model.recommend(
+    inputs="title_or_list_of_titles",
+    model=BERT_model,
     sim_index=sim_index,
     vectors=vectors,
     titles=titles,
