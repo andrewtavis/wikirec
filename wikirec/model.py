@@ -5,7 +5,7 @@ model
 Functions for modeling text corpuses and producing recommendations
 
 Contents:
-    derive_similarities,
+    gen_sim_matrix,
     recommend
 """
 
@@ -14,15 +14,21 @@ import math
 
 import numpy as np
 
+from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+import gensim
 from gensim import corpora, models, similarities
-from gensim.models import LdaModel, CoherenceModel
+from gensim.models.ldamulticore import LdaMulticore
+from gensim.models import CoherenceModel
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+
+from sentence_transformers import SentenceTransformer
 
 from wikirec import utils
 
 
-def derive_similarities(
-    method="lda", num_topics=10, text_corpus=None,
-):
+def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
     """
     Derives similarities between the entries in the text corpus
 
@@ -32,36 +38,49 @@ def derive_similarities(
             The modelling method
 
             Options:
+                BERT: Bidirectional Encoder Representations from Transformers
+
+                    - Words embeddings are derived via Google Neural Networks
+
+                    - Embeddings are then used to derive similarities
+
+                Doc2vec : Document to Vector
+
+                    - An entire document is converted to a vector
+
+                    - Based on word2vec, but maintains the document context
+
                 LDA: Latent Dirichlet Allocation
 
                     - Text data is classified into a given number of categories
+
                     - These categories are then used to classify individual entries given the percent they fall into categories
 
-                BERT: Bidirectional Encoder Representations from Transformers
+                TFIDF: Term Frequency Inverse Document Frequency
 
-                    - Words are classified via Google Neural Networks
-                    - Word classifications are then used to derive similarities
+                    - Word importance increases proportionally to the number of times a word appears in the document while being offset by the number of documents in the corpus that contain the word
 
-        num_topics : int (default=10)
-            The number of topics for LDA models
+                    - These importances are then vectorized and used to relate documents
 
-        text_corpus : list or list of lists (default=None)
+        metric : str (default=cosine)
+            The metric to be used when comparing vectorized corpus entries
+
+            Options include: cosine and euclidean
+
+        corpus : list or list of lists (default=None)
             The text corpus over which analysis should be done
+
+        **kwargs : keyword arguments
+            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, or gensim.models.ldamulticore.LdaMulticore
 
     Returns
     -------
-        model : gensim.models.LdaModel or BERT
-            The model with which recommendations should be made
-
-        sim_index : gensim.similarities.docsim.MatrixSimilarity or BERT
-            An index of similarities for all items
-
-        vectors : gensim.interfaces.TransformedCorpus or BERT
-            The similarity vectors for the corpus from the given model
+        sim_matrix : gensim.interfaces.TransformedCorpus or numpy.ndarray
+            The similarity sim_matrix for the corpus from the given model
     """
     method = method.lower()
 
-    valid_methods = ["lda", "bert"]
+    valid_methods = ["bert", "doc2vec", "lda", "tfidf"]
 
     assert (
         method in valid_methods
@@ -69,28 +88,89 @@ def derive_similarities(
         valid_methods
     )
 
-    if method == "lda":
-        dictionary = corpora.Dictionary(text_corpus)
-        bow_corpus = [dictionary.doc2bow(text) for text in text_corpus]
+    if method == "bert":
+        bert_model = SentenceTransformer("bert-base-nli-mean-tokens")
 
-        model = LdaModel(
-            bow_corpus,
-            num_topics=num_topics,
-            random_state=42,
-            update_every=1,
-            passes=10,
-            id2word=dictionary,
-        )
+        document_embeddings = bert_model.encode(corpus, **kwargs)
 
-        sim_index = similarities.MatrixSimilarity(model[bow_corpus])
+        if metric == "cosine":
+            sim_matrix = cosine_similarity(document_embeddings)
 
-        vectors = model[bow_corpus]
+        elif metric == "euclidean":
+            sim_matrix = euclidean_distances(document_embeddings)
 
-    return model, sim_index, vectors
+        return sim_matrix
+
+    elif method == "doc2vec":
+        tagged_data = [
+            TaggedDocument(words=tc_i, tags=[i]) for i, tc_i in enumerate(corpus)
+        ]
+
+        if "vector_size" in kwargs:
+            vector_size = kwargs.get("vector_size")
+        else:
+            vector_size = 100
+
+        model_d2v = Doc2Vec(vector_size=vector_size, **kwargs)
+        model_d2v.build_vocab(tagged_data)
+
+        for _ in range(vector_size):
+            model_d2v.train(
+                documents=tagged_data,
+                total_examples=model_d2v.corpus_count,
+                epochs=model_d2v.epochs,
+            )
+
+        document_embeddings = np.zeros((len(tagged_data), vector_size))
+        for i in range(len(document_embeddings)):
+            document_embeddings[i] = model_d2v.docvecs[i]
+
+        if metric == "cosine":
+            sim_matrix = cosine_similarity(document_embeddings)
+
+        elif metric == "euclidean":
+            sim_matrix = euclidean_distances(document_embeddings)
+
+        return sim_matrix
+
+    elif method == "lda":
+        dictionary = corpora.Dictionary(corpus)
+        bow_corpus = [dictionary.doc2bow(text) for text in corpus]
+
+        model_lda = LdaMulticore(corpus=bow_corpus, id2word=dictionary, **kwargs)
+
+        if metric == "cosine":
+            sim_index = similarities.MatrixSimilarity(model_lda[bow_corpus])
+
+        elif metric == "euclidean":
+            print(
+                "Euclidean distance is not implemented for LDA modeling at this time. Please use 'cosine' for the metric argument."
+            )
+            return
+
+        vectors = model_lda[bow_corpus]
+        sim_matrix = sim_index[vectors]
+
+        return sim_matrix
+
+    elif method == "tfidf":
+        tfidfvectoriser = TfidfVectorizer()
+        tfidfvectoriser.fit(corpus)
+        tfidf_vectors = tfidfvectoriser.transform(corpus)
+
+        if metric == "cosine":
+            sim_matrix = np.dot(  # pylint: disable=no-member
+                tfidf_vectors, tfidf_vectors.T
+            ).toarray()
+
+        elif metric == "euclidean":
+            sim_matrix = euclidean_distances(tfidf_vectors)
+
+        return sim_matrix
 
 
 def recommend(
-    inputs=None, model=None, sim_index=None, vectors=None, titles=None, n=10,
+    inputs=None, titles=None, sim_matrix=None, n=10,
 ):
     """
     Recommends similar items given an input or list of inputs of interest
@@ -100,17 +180,11 @@ def recommend(
         inputs : str or list (default=None)
             The name of an item or items of interest
 
-        model : gensim.models.LdaModel or BERT
-            The model with which recommendations should be made
-
-        sim_index : gensim.similarities.docsim.MatrixSimilarity or BERT
-            An index of similarities for all items
-
-        vectors : gensim.interfaces.TransformedCorpus or BERT
-            The similarity vectors for the corpus from the given model
-
         titles : lists (default=None)
             The titles of the articles
+
+        sim_matrix : gensim.interfaces.TransformedCorpus or np.ndarray (default=None)
+            The similarity sim_matrix for the corpus from the given model
 
         n : int (default=10)
             The number of items to recommend
@@ -123,28 +197,43 @@ def recommend(
     if type(inputs) == str:
         inputs = [inputs]
 
-    sims = None
+    first_input = True
     for inpt in inputs:
         checked = 0
+        num_missing = 0
         for i in range(len(titles)):
             if titles[i] == inpt:
-                if sims is None:
-                    sims = sim_index[vectors[i]]
+                if first_input == True:
+                    sims = sim_matrix[i]
+
+                    first_input = False
+
                 else:
                     sims = [
-                        np.mean([sims[j], sim_index[vectors[i]][j]])
-                        for j in range(len(sims))
+                        np.mean([sims[j], sim_matrix[i][j]]) for j in range(len(sims))
                     ]
 
             else:
                 checked += 1
                 if checked == len(titles):
-                    print(f"{inputs} not available")
-                    utils._check_str_args(arguments=inputs, valid_args=titles)
+                    num_missing += 1
+                    print(f"{inpt} not available")
+                    utils._check_str_args(arguments=inpt, valid_args=titles)
+
+                    if num_missing == len(inputs):
+                        ValueError(
+                            "None of the provided inputs were found in the index. Please check them and reference Wikipedia for valid inputs via article names."
+                        )
 
     titles_and_scores = [[titles[i], sims[i]] for i in range(len(titles))]
 
-    recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=True)
+    if sim_matrix.all() <= 1:
+        # Cosine similarities have been used (higher is better)
+        recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=True)
+    else:
+        # Euclidean distances have been used (lower is better)
+        recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=False)
+
     recommendations = [r for r in recommendations if r[0] not in inputs][:n]
 
     return recommendations

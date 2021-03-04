@@ -69,15 +69,63 @@ data_utils.parse_to_ndjson(
 with open("wiki_book_articles.ndjson", "r") as fin:
     books = [json.loads(l) for l in fin]
 
-titles = [re.sub(r'\(.*?\)', '', b[0]).strip() for b in books]
+titles = [b[0] for b in books]
 texts = [b[1] for b in books]
 
-corpus = data_utils.clean_and_tokenize_texts(texts=texts)[0]
+text_corpus, token_corpus = data_utils.clean_and_tokenize_texts(texts=texts)[:2]
 ```
 
 # Methods [`↩`](#jumpto)
 
-wikirec uses natural language processing models to derive topics and then find relations between Wikipedia entries. Current NLP modeling methods implemented include:
+Implemented NLP modeling methods include:
+
+### BERT
+
+[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on NLP models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
+
+```python
+from wikirec import model
+
+# We can pass kwargs for sentence_transformers.SentenceTransformer.encode
+sim_matrix = model.gen_sim_matrix(
+    method="bert", metric="cosine", corpus=text_corpus,
+)
+
+recs = model.recommend(
+    inputs="title_or_list_of_titles",
+    titles=titles,
+    sim_matrix=sim_matrix,
+    n=10,
+)
+```
+
+<!---
+Outputs
+--->
+
+### Doc2vec
+
+Doc2vec (a generalization of [Word2vec](https://en.wikipedia.org/wiki/Word2vec)) is an NLP algorithm for deriving vector representations of documents from contextual word interrelations. These representations are then used as a baseline for recommendations.
+
+```python
+from wikirec import model
+
+# We can pass kwargs for gensim.models.doc2vec.Doc2Vec
+sim_matrix = model.gen_sim_matrix(
+    method="doc2vec", metric="cosine", corpus=text_corpus,
+)
+
+recs = model.recommend(
+    inputs="title_or_list_of_titles",
+    titles=titles,
+    sim_matrix=sim_matrix,
+    n=10,
+)
+```
+
+<!---
+Outputs
+--->
 
 ### LDA
 
@@ -86,42 +134,45 @@ wikirec uses natural language processing models to derive topics and then find r
 ```python
 from wikirec import model
 
-LDA_model, sim_index, vectors = model.derive_similarities(
-    method="lda", num_topics=10, text_corpus=corpus,
+# We can pass kwargs for gensim.models.ldamulticore.LdaMulticore
+sim_matrix = model.gen_sim_matrix(
+    method="lda", metric="cosine", corpus=token_corpus, num_topics=10,
 )
 
 recs = model.recommend(
     inputs="title_or_list_of_titles",
-    model=LDA_model,
-    sim_index=sim_index,
-    vectors=vectors,
     titles=titles,
+    sim_matrix=sim_matrix,
     n=10,
 )
 ```
 
-### BERT
+<!---
+Outputs
+--->
 
-[Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on nlp models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
+### TFIDF
 
-(WIP): the following is `pseudocode`:
+[Term Frequency Inverse Document Frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. In case of wikirec, word importances are combined and compared to derive article similarities and thus provide recommendations.
 
 ```python
 from wikirec import model
 
-BERT_model, sim_index, vectors = model.derive_similarities(
-    method="bert", text_corpus=corpus,
+sim_matrix = model.gen_sim_matrix(
+    method="tfidf", metric="cosine", corpus=text_corpus,
 )
 
 recs = model.recommend(
     inputs="title_or_list_of_titles",
-    model=BERT_model,
-    sim_index=sim_index,
-    vectors=vectors,
     titles=titles,
+    sim_matrix=sim_matrix,
     n=10,
 )
 ```
+
+<!---
+Outputs
+--->
 
 # To-Do [`↩`](#jumpto)
 

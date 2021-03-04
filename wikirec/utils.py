@@ -64,7 +64,7 @@ def _check_str_args(arguments, valid_args):
 
 
 def graph_lda_topic_evals(
-    text_corpus=None,
+    corpus=None,
     num_topic_words=10,
     topic_nums_to_compare=None,
     metrics=True,
@@ -75,7 +75,7 @@ def graph_lda_topic_evals(
 
     Parameters
     ----------
-        text_corpus : list or list of lists
+        corpus : list or list of lists
             The text corpus over which analysis should be done
 
         num_topic_words : int (default=10)
@@ -138,8 +138,8 @@ def graph_lda_topic_evals(
     plt.figure()  # begin figure
     metric_vals = []  # add metric values so that figure y-axis can be scaled
 
-    dirichlet_dict = corpora.Dictionary(text_corpus)
-    bow_corpus = [dirichlet_dict.doc2bow(text) for text in text_corpus]
+    dirichlet_dict = corpora.Dictionary(corpus)
+    bow_corpus = [dirichlet_dict.doc2bow(text) for text in corpus]
 
     # Add an extra topic so that metrics can be calculated all inputs
     if topic_nums_to_compare == None:
@@ -192,7 +192,7 @@ def graph_lda_topic_evals(
     coherences = [
         CoherenceModel(
             model=LDA_models[i],
-            texts=text_corpus,
+            texts=corpus,
             dictionary=dirichlet_dict,
             coherence="c_v",
         ).get_coherence()

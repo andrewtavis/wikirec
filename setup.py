@@ -42,7 +42,6 @@ else:
         "pytest-cov",
         "numpy",
         "pandas",
-        "nltk",
         "spacy",
         "stopwordsiso",
         "matplotlib",
