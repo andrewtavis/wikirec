@@ -175,6 +175,7 @@ dependencies:
   - requests=2.25.1
   - requests-toolbelt=0.9.1
   - rfc3986=1.4.0
+  - rope=0.18.0
   - rsa=4.7.2
   - s3transfer=0.3.4
   - scikit-learn=0.24.1
@@ -222,8 +223,12 @@ dependencies:
   - zlib=1.2.11
   - zstd=1.4.5
   - pip:
+    - alabaster==0.7.12
+    - babel==2.9.0
     - beautifulsoup4==4.9.3
+    - en-core-web-sm==2.3.1
     - filelock==3.0.12
+    - imagesize==1.2.0
     - ipython==7.10.0
     - jupyter-contrib-core==0.3.3
     - jupyter-contrib-nbextensions==0.5.1
@@ -236,7 +241,16 @@ dependencies:
     - sacremoses==0.0.43
     - sentence-transformers==0.4.1.2
     - sentencepiece==0.1.95
+    - snowballstemmer==2.1.0
     - soupsieve==2.2
+    - sphinx==3.5.1
+    - sphinx-rtd-theme==0.5.1
+    - sphinxcontrib-applehelp==1.0.2
+    - sphinxcontrib-devhelp==1.0.2
+    - sphinxcontrib-htmlhelp==1.0.3
+    - sphinxcontrib-jsmath==1.0.1
+    - sphinxcontrib-qthelp==1.0.3
+    - sphinxcontrib-serializinghtml==1.1.4
     - stopwordsiso==0.6.1
     - tokenizers==0.10.1
     - torch==1.7.1
