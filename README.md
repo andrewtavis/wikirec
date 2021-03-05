@@ -20,7 +20,7 @@
 [//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
 **Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Recommendations](#recommendations-) • [To-Do](#to-do-)
 
-**wikirec** is a framework that allows users to parse the Wikipedia of any language for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia of any language for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
 
 # Installation via PyPi
 
@@ -68,13 +68,18 @@ data_utils.parse_to_ndjson(
 Generating a clean text and token corpus is achieved through the following:
 
 ```python
+import json
+
 with open("enwiki_books.ndjson", "r") as fin:
     books = [json.loads(l) for l in fin]
 
 titles = [b[0] for b in books]
 texts = [b[1] for b in books]
 
-text_corpus, token_corpus = data_utils.clean(texts=texts)[:2]
+text_corpus, token_corpus = data_utils.clean(
+    texts=texts,
+    language="en"
+)[:2]
 ```
 
 # Methods [`↩`](#jumpto)

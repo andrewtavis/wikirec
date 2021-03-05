@@ -136,7 +136,6 @@ def graph_lda_topic_evals(
         return num_intersect / num_union
 
     plt.figure()  # begin figure
-    metric_vals = []  # add metric values so that figure y-axis can be scaled
 
     dirichlet_dict = corpora.Dictionary(corpus)
     bow_corpus = [dirichlet_dict.doc2bow(text) for text in corpus]
@@ -200,7 +199,8 @@ def graph_lda_topic_evals(
     ]
 
     coh_sta_diffs = [
-        coherences[i] - mean_stabilities[i] for i in range(num_topic_words)[:-1]
+        coherences[i] - mean_stabilities[i]
+        for i in range(len(topic_nums_to_compare))[:-1]
     ]  # limit topic numbers to the number of keywords
     coh_sta_max = max(coh_sta_diffs)
     coh_sta_max_idxs = [i for i, j in enumerate(coh_sta_diffs) if j == coh_sta_max]
