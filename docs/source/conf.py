@@ -60,7 +60,7 @@ autodoc_mock_imports = [
     "keras",
     "sentence_transformers",
     "tqdm",
-    "beautifulsoup4",
+    "bs4",
     "mwparserfromhell",
 ]
 
