@@ -68,6 +68,8 @@ data_utils.parse_to_ndjson(
 Generating a clean text and token corpus is achieved through the following:
 
 ```python
+import json
+
 with open("enwiki_books.ndjson", "r") as fin:
     books = [json.loads(l) for l in fin]
 

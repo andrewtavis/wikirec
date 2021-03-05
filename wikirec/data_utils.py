@@ -12,6 +12,7 @@ Contents:
     parse_to_ndjson,
     _combine_tokens_to_str,
     _clean_text_strings,
+    lemmatize,
     clean
 
     WikiXmlHandler Class
@@ -135,6 +136,8 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
 
     file_info = []
 
+    print(target_dir)
+
     file_present_bools = [
         os.path.exists(target_dir + "/" + f) for f in files_to_download
     ]
@@ -143,16 +146,25 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     else:
         dl_files = True
 
+    try:
+        cache_subdir = target_dir.split("/")[-1]
+        cache_dir = "/".join(target_dir.split("/")[:-1])
+    except:
+        cache_subdir = target_dir
+        cache_dir = "."
+
     if dl_files == True:
         for f in files_to_download:
             file_path = target_dir + "/" + f
             if not os.path.exists(file_path):
+                print(f"DL file to {file_path}")
                 saved_file_path = tf.keras.utils.get_file(
-                    f,
+                    fname=f,
                     origin=dump_url + f,
                     extract=True,
                     archive_format="auto",
-                    cache_subdir=target_dir,
+                    cache_subdir=cache_subdir,
+                    cache_dir=cache_dir,
                 )
 
                 file_size = os.stat(saved_file_path).st_size / 1e6
@@ -160,7 +172,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
                     f.split("p")[-2]
                 )
 
-                file_info.append((f, file_size, total_articles))
+                file_info.append((f.split("-")[-1], file_size, total_articles))
 
     else:
         print(f"Files already available in the {target_dir} directory.")
@@ -847,4 +859,5 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         if name == "page":
             target_article = _process_article(**self._values, template=self.template)
             if target_article:
-                self._target_articles.append(target_article)
+                if "Wikipedia:" not in target_article[0]:  # no archive files
+                    self._target_articles.append(target_article)
