@@ -34,5 +34,5 @@ def test__clean_text_strings():
     assert True
 
 
-def test_clean_and_tokenize_texts():
+def test_clean():
     assert True
