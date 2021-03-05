@@ -169,6 +169,9 @@ def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
         return sim_matrix
 
 
+# Allow for !arguments
+
+
 def recommend(
     inputs=None, titles=None, sim_matrix=None, n=10,
 ):
