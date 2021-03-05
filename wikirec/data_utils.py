@@ -12,7 +12,7 @@ Contents:
     parse_to_ndjson,
     _combine_tokens_to_str,
     _clean_text_strings,
-    clean_and_tokenize_texts,
+    clean
 
     WikiXmlHandler Class
         __init__,
@@ -49,6 +49,8 @@ from gensim.models import Phrases
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 import tensorflow as tf
+
+from wikirec import utils
 
 
 def input_conversion_dict():
@@ -194,6 +196,7 @@ def _process_article(title, text, template="Infobox book"):
 
     if len(matching_templates) >= 1:
         text = wikicode.strip_code().strip()
+        title = re.sub(r"\(.*?\)", "", title).strip()
 
         article_data = (title, text)
 
@@ -368,10 +371,6 @@ def parse_to_ndjson(
     -------
         Wikipedia dump files parsed for the given template type and converted to json files
     """
-    if not os.path.exists(partitions_dir):
-        print(f"Making {partitions_dir} directory for the partitions")
-        os.makedirs(partitions_dir)
-
     output_dir = "/".join([i for i in output_path.split("/")[:-1]])
     if not os.path.exists(output_dir):
         print(f"Making {output_dir} directory for the output")
@@ -398,53 +397,57 @@ def parse_to_ndjson(
         else:
             output_file_name = output_path
 
-    target_files = [
-        input_dir + "/" + f for f in os.listdir(input_dir) if "pages-articles" in f
-    ]
-
-    parse_inputs = zip(
-        [topic] * len(target_files),
-        target_files,
-        [partitions_dir] * len(target_files),
-        [limit] * len(target_files),
-        [False] * len(target_files),
-    )
-
-    disable = not verbose
-    if __name__ == "wikirec.data":
-        with Pool(processes=num_cores) as pool:
-            for _ in tqdm(
-                pool.imap_unordered(_iterate_and_parse_file, parse_inputs),
-                total=len(target_files),
-                desc="Files partitioned",
-                unit="files",
-                disable=disable,
-            ):
-                pass
-
-    def read_and_combine_json(file_path):
-        """Read in json data from a file_path"""
-        data = []
-
-        with open(file_path, "r") as fin:
-            for l in fin.readlines():
-                data.append(json.loads(l))
-
-        return data
-
-    threadpool = Threadpool(processes=num_cores)
-
-    partition_files = [
-        partitions_dir + "/" + f
-        for f in os.listdir(partitions_dir)
-        if f[-len(".ndjson") :] == ".ndjson"
-    ]
-
-    results = threadpool.map(read_and_combine_json, partition_files)
-
-    file_list = list(chain(*results))
-
     if not os.path.exists(output_file_name):
+        if not os.path.exists(partitions_dir):
+            print(f"Making {partitions_dir} directory for the partitions")
+            os.makedirs(partitions_dir)
+
+        target_files = [
+            input_dir + "/" + f for f in os.listdir(input_dir) if "pages-articles" in f
+        ]
+
+        parse_inputs = zip(
+            [topic] * len(target_files),
+            target_files,
+            [partitions_dir] * len(target_files),
+            [limit] * len(target_files),
+            [False] * len(target_files),
+        )
+
+        disable = not verbose
+        if __name__ == "wikirec.data_utils":
+            with Pool(processes=num_cores) as pool:
+                for _ in tqdm(
+                    pool.imap_unordered(_iterate_and_parse_file, parse_inputs),
+                    total=len(target_files),
+                    desc="Files partitioned",
+                    unit="files",
+                    disable=disable,
+                ):
+                    pass
+
+        def read_and_combine_json(file_path):
+            """Read in json data from a file_path"""
+            data = []
+
+            with open(file_path, "r") as fin:
+                for l in fin.readlines():
+                    data.append(json.loads(l))
+
+            return data
+
+        threadpool = Threadpool(processes=num_cores)
+        partition_files = [
+            partitions_dir + "/" + f
+            for f in os.listdir(partitions_dir)
+            if f[-len(".ndjson") :] == ".ndjson"
+        ]
+
+        if __name__ == "wikirec.data_utils":
+            results = threadpool.map(read_and_combine_json, partition_files)
+
+        file_list = list(chain(*results))
+
         with open(output_file_name, "wt") as fout:
             for f in file_list:
                 fout.write(json.dumps(f) + "\n")
@@ -452,12 +455,13 @@ def parse_to_ndjson(
 
     else:
         print(
-            f"File {output_file_name} with articles for the given topic was already saved"
+            f"File {output_file_name} with articles for the given topic already exists"
         )
 
     if delete_parsed_files:
-        print(f"Deleting {partitions_dir} directory")
-        os.system(f"rm -rf {partitions_dir}")
+        if os.path.exists(partitions_dir):
+            print(f"Deleting {partitions_dir} directory")
+            os.system(f"rm -rf {partitions_dir}")
 
     return
 
@@ -557,7 +561,7 @@ def lemmatize(tokens, nlp=None):
     return lemmatized_tokens
 
 
-def clean_and_tokenize_texts(
+def clean(
     texts,
     min_freq=2,
     min_word_len=3,
@@ -575,7 +579,7 @@ def clean_and_tokenize_texts(
             The texts to be cleaned and tokenized
 
         min_freq : int (default=2)
-            The minimum allowable frequency of a word inside the text corpus
+            The minimum allowable frequency of a word inside the corpus
 
         min_word_len : int (default=3)
             The smallest allowable length of a word
@@ -594,8 +598,8 @@ def clean_and_tokenize_texts(
 
     Returns
     -------
-        text_corpus, clean_texts, selection_idxs : list or list of lists, list, list
-            The texts formatted for text analysis both as tokens and strings, as well as the indexes for selected entries
+        text_corpus, token_corpus, selection_idxs : list or list of lists, list, list
+            The texts formatted for text analysis both as strings as tokens, as well as the indexes for selected entries
     """
     if type(texts) == str:
         texts = [texts]
@@ -670,7 +674,11 @@ def clean_and_tokenize_texts(
     # Remove names after bigrams have been created
     if remove_names:
         tokens_with_bigrams = [
-            [t for t in text if t not in [n.lower() for n in english_names_list()]]
+            [
+                t
+                for t in text
+                if t not in [n.lower() for n in utils.english_names_list()]
+            ]
             for text in tokens_with_bigrams
         ]
     pbar.update()
@@ -715,31 +723,31 @@ def clean_and_tokenize_texts(
     pbar.update()
 
     non_empty_texts = [t for t in min_len_freq_tokens if t != []]
-    clean_texts = [
+    text_corpus = [
         _clean_text_strings(s=_combine_tokens_to_str(t)) for t in non_empty_texts
     ]
 
     if max_text_len != None and type(max_text_len) == int:
-        text_corpus = [t[:max_text_len] for t in non_empty_texts]
+        token_corpus = [t[:max_text_len] for t in non_empty_texts]
     else:
-        text_corpus = non_empty_texts
+        token_corpus = non_empty_texts
 
     # Sample texts if desired
     if sample_size != 1:
         selected_idxs = [
             i
             for i in random.choices(
-                range(len(text_corpus)), k=int(sample_size * len(text_corpus))
+                range(len(token_corpus)), k=int(sample_size * len(token_corpus))
             )
         ]
     else:
-        selected_idxs = list(range(len(text_corpus)))
+        selected_idxs = list(range(len(token_corpus)))
 
     text_corpus = [text_corpus[i] for i in selected_idxs]
-    clean_texts = [clean_texts[i] for i in selected_idxs]
+    token_corpus = [token_corpus[i] for i in selected_idxs]
     pbar.update()
 
-    return text_corpus, clean_texts, selected_idxs
+    return text_corpus, token_corpus, selected_idxs
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):

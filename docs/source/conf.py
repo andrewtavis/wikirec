@@ -51,7 +51,6 @@ autodoc_mock_imports = [
     "pytest-cov",
     "numpy",
     "pandas",
-    "nltk",
     "spacy",
     "stopwordsiso",
     "matplotlib",
