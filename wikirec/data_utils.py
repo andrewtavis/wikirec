@@ -76,7 +76,7 @@ def input_conversion_dict():
     return input_conversion_dict
 
 
-def download_wiki(language="en", target_dir="wiki_dump", num_files=-1, dump_id=False):
+def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=False):
     """
     Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory
 
@@ -88,8 +88,8 @@ def download_wiki(language="en", target_dir="wiki_dump", num_files=-1, dump_id=F
         target_dir : str (default=wiki_dump)
             The directory in the pwd into which files should be downloaded
 
-        num_files : int (default=-1, all files)
-            The number of files to download
+        file_limit : int (default=-1, all files)
+            The limit for the number of files to download
 
         dump_id : str (default=False)
             The id of an explicit Wikipedia dump that the user wants to download
@@ -102,8 +102,8 @@ def download_wiki(language="en", target_dir="wiki_dump", num_files=-1, dump_id=F
             Information on the downloaded Wikipedia dump files
     """
     assert (
-        type(num_files) == int
-    ), "The 'num_files' argument must be an integer to subset the available file list by as an upper bound."
+        type(file_limit) == int
+    ), "The 'file_limit' argument must be an integer to subset the available file list by as an upper bound."
 
     if not os.path.exists(target_dir):
         print(f"Making {target_dir} directory")
@@ -131,7 +131,7 @@ def download_wiki(language="en", target_dir="wiki_dump", num_files=-1, dump_id=F
             files.append((text.split()[0], text.split()[1:]))
 
     # Don't select the combined dump so we can check the progress
-    files_to_download = [file[0] for file in files if ".xml-p" in file[0]][:num_files]
+    files_to_download = [file[0] for file in files if ".xml-p" in file[0]][:file_limit]
 
     file_info = []
 
@@ -616,6 +616,12 @@ def clean(
         text_corpus, token_corpus, selection_idxs : list or list of lists, list, list
             The texts formatted for text analysis both as strings as tokens, as well as the indexes for selected entries
     """
+    language = language.lower()
+
+    # Select abbreviation for the lemmatizer, if it's available
+    if language in languages.lem_abbr_dict().keys():
+        language = languages.lem_abbr_dict()[language]
+
     if type(texts) == str:
         texts = [texts]
 
@@ -661,7 +667,20 @@ def clean(
         )
     pbar.update()
 
-    stop_words = stopwords("en")
+    # Remove stopwords and tokenize
+    if stopwords(language) != set():  # the input language has stopwords
+        stop_words = stopwords(language)
+
+    # Stemming and normal stopwords are still full language names
+    elif language in languages.stem_abbr_dict().keys():
+        stop_words = stopwords(languages.stem_abbr_dict()[language])
+
+    elif language in languages.sw_abbr_dict().keys():
+        stop_words = stopwords(languages.sw_abbr_dict()[language])
+
+    else:
+        stop_words = []
+
     tokenized_texts = [
         [
             word
@@ -698,17 +717,50 @@ def clean(
         ]
     pbar.update()
 
+    # Try lemmatization, and if not available stem, and if not available nothing
+    nlp = None
     try:
-        nlp = spacy.load("en_core_web_sm")
+        nlp = spacy.load(language)
         lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
 
     except OSError:
         try:
-            os.system("python -m spacy download en_core_web_sm")
-            nlp = spacy.load("en_core_web_sm")
+            os.system("python -m spacy download {}".format(language))
+            nlp = spacy.load(language)
             lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
+
         except:
             pass
+
+    if nlp == None:
+        # Lemmatization failed, so try stemming
+        stemmer = None
+        if language in SnowballStemmer.languages:
+            stemmer = SnowballStemmer(language)
+
+        # Correct if the abbreviations were put in
+        elif language == "ar":
+            stemmer = SnowballStemmer("arabic")
+
+        elif language == "fi":
+            stemmer = SnowballStemmer("finish")
+
+        elif language == "hu":
+            stemmer = SnowballStemmer("hungarian")
+
+        elif language == "sv":
+            stemmer = SnowballStemmer("swedish")
+
+        if stemmer != None:
+            # Stemming instead of lemmatization
+            lemmatized_tokens = []  # still call it lemmatized for consistency
+            for tokens in tokens_with_bigrams:
+                stemmed_tokens = [stemmer.stem(t) for t in tokens]
+                lemmatized_tokens.append(stemmed_tokens)
+
+        else:
+            # We cannot lemmatize or stem
+            lemmatized_tokens = tokens_with_bigrams
     pbar.update()
 
     token_frequencies = defaultdict(int)
