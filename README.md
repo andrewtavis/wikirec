@@ -72,7 +72,7 @@ with open("wiki_book_articles.ndjson", "r") as fin:
 titles = [b[0] for b in books]
 texts = [b[1] for b in books]
 
-text_corpus, token_corpus = data_utils.clean_and_tokenize_texts(texts=texts)[:2]
+text_corpus, token_corpus = data_utils.clean(texts=texts)[:2]
 ```
 
 # Methods [`↩`](#jumpto)
