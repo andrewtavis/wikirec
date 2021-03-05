@@ -59,6 +59,7 @@ autodoc_mock_imports = [
     "sklearn",
     "keras",
     "sentence_transformers",
+    "tensorflow",
     "tqdm",
     "bs4",
     "mwparserfromhell",

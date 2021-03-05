@@ -50,6 +50,7 @@ else:
         "scikit-learn",
         "keras",
         "sentence-transformers",
+        "tensorflow",
         "tqdm",
         "beautifulsoup4",
         "mwparserfromhell",
