@@ -61,6 +61,7 @@ autodoc_mock_imports = [
     "sentence_transformers",
     "tqdm",
     "beautifulsoup4",
+    "mwparserfromhell",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

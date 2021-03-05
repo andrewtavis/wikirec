@@ -52,6 +52,7 @@ else:
         "sentence-transformers",
         "tqdm",
         "beautifulsoup4",
+        "mwparserfromhell",
     ]
 
 if __name__ == "__main__":
