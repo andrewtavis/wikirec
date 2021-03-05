@@ -8,7 +8,7 @@ Contents:
     input_conversion_dict,
     download_wiki,
     _process_article,
-    _iterate_and_parse_file,
+    iterate_and_parse_file,
     parse_to_ndjson,
     _combine_tokens_to_str,
     _clean_text_strings,
@@ -43,6 +43,7 @@ from tqdm.auto import tqdm
 import mwparserfromhell
 from bs4 import BeautifulSoup
 
+from nltk.stem.snowball import SnowballStemmer
 import spacy
 from stopwordsiso import stopwords
 from gensim.models import Phrases
@@ -50,7 +51,7 @@ from gensim.models import Phrases
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 import tensorflow as tf
 
-from wikirec import utils
+from wikirec import languages, utils
 
 
 def input_conversion_dict():
@@ -75,17 +76,23 @@ def input_conversion_dict():
     return input_conversion_dict
 
 
-def download_wiki(target_dir="wikipedia_dump", explicit_dump=False):
+def download_wiki(language="en", target_dir="wiki_dump", num_files=-1, dump_id=False):
     """
     Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory
 
     Parameters
     ----------
-        target_dir : str (default=wikipedia_dump)
+        language : str (default=en)
+            The language of Wikipedia to download
+
+        target_dir : str (default=wiki_dump)
             The directory in the pwd into which files should be downloaded
 
-        explicit_dump : str (default=False)
-            An explicit Wikipedia dump that the user wants to download
+        num_files : int (default=-1, all files)
+            The number of files to download
+
+        dump_id : str (default=False)
+            The id of an explicit Wikipedia dump that the user wants to download
 
             Note: a value of False will select the third from the last (latest stable dump)
 
@@ -94,19 +101,23 @@ def download_wiki(target_dir="wikipedia_dump", explicit_dump=False):
         file_info : list of lists
             Information on the downloaded Wikipedia dump files
     """
+    assert (
+        type(num_files) == int
+    ), "The 'num_files' argument must be an integer to subset the available file list by as an upper bound."
+
     if not os.path.exists(target_dir):
         print(f"Making {target_dir} directory")
         os.makedirs(target_dir)
 
-    base_url = "https://dumps.wikimedia.org/enwiki/"
+    base_url = f"https://dumps.wikimedia.org/{language}wiki/"
     index = requests.get(base_url).text
     soup_index = BeautifulSoup(index, "html.parser")
 
     all_dumps = [a["href"] for a in soup_index.find_all("a") if a.has_attr("href")]
     target_dump = all_dumps[-3]
-    if explicit_dump != False:
-        if explicit_dump in all_dumps:
-            target_dump = explicit_dump
+    if dump_id != False:
+        if dump_id in all_dumps:
+            target_dump = dump_id
 
     dump_url = base_url + target_dump
     dump_html = requests.get(dump_url).text
@@ -120,7 +131,7 @@ def download_wiki(target_dir="wikipedia_dump", explicit_dump=False):
             files.append((text.split()[0], text.split()[1:]))
 
     # Don't select the combined dump so we can check the progress
-    files_to_download = [file[0] for file in files if ".xml-p" in file[0]]
+    files_to_download = [file[0] for file in files if ".xml-p" in file[0]][:num_files]
 
     file_info = []
 
@@ -203,7 +214,7 @@ def _process_article(title, text, template="Infobox book"):
         return article_data
 
 
-def _iterate_and_parse_file(args):
+def iterate_and_parse_file(args):
     """
     Creates partitions of desired articles
 
@@ -418,10 +429,10 @@ def parse_to_ndjson(
         if __name__ == "wikirec.data_utils":
             with Pool(processes=num_cores) as pool:
                 for _ in tqdm(
-                    pool.imap_unordered(_iterate_and_parse_file, parse_inputs),
+                    pool.imap_unordered(iterate_and_parse_file, parse_inputs),
                     total=len(target_files),
                     desc="Files partitioned",
-                    unit="files",
+                    unit="file",
                     disable=disable,
                 ):
                     pass
@@ -563,6 +574,7 @@ def lemmatize(tokens, nlp=None):
 
 def clean(
     texts,
+    language="en",
     min_freq=2,
     min_word_len=3,
     max_text_len=None,
@@ -571,12 +583,15 @@ def clean(
     verbose=True,
 ):
     """
-    Cleans and tokenizes a text body to prepare it for analysis
+    Cleans text body to prepare it for analysis
 
     Parameters
     ----------
         texts : str or list
             The texts to be cleaned and tokenized
+
+        language : str (default=en)
+            The language of Wikipedia to download
 
         min_freq : int (default=2)
             The minimum allowable frequency of a word inside the corpus

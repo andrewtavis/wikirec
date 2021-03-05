@@ -18,7 +18,7 @@ def test__process_article():
     assert True
 
 
-def test__iterate_and_parse_file():
+def test_iterate_and_parse_file():
     assert True
 
 

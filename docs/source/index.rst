@@ -61,6 +61,7 @@ Installation
 
    model
    data_utils
+   languages
    utils
    notes
 
