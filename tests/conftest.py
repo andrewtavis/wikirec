@@ -25,6 +25,7 @@ from wikirec.data_utils import _clean_text_strings
 from wikirec.data_utils import languages
 from wikirec.data_utils import clean
 
+from wikirec import model
 from wikirec.model import gen_sim_matrix
 from wikirec.model import recommend
 
@@ -39,22 +40,40 @@ from wikirec.utils import english_names_list
 
 np.random.seed(42)
 
+input_dir = "../wikirec/enwiki_dump"
+
 files = data_utils.download_wiki(
-    language="en", target_dir="../wikirec/enwiki_dump", file_limit=1, dump_id=False
+    language="en", target_dir=input_dir, file_limit=1, dump_id=False
 )
 
+# To check that it finds already downloaded file
+files = data_utils.download_wiki(
+    language="en", target_dir=input_dir, file_limit=1, dump_id=False
+)
+
+output_path = "../wikirec/enwiki_books.ndjson"
+partitions_dir = "../wikirec/enwiki_partitions"
+limit = 10
 data_utils.parse_to_ndjson(
     topic="books",
-    output_path="../wikirec/enwiki_books.ndjson",
-    input_dir="../wikirec/enwiki_dump",
-    partitions_dir="../wikirec/enwiki_partitions",
-    limit=10,
+    output_path=output_path,
+    input_dir=input_dir,
+    partitions_dir=partitions_dir,
+    limit=limit,
     delete_parsed_files=True,
     multicore=True,
     verbose=True,
 )
 
-with open("../wikirec/enwiki_books.ndjson", "r") as fin:
+dump_file_path = f"{input_dir}/{os.listdir(input_dir)[0]}"
+
+parse_args = ("books", dump_file_path, partitions_dir, limit, True)
+data_utils.iterate_and_parse_file(args=parse_args)
+
+# Again to check that it skips the parse
+data_utils.iterate_and_parse_file(args=parse_args)
+
+with open(output_path, "r") as fin:
     books = [json.loads(l) for l in fin]
 
 book_titles = [b[0] for b in books]
@@ -69,6 +88,10 @@ txts, tokens = data_utils.clean(
     sample_size=1,
     verbose=True,
 )[:2]
+
+smc = model.gen_sim_matrix(method="doc2vec", metric="cosine", corpus=txts)
+
+sme = model.gen_sim_matrix(method="tfidf", metric="euclidean", corpus=txts)
 
 
 @pytest.fixture(params=[book_titles])
@@ -91,5 +114,16 @@ def token_corpus(request):
     return request.param
 
 
-os.system("rm -rf ../wikirec/enwiki_dump")
-os.system("rm -rf ../wikirec/enwiki_books.ndjson")
+@pytest.fixture(params=[smc])
+def sim_matrix_cosine(request):
+    return request.param
+
+
+@pytest.fixture(params=[sme])
+def sim_matrix_euclidean(request):
+    return request.param
+
+
+os.system(f"rm -rf {input_dir}")
+os.system(f"rm -rf {partitions_dir}")
+os.system(f"rm -rf {output_path}")

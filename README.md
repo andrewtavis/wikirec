@@ -157,7 +157,7 @@ recs = model.recommend(
 Outputs
 --->
 
-See [examples/rec_books](https://github.com/andrewtavis/wikirec/tree/main/examples/rec_books) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/tree/main/examples/rec_movies) for fully detailed examples with model comparisons.
+See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for fully detailed examples with model comparisons.
 
 # To-Do [`↩`](#jumpto)
 

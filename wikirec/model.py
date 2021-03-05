@@ -82,11 +82,12 @@ def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
 
     valid_methods = ["bert", "doc2vec", "lda", "tfidf"]
 
-    assert (
-        method in valid_methods
-    ), "The value for the 'method' argument is invalid. Please choose one of ".join(
-        valid_methods
-    )
+    if method not in valid_methods:
+        raise ValueError(
+            "The value for the 'method' argument is invalid. Please choose one of ".join(
+                valid_methods
+            )
+        )
 
     if method == "bert":
         bert_model = SentenceTransformer("bert-base-nli-mean-tokens")
