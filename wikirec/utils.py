@@ -21,7 +21,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from gensim import corpora
-from gensim.models import CoherenceModel, LdaModel
+from gensim.models.ldamulticore import LdaMulticore
+from gensim.models import CoherenceModel
 
 
 def _check_str_similarity(str_1, str_2):
@@ -152,14 +153,12 @@ def graph_lda_topic_evals(
     for i in tqdm(
         iterable=topic_nums_to_compare, desc="LDA models ran", disable=disable
     ):
-        LDA_models[i] = LdaModel(
+        LDA_models[i] = LdaMulticore(
             corpus=bow_corpus,
             id2word=dirichlet_dict,
             num_topics=i,
-            update_every=1,
             chunksize=len(bow_corpus),
             passes=20,
-            alpha="auto",
             random_state=None,
         )
 

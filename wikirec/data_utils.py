@@ -136,8 +136,6 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
 
     file_info = []
 
-    print(target_dir)
-
     file_present_bools = [
         os.path.exists(target_dir + "/" + f) for f in files_to_download
     ]
