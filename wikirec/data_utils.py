@@ -27,7 +27,6 @@ import gc
 from itertools import chain
 import json
 import os
-import random
 import re
 import requests
 import string
@@ -39,6 +38,7 @@ import subprocess
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as Threadpool
 
+import numpy as np
 from tqdm.auto import tqdm
 
 import mwparserfromhell
@@ -585,9 +585,10 @@ def lemmatize(tokens, nlp=None):
 def clean(
     texts,
     language="en",
-    min_freq=2,
-    min_word_len=3,
-    max_text_len=None,
+    min_token_freq=2,
+    min_token_len=3,
+    min_tokens=0,
+    max_token_index=-1,
     remove_names=False,
     sample_size=1,
     verbose=True,
@@ -603,14 +604,17 @@ def clean(
         language : str (default=en)
             The language of Wikipedia to download
 
-        min_freq : int (default=2)
+        min_token_freq : int (default=2)
             The minimum allowable frequency of a word inside the corpus
 
-        min_word_len : int (default=3)
+        min_token_len : int (default=3)
             The smallest allowable length of a word
 
-        max_text_len : int (default=None)
-            The maximum allowable length of a text
+        min_tokens : int (default=0)
+            The minimum allowable length of a tokenized text
+
+        max_token_index : int (default=-1)
+            The maximum allowable length of a tokenized text
 
         remove_names : bool (default=False)
             Whether to remove the most common English names
@@ -623,7 +627,7 @@ def clean(
 
     Returns
     -------
-        text_corpus, token_corpus, selection_idxs : list or list of lists, list, list
+        text_corpus, token_corpus, selected_idxs : list or list of lists, list, list
             The texts formatted for text analysis both as strings as tokens, as well as the indexes for selected entries
     """
     language = language.lower()
@@ -778,15 +782,17 @@ def clean(
         for t in list(set(tokens)):
             token_frequencies[t] += 1
 
-    if min_word_len == None or min_word_len == False:
-        min_word_len = 0
-    if min_freq == None or min_freq == False:
-        min_freq = 0
+    if min_token_len == None or min_token_len == False:
+        min_token_len = 0
+    if min_token_freq == None or min_token_freq == False:
+        min_token_freq = 0
 
     assert (
-        type(min_word_len) == int
-    ), "The 'min_word_len' argument must be an integer if used"
-    assert type(min_freq) == int, "The 'min_freq' argument must be an integer if used"
+        type(min_token_len) == int
+    ), "The 'min_token_len' argument must be an integer if used"
+    assert (
+        type(min_token_freq) == int
+    ), "The 'min_token_freq' argument must be an integer if used"
 
     min_len_freq_tokens = []
     for tokens in lemmatized_tokens:
@@ -794,34 +800,36 @@ def clean(
             [
                 t
                 for t in tokens
-                if len(t) >= min_word_len and token_frequencies[t] >= min_freq
+                if len(t) >= min_token_len and token_frequencies[t] >= min_token_freq
             ]
         )
     pbar.update()
 
-    non_empty_texts = [t for t in min_len_freq_tokens if t != []]
-    text_corpus = [
-        _clean_text_strings(s=_combine_tokens_to_str(t)) for t in non_empty_texts
+    # Save original length for sampling
+    original_len = len(min_len_freq_tokens)
+    min_sized_texts = [
+        [i, t] for i, t in enumerate(min_len_freq_tokens) if len(t) > min_tokens
     ]
 
-    if max_text_len != None and type(max_text_len) == int:
-        token_corpus = [t[:max_text_len] for t in non_empty_texts]
-    else:
-        token_corpus = non_empty_texts
+    token_corpus = [[t[0], t[1][:max_token_index]] for t in min_sized_texts]
 
-    # Sample texts if desired
-    if sample_size != 1:
-        selected_idxs = [
-            i
-            for i in random.choices(
-                range(len(token_corpus)), k=int(sample_size * len(token_corpus))
-            )
-        ]
-    else:
-        selected_idxs = list(range(len(token_corpus)))
+    text_corpus = [
+        [t[0], _clean_text_strings(s=_combine_tokens_to_str(t[1]))]
+        for t in token_corpus
+    ]
 
-    text_corpus = [text_corpus[i] for i in selected_idxs]
-    token_corpus = [token_corpus[i] for i in selected_idxs]
+    # Sample texts
+    if len(token_corpus) > int(sample_size * original_len):
+        idxs = [t[0] for t in token_corpus]
+        selected_idxs = np.random.choice(
+            a=idxs, size=int(sample_size * original_len), replace=False
+        )
+
+    else:
+        selected_idxs = [t[0] for t in token_corpus]
+
+    text_corpus = [t[1] for t in text_corpus if t[0] in selected_idxs]
+    token_corpus = [t[1] for t in token_corpus if t[0] in selected_idxs]
     pbar.update()
 
     return text_corpus, token_corpus, selected_idxs

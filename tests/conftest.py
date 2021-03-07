@@ -81,9 +81,10 @@ book_texts = [b[1] for b in books]
 
 txts, tokens = data_utils.clean(
     texts=book_texts,
-    min_freq=2,
-    min_word_len=3,
-    max_text_len=None,
+    min_token_freq=2,
+    min_token_len=3,
+    min_tokens=0,
+    max_token_index=-1,
     remove_names=True,
     sample_size=1,
     verbose=True,
