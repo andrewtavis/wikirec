@@ -28,7 +28,13 @@ from sentence_transformers import SentenceTransformer
 from wikirec import utils
 
 
-def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
+def gen_sim_matrix(
+    method="lda",
+    metric="cosine",
+    corpus=None,
+    bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
+    **kwargs,
+):
     """
     Derives similarities between the entries in the text corpus
 
@@ -70,8 +76,11 @@ def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
         corpus : list or list of lists (default=None)
             The text corpus over which analysis should be done
 
+        bert_st_model : str (deafault=xlm-r-bert-base-nli-stsb-mean-tokens)
+            The BERT model to use
+
         **kwargs : keyword arguments
-            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, or gensim.models.ldamulticore.LdaMulticore
+            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer
 
     Returns
     -------
@@ -90,7 +99,7 @@ def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
         )
 
     if method == "bert":
-        bert_model = SentenceTransformer("bert-base-nli-mean-tokens")
+        bert_model = SentenceTransformer(bert_st_model)
 
         document_embeddings = bert_model.encode(corpus, **kwargs)
 
@@ -155,7 +164,7 @@ def gen_sim_matrix(method="lda", metric="cosine", corpus=None, **kwargs):
         return sim_matrix
 
     elif method == "tfidf":
-        tfidfvectoriser = TfidfVectorizer()
+        tfidfvectoriser = TfidfVectorizer(**kwargs)
         tfidfvectoriser.fit(corpus)
         tfidf_vectors = tfidfvectoriser.transform(corpus)
 

@@ -70,6 +70,7 @@ def graph_lda_topic_evals(
     topic_nums_to_compare=None,
     metrics=True,
     verbose=True,
+    **kwargs,
 ):
     """
     Graphs metrics for the given models over the given number of topics
@@ -97,6 +98,9 @@ def graph_lda_topic_evals(
 
         verbose : bool (default=True)
             Whether to show a tqdm progress bar for the query
+
+        **kwargs : keyword arguments
+            Arguments correspoding to gensim.models.ldamulticore.LdaMulticore
 
     Returns
     -------
@@ -154,12 +158,7 @@ def graph_lda_topic_evals(
         iterable=topic_nums_to_compare, desc="LDA models ran", disable=disable
     ):
         LDA_models[i] = LdaMulticore(
-            corpus=bow_corpus,
-            id2word=dirichlet_dict,
-            num_topics=i,
-            chunksize=len(bow_corpus),
-            passes=20,
-            random_state=None,
+            corpus=bow_corpus, id2word=dirichlet_dict, num_topics=i, **kwargs
         )
 
         shown_topics = LDA_models[i].show_topics(
