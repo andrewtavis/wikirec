@@ -66,9 +66,7 @@ data_utils.parse_to_ndjson(
 
 The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) directory has a compressed copy of `enwiki_books.ndjson` for testing purposes.
 
-[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the loaded articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) for the full breakdown of what is available for each language.
-
-Generating a clean text and token corpus is achieved through the following:
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the loaded articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) for the full breakdown of what is available for each language. Generating a clean text and token corpus is achieved through the following:
 
 ```python
 import json
@@ -88,7 +86,7 @@ text_corpus, token_corpus, selected_idxs = data_utils.clean(
     max_token_index=-1,
 )
 
-titles = [titles[i] for i in selected_idxs]
+selected_titles = [titles[i] for i in selected_idxs]
 ```
 
 # Methods [`↩`](#jumpto)
@@ -176,7 +174,7 @@ inputs = ["Harry Potter and the Philosopher's Stone", "The Hobbit"]
 
 recs = model.recommend(
     inputs=inputs,
-    titles=titles,
+    titles=selected_titles,
     sim_matrix=bert_sim_matrix,
     n=10,
 )
