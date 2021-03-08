@@ -37,7 +37,7 @@
 .. |codestyle| image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
-.. |colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+.. |colab| image:: https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=5B5B5B
     :target: https://colab.research.google.com/github/andrewtavis/wikirec
 
 Open-source recommendation engines based on Wikipedia data
