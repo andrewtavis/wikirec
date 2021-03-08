@@ -10,11 +10,11 @@ with open("README.md", "r") as fh:
 
 setup_args = dict(
     name="wikirec",
-    version="0.0.3.2",
+    version="0.1.0",
     author="Andrew Tavis McAllister",
     author_email="andrew.t.mcallister@gmail.com",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",

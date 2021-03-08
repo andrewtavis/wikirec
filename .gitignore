@@ -38,3 +38,5 @@ wikirec-dev
 ###############
 .coverage
 _*.ipynb
+*.ndjson.zip
+*.pkl

@@ -5,8 +5,10 @@ The :py:mod:`model` module provides needed functions for modeling text corpuses 
 
 **Functions**
 
+* :py:func:`wikirec.model.gen_embeddings`
 * :py:func:`wikirec.model.gen_sim_matrix`
 * :py:func:`wikirec.model.recommend`
 
+.. autofunction:: wikirec.model.gen_embeddings
 .. autofunction:: wikirec.model.gen_sim_matrix
 .. autofunction:: wikirec.model.recommend
