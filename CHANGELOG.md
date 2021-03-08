@@ -2,9 +2,9 @@
 
 First stable release of wikirec
 
-- Files to subset Wikipedia of any language by infobox topics have been provided
+- Functions to subset Wikipedia in any language by infobox topics have been provided
 
-- A multilingual cleaning process that can clean and tokenize texts or any language to varying degrees of efficacy is included
+- A multilingual cleaning process that can clean texts of any language to varying degrees of efficacy is included
 
 - Similarity matrices can be generated from embeddings using the following models:
   - BERT

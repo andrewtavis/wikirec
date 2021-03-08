@@ -21,7 +21,7 @@
 [//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
 **Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Recommendations](#recommendations-) • [Comparative Results](#comparative-results-) • [To-Do](#to-do-)
 
-**wikirec** is a framework that allows users to parse Wikipedia of any language for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly create recommendation engines based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
 
 # Installation via PyPi
 
