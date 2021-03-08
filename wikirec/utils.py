@@ -77,7 +77,7 @@ def graph_lda_topic_evals(
 
     Parameters
     ----------
-        corpus : list or list of lists
+        corpus : list of lists (default=None)
             The text corpus over which analysis should be done
 
         num_topic_words : int (default=10)
@@ -113,6 +113,9 @@ def graph_lda_topic_evals(
 
     if metrics == True:
         metrics = ["stability", "coherence"]
+
+    if type(corpus[0]) != list:
+        corpus = [c.split() for c in corpus]
 
     def jaccard_similarity(topic_1, topic_2):
         """

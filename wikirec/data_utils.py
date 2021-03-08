@@ -11,7 +11,6 @@ Contents:
     iterate_and_parse_file,
     parse_to_ndjson,
     _combine_tokens_to_str,
-    _clean_text_strings,
     lemmatize,
     clean
 
@@ -451,8 +450,8 @@ def parse_to_ndjson(
             """Read in json data from a file_path"""
             data = []
 
-            with open(file_path, "r") as fin:
-                for l in fin.readlines():
+            with open(file_path, "r") as f:
+                for l in f.readlines():
                     data.append(json.loads(l))
 
             return data
@@ -520,36 +519,6 @@ def _combine_tokens_to_str(texts, ignore_words=None):
     return texts_str
 
 
-def _clean_text_strings(s):
-    """
-    Cleans the string of a text body to prepare it for BERT analysis
-
-    Parameters
-    ----------
-        s : str
-            The combined texts to be cleaned
-
-    Returns
-    -------
-        s : str
-            The texts formatted for analysis
-    """
-    s = re.sub(r"([a-z])([A-Z])", r"\1\. \2", s)
-    s = s.lower()
-    s = re.sub(r"&gt|&lt", " ", s)
-    s = re.sub(r"([a-z])\1{2,}", r"\1", s)
-    s = re.sub(r"([\W+])\1{1,}", r"\1", s)
-    s = re.sub(r"\*|\W\*|\*\W", ". ", s)
-    s = re.sub(r"\(.*?\)", ". ", s)
-    s = re.sub(r"\W+?\.", ".", s)
-    s = re.sub(r"(\.|\?|!)(\w)", r"\1 \2", s)
-    s = re.sub(r" ing ", " ", s)
-    s = re.sub(r"product received for free[.| ]", " ", s)
-    s = re.sub(r"(.{2,}?)\1{1,}", r"\1", s)
-
-    return s.strip()
-
-
 def lemmatize(tokens, nlp=None):
     """
     Lemmatizes tokens
@@ -589,6 +558,7 @@ def clean(
     min_token_len=3,
     min_tokens=0,
     max_token_index=-1,
+    ignore_words=None,
     remove_names=False,
     sample_size=1,
     verbose=True,
@@ -616,6 +586,9 @@ def clean(
         max_token_index : int (default=-1)
             The maximum allowable length of a tokenized text
 
+        ignore_words : str or list
+            Strings that should be removed from the text body
+
         remove_names : bool (default=False)
             Whether to remove the most common English names
 
@@ -627,8 +600,8 @@ def clean(
 
     Returns
     -------
-        text_corpus, token_corpus, selected_idxs : list or list of lists, list, list
-            The texts formatted for text analysis both as strings as tokens, as well as the indexes for selected entries
+        text_corpus, selected_idxs : list, list
+            The texts formatted for text analysis as well as the indexes for selected entries
     """
     language = language.lower()
 
@@ -638,6 +611,9 @@ def clean(
 
     if type(texts) == str:
         texts = [texts]
+
+    if type(ignore_words) == str:
+        ignore_words = [ignore_words]
 
     disable = not verbose
     pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps", disable=disable)
@@ -814,7 +790,7 @@ def clean(
     token_corpus = [[t[0], t[1][:max_token_index]] for t in min_sized_texts]
 
     text_corpus = [
-        [t[0], _clean_text_strings(s=_combine_tokens_to_str(t[1]))]
+        [t[0], _combine_tokens_to_str(t[1], ignore_words=ignore_words)]
         for t in token_corpus
     ]
 
@@ -829,10 +805,9 @@ def clean(
         selected_idxs = [t[0] for t in token_corpus]
 
     text_corpus = [t[1] for t in text_corpus if t[0] in selected_idxs]
-    token_corpus = [t[1] for t in token_corpus if t[0] in selected_idxs]
     pbar.update()
 
-    return text_corpus, token_corpus, selected_idxs
+    return text_corpus, selected_idxs
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
