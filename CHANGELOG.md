@@ -1,4 +1,4 @@
-### wikirec 0.1.0 (March 7, 2021)
+### wikirec 0.1.0 (March 8, 2021)
 
 First stable release of wikirec
 
