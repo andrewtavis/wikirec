@@ -43,7 +43,7 @@ import wikirec
 
 # Data [`↩`](#jumpto)
 
-[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given document topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
 Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topic` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
 
@@ -148,7 +148,7 @@ from wikirec import model
 lda_embeddings = model.gen_embeddings(
         method="lda",
         corpus=text_corpus,
-        num_topics=35,
+        num_topics=50,
         passes=10,
         decay=0.5,
 )
@@ -215,7 +215,7 @@ Harry Potter and the Philosopher's Stone recommendations:
  ['Harry Potter and the Cursed Child', 0.5019619677408425],
  ['Fantastic Beasts and Where to Find Them', 0.48860861798783956]]
 
- Note: The Prisoner of Azkaban is lost due to the prevalence of 'black'
+ Note: The Prisoner of Azkaban is lower due to the prevalence of 'black'
 
 The Hobbit recommendations:
  [['The History of The Hobbit', 0.6968314428704283],
