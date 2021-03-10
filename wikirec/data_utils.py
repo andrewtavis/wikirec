@@ -501,13 +501,13 @@ def parse_to_ndjson(
     return
 
 
-def _combine_tokens_to_str(texts):
+def _combine_tokens_to_str(tokens):
     """
     Combines the texts into one string
 
     Parameters
     ----------
-        texts : str or list
+        tokens : str or list
             The texts to be combined
 
     Returns
@@ -515,10 +515,10 @@ def _combine_tokens_to_str(texts):
         texts_str : str
             A string of the full text with unwanted words removed
     """
-    if type(texts[0]) == list:
-        flat_words = [word for sublist in texts for word in sublist]
+    if type(tokens[0]) == list:
+        flat_words = [word for sublist in tokens for word in sublist]
     else:
-        flat_words = texts
+        flat_words = tokens
 
     texts_str = " ".join([word for word in flat_words])
 
@@ -570,7 +570,7 @@ def _lower_remove_unwanted(args):
     return text_lower
 
 
-def _lemmatize(tokens, nlp=None):
+def _lemmatize(tokens, nlp=None, verbose=True):
     """
     Lemmatizes tokens
 
@@ -581,6 +581,9 @@ def _lemmatize(tokens, nlp=None):
         nlp : spacy.load object
             A spacy language model
 
+        verbose : bool (default=True)
+            Whether to show a tqdm progress bar for the query
+
     Returns
     -------
         lemmatized_tokens : list or list of lists
@@ -588,9 +591,16 @@ def _lemmatize(tokens, nlp=None):
     """
     allowed_pos_tags = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 
+    disable = not verbose
     lemmatized_tokens = []
-    for t in tokens:
-        combined_tokens = _combine_tokens_to_str(texts=t)
+    for t in tqdm(
+        tokens,
+        total=len(tokens),
+        desc="Texts lemmatized",
+        unit="text",
+        disable=disable,
+    ):
+        combined_tokens = _combine_tokens_to_str(tokens=t)
 
         lem_tokens = nlp(combined_tokens)
         lemmed_tokens = [
@@ -626,7 +636,7 @@ def _subset_and_combine_tokens(args):
 
     sub_comb_text = [
         text[0],
-        _combine_tokens_to_str(text[1][:max_token_index]),
+        _combine_tokens_to_str(tokens=text[1][:max_token_index]),
     ]
 
     return sub_comb_text
@@ -810,6 +820,7 @@ def clean(
                     disable=disable,
                 )
             )
+
     gc.collect()
     pbar.update()
 
@@ -817,13 +828,13 @@ def clean(
     nlp = None
     try:
         nlp = spacy.load(language)
-        lemmatized_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp)
+        base_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp, verbose=verbose)
 
     except OSError:
         try:
             os.system("python -m spacy download {}".format(language))
             nlp = spacy.load(language)
-            lemmatized_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp)
+            base_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp, verbose=verbose)
 
         except:
             pass
@@ -849,20 +860,26 @@ def clean(
 
         if stemmer != None:
             # Stemming instead of lemmatization
-            lemmatized_tokens = []  # still call it lemmatized for consistency
-            for tokens in tokens_lower:
+            base_tokens = []
+            for tokens in tqdm(
+                tokens_lower,
+                total=len(tokens_lower),
+                desc="Texts stemmed",
+                unit="text",
+                disable=disable,
+            ):
                 stemmed_tokens = [stemmer.stem(t) for t in tokens]
-                lemmatized_tokens.append(stemmed_tokens)
+                base_tokens.append(stemmed_tokens)
 
         else:
             # We cannot lemmatize or stem
-            lemmatized_tokens = tokens_lower
+            base_tokens = tokens_lower
 
     gc.collect()
     pbar.update()
 
     token_frequencies = defaultdict(int)
-    for tokens in lemmatized_tokens:
+    for tokens in base_tokens:
         for t in list(set(tokens)):
             token_frequencies[t] += 1
 
@@ -879,7 +896,7 @@ def clean(
     ), "The 'min_token_freq' argument must be an integer if used"
 
     min_len_freq_tokens = []
-    for tokens in lemmatized_tokens:
+    for tokens in base_tokens:
         min_len_freq_tokens.append(
             [
                 t

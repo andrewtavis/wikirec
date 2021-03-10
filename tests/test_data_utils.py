@@ -18,9 +18,9 @@ def test__combine_tokens_to_str():
     texts_lol = [["words", "to"], ["be", "combined"]]
     result = "words to be combined"
 
-    assert data_utils._combine_tokens_to_str(texts=texts) == result
+    assert data_utils._combine_tokens_to_str(tokens=texts) == result
 
-    assert data_utils._combine_tokens_to_str(texts=texts_lol) == result
+    assert data_utils._combine_tokens_to_str(tokens=texts_lol) == result
 
 
 def test__lower_remove_unwanted():
