@@ -288,7 +288,6 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 - Compiling other sources of open-source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
 - Allowing multiple infobox topics to be subsetted for at once in [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) functions
-- Speeding up the cleaning process of [wikirec.data_utils.clean()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py)
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
 - Making recommendations faster in [wikirec.model.recommend()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
   - Recommendations can at times take a moment given the for loop to find input names
