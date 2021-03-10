@@ -77,13 +77,23 @@ def test_recommend(titles, sim_matrix_cosine, sim_matrix_euclidean):
     n = 5
 
     recs = model.recommend(
-        inputs=titles[0], titles=titles, sim_matrix=sim_matrix_euclidean, n=n,
+        inputs=titles[0],
+        titles=titles,
+        sim_matrix=sim_matrix_euclidean,
+        n=n,
+        metric="euclidean",
     )
 
     assert len(recs) == n
+    assert recs[0][1] == min([r[1] for r in recs])
 
     recs = model.recommend(
-        inputs=[titles[0], titles[1]], titles=titles, sim_matrix=sim_matrix_cosine, n=n,
+        inputs=[titles[0], titles[1]],
+        titles=titles,
+        sim_matrix=sim_matrix_cosine,
+        n=n,
+        metric="cosine",
     )
 
     assert len(recs) == n
+    assert recs[0][1] == max([r[1] for r in recs])

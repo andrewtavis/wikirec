@@ -9,7 +9,7 @@ dependencies:
   - appnope=0.1.2
   - argon2-cffi=20.1.0
   - astor=0.8.1
-  - astroid=2.3.3
+  - astroid=2.5
   - async-timeout=3.0.1
   - async_generator=1.10
   - attrs=20.3.0
@@ -69,7 +69,7 @@ dependencies:
   - ipykernel=5.3.4
   - ipython_genutils=0.2.0
   - ipywidgets=7.6.3
-  - isort=4.3.21
+  - isort=5.7.0
   - jedi=0.17.0
   - jinja2=2.11.3
   - jmespath=0.10.0
@@ -122,6 +122,7 @@ dependencies:
   - nbformat=5.1.2
   - ncurses=6.2
   - nest-asyncio=1.5.1
+  - nltk=3.5
   - notebook=6.2.0
   - numpy=1.19.2
   - numpy-base=1.19.2
@@ -153,7 +154,7 @@ dependencies:
   - pyasn1-modules=0.2.8
   - pycparser=2.20
   - pygments=2.8.0
-  - pylint=2.4.4
+  - pylint=2.7.1
   - pyopenssl=20.0.1
   - pyparsing=2.4.7
   - pyqt=5.9.2
@@ -253,3 +254,4 @@ dependencies:
     - tokenizers==0.10.1
     - torch==1.7.1
     - transformers==4.3.3
+    - wikirec==0.1.0

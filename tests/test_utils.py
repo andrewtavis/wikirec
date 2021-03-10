@@ -27,7 +27,3 @@ def test_graph_lda_topic_evals(monkeypatch, text_corpus):
         metrics=True,
         verbose=True,
     )
-
-
-def test_english_names_list():
-    assert type(utils.english_names_list()) == list
