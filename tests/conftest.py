@@ -21,9 +21,10 @@ from wikirec.data_utils import _process_article
 from wikirec.data_utils import iterate_and_parse_file
 from wikirec.data_utils import parse_to_ndjson
 from wikirec.data_utils import _combine_tokens_to_str
-from wikirec.data_utils import add_digrams
-from wikirec.data_utils import lower_remove_unwanted
-from wikirec.data_utils import lemmatize
+from wikirec.data_utils import _add_digrams
+from wikirec.data_utils import _lower_remove_unwanted
+from wikirec.data_utils import _lemmatize
+from wikirec.data_utils import _subset_and_combine_tokens
 from wikirec.data_utils import clean
 
 from wikirec import model

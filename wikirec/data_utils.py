@@ -11,9 +11,10 @@ Contents:
     iterate_and_parse_file,
     parse_to_ndjson,
     _combine_tokens_to_str,
-    add_digrams,
-    lower_remove_unwanted,
-    lemmatize,
+    _add_digrams,
+    _lower_remove_unwanted,
+    _lemmatize,
+    _subset_and_combine_tokens
     clean
 
     WikiXmlHandler Class
@@ -57,7 +58,7 @@ except:
 
 male_names = names.words("male.txt")
 female_names = names.words("female.txt")
-all_names = set(male_names + female_names)
+all_names = set(list(male_names) + list(female_names))
 
 import spacy
 from stopwordsiso import stopwords
@@ -501,7 +502,7 @@ def parse_to_ndjson(
     return
 
 
-def _combine_tokens_to_str(texts, ignore_words=None):
+def _combine_tokens_to_str(texts):
     """
     Combines the texts into one string
 
@@ -509,9 +510,6 @@ def _combine_tokens_to_str(texts, ignore_words=None):
     ----------
         texts : str or list
             The texts to be combined
-
-        ignore_words : str or list
-            Strings that should be removed from the text body
 
     Returns
     -------
@@ -523,18 +521,12 @@ def _combine_tokens_to_str(texts, ignore_words=None):
     else:
         flat_words = texts
 
-    if type(ignore_words) == str:
-        ignore_words = [ignore_words]
-    elif ignore_words == None:
-        ignore_words = []
-
-    flat_words = [word for word in flat_words if word not in ignore_words]
     texts_str = " ".join([word for word in flat_words])
 
     return texts_str
 
 
-def add_digrams(args):
+def _add_digrams(args):
     """
     Adds digrams to a tokenized text using gensim.models.Phrases
 
@@ -572,14 +564,14 @@ def add_digrams(args):
     return text
 
 
-def lower_remove_unwanted(args):
+def _lower_remove_unwanted(args):
     """
     Lower cases tokens and removes numbers and possibly names
 
     Parameters
     ----------
         args : list of tuples
-            The following arguments
+            The following arguments zipped
 
         text : list
             The text to clean
@@ -587,28 +579,37 @@ def lower_remove_unwanted(args):
         remove_names : bool
             Whether to remove names
 
+        ignore_words : str or list
+                Strings that should be removed from the text body
+
     Returns
     -------
         text_lower : list
             The text with lowercased tokens and without unwanted tokens
     """
-    text, remove_names = args
+    text, remove_names, ignore_words = args
 
     if remove_names:
         # Remove names and numbers after digrams have been created
         text_lower = [
             token.lower()
             for token in text
-            if token not in all_names and not token.isnumeric()
+            if token not in all_names
+            and not token.isnumeric()
+            and token not in ignore_words
         ]
     else:
         # Or simply lower case tokens and remove non-bigrammed numbers
-        text_lower = [token.lower() for token in text if not token.isnumeric()]
+        text_lower = [
+            token.lower()
+            for token in text
+            if not token.isnumeric() and token not in ignore_words
+        ]
 
     return text_lower
 
 
-def lemmatize(tokens, nlp=None):
+def _lemmatize(tokens, nlp=None):
     """
     Lemmatizes tokens
 
@@ -638,6 +639,36 @@ def lemmatize(tokens, nlp=None):
         lemmatized_tokens.append(lemmed_tokens)
 
     return lemmatized_tokens
+
+
+def _subset_and_combine_tokens(args):
+    """
+        Subsets a text by a maximum length and combines it to a string.
+
+        Parameters
+        ----------
+            args : list of tuples
+                The following arguments zipped
+
+            text : list
+                The list of tokens to be subsetted for and combined
+
+            max_token_index : int (default=-1)
+                The maximum allowable length of a tokenized text
+
+        Returns
+        -------
+            sub_comb_text : tuple
+                An index and its combined text
+        """
+    text, max_token_index = args
+
+    sub_comb_text = [
+        text[0],
+        _combine_tokens_to_str(text[1][:max_token_index]),
+    ]
+
+    return sub_comb_text
 
 
 def clean(
@@ -703,6 +734,8 @@ def clean(
 
     if type(ignore_words) == str:
         ignore_words = [ignore_words]
+    elif ignore_words == None:
+        ignore_words = []
 
     disable = not verbose
     pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps", disable=disable)
@@ -780,26 +813,48 @@ def clean(
     num_cores = os.cpu_count()
     if __name__ == "wikirec.data_utils":
         with Pool(processes=num_cores) as pool:
-            tokens_with_digrams = list(pool.imap(add_digrams, args))
+            tokens_with_digrams = list(
+                tqdm(
+                    pool.imap(_add_digrams, args),
+                    total=len(tokenized_texts),
+                    desc="Digrams generated",
+                    unit="text",
+                    disable=disable,
+                )
+            )
+    gc.collect()
     pbar.update()
 
-    args = zip(tokens_with_digrams, [remove_names] * len(tokens_with_digrams))
+    args = zip(
+        tokens_with_digrams,
+        [remove_names] * len(tokens_with_digrams),
+        [ignore_words] * len(tokens_with_digrams),
+    )
     if __name__ == "wikirec.data_utils":
         with Pool(processes=num_cores) as pool:
-            tokens_lower = list(pool.imap(lower_remove_unwanted, args))
+            tokens_lower = list(
+                tqdm(
+                    pool.imap(_lower_remove_unwanted, args),
+                    total=len(tokens_with_digrams),
+                    desc="Unwanted words removed",
+                    unit="text",
+                    disable=disable,
+                )
+            )
+    gc.collect()
     pbar.update()
 
     # Try lemmatization, and if not available stem, and if not available nothing
     nlp = None
     try:
         nlp = spacy.load(language)
-        lemmatized_tokens = lemmatize(tokens=tokens_lower, nlp=nlp)
+        lemmatized_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp)
 
     except OSError:
         try:
             os.system("python -m spacy download {}".format(language))
             nlp = spacy.load(language)
-            lemmatized_tokens = lemmatize(tokens=tokens_lower, nlp=nlp)
+            lemmatized_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp)
 
         except:
             pass
@@ -869,22 +924,29 @@ def clean(
         [i, t] for i, t in enumerate(min_len_freq_tokens) if len(t) > min_tokens
     ]
 
-    token_corpus = [[t[0], t[1][:max_token_index]] for t in min_sized_texts]
-
-    text_corpus = [
-        [t[0], _combine_tokens_to_str(t[1], ignore_words=ignore_words)]
-        for t in token_corpus
-    ]
+    args = zip(min_sized_texts, [max_token_index] * len(min_sized_texts))
+    if __name__ == "wikirec.data_utils":
+        with Pool(processes=num_cores) as pool:
+            text_corpus = list(
+                tqdm(
+                    pool.imap(_subset_and_combine_tokens, args),
+                    total=len(min_sized_texts),
+                    desc="Texts finalized",
+                    unit="text",
+                    disable=disable,
+                )
+            )
+    gc.collect()
 
     # Sample texts
-    if len(token_corpus) > int(sample_size * original_len):
-        idxs = [t[0] for t in token_corpus]
+    if len(text_corpus) > int(sample_size * original_len):
+        idxs = [t[0] for t in text_corpus]
         selected_idxs = np.random.choice(
             a=idxs, size=int(sample_size * original_len), replace=False
         )
 
     else:
-        selected_idxs = [t[0] for t in token_corpus]
+        selected_idxs = [t[0] for t in text_corpus]
 
     text_corpus = [t[1] for t in text_corpus if t[0] in selected_idxs]
     pbar.update()
