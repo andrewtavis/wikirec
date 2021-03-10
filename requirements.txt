@@ -5,7 +5,7 @@ appdirs==1.4.4
 appnope==0.1.2
 argon2-cffi==20.1.0
 astor==0.8.1
-astroid==2.3.3
+astroid==2.5
 async-generator==1.10
 async-timeout==3.0.1
 attrs==20.3.0
@@ -28,13 +28,14 @@ click==7.1.2
 cmarkgfm==0.4.2
 colorama==0.4.4
 coverage==5.5
-cryptography>=3.3.1
+cryptography==3.3.1
 cycler==0.10.0
 cymem==2.0.5
 Cython==0.29.22
 decorator==4.4.2
 defusedxml==0.6.0
 docutils==0.16
+en-core-web-sm==2.3.1
 entrypoints==0.3
 filelock==3.0.12
 future==0.18.2
@@ -55,10 +56,10 @@ imagesize==1.2.0
 importlib-metadata==2.0.0
 iniconfig==1.1.1
 ipykernel==5.3.4
-ipython==7.10.0
+ipython==7.21.0
 ipython-genutils==0.2.0
 ipywidgets==7.6.3
-isort==4.3.21
+isort==5.7.0
 jedi==0.17.0
 Jinja2==2.11.3
 jmespath==0.10.0
@@ -100,6 +101,7 @@ nbclient==0.5.3
 nbconvert==6.0.7
 nbformat==5.1.2
 nest-asyncio==1.5.1
+nltk==3.5
 notebook==6.2.0
 numpy==1.19.2
 olefile==0.46
@@ -126,7 +128,7 @@ pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
 Pygments==2.7.4
-pylint==2.4.4
+pylint==2.7.1
 pyOpenSSL==20.0.1
 pyparsing==2.4.7
 pyrsistent==0.17.3
@@ -195,6 +197,7 @@ webencodings==0.5.1
 Werkzeug==1.0.1
 wheel==0.36.2
 widgetsnbextension==3.5.1
+wikirec==0.1.0
 wrapt==1.12.1
 yarl==1.5.1
 zipp==3.4.0
