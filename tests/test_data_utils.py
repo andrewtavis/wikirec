@@ -40,6 +40,16 @@ def test__combine_tokens_to_str():
     )
 
 
+def test_lower_remove_unwanted():
+    assert data_utils.lower_remove_unwanted(
+        args=(["Harry", "Potter", "25", "Zoo"], True)
+    ) == ["potter", "zoo"]
+
+    assert data_utils.lower_remove_unwanted(
+        args=(["Harry", "Potter", "25", "Zoo"], False)
+    ) == ["harry", "potter", "zoo"]
+
+
 def test_lemmatize():
     try:
         nlp = spacy.load("en")
