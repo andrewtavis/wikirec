@@ -239,7 +239,7 @@ def gen_sim_matrix(
 
 
 def recommend(
-    inputs=None, titles=None, sim_matrix=None, n=10,
+    inputs=None, titles=None, sim_matrix=None, metric="cosine", n=10,
 ):
     """
     Recommends similar items given an input or list of inputs of interest
@@ -257,6 +257,11 @@ def recommend(
 
         n : int (default=10)
             The number of items to recommend
+
+        metric : str (default=cosine)
+            The metric to be used when comparing vectorized corpus entries
+
+            Options include: cosine and euclidean
 
     Returns
     -------
@@ -296,10 +301,10 @@ def recommend(
 
     titles_and_scores = [[titles[i], sims[i]] for i in range(len(titles))]
 
-    if sim_matrix.all() <= 1:
+    if metric == "cosine":
         # Cosine similarities have been used (higher is better)
         recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=True)
-    else:
+    elif metric == "euclidean":
         # Euclidean distances have been used (lower is better)
         recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=False)
 

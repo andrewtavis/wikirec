@@ -36,7 +36,6 @@ from wikirec.languages import sw_abbr_dict
 from wikirec.utils import _check_str_similarity
 from wikirec.utils import _check_str_args
 from wikirec.utils import graph_lda_topic_evals
-from wikirec.utils import english_names_list
 
 np.random.seed(42)
 

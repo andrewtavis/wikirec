@@ -44,6 +44,7 @@ import mwparserfromhell
 from bs4 import BeautifulSoup
 
 from nltk.stem.snowball import SnowballStemmer
+from nltk.corpus import names
 import spacy
 from stopwordsiso import stopwords
 from gensim.models import Phrases
@@ -590,7 +591,7 @@ def clean(
             Strings that should be removed from the text body
 
         remove_names : bool (default=False)
-            Whether to remove the most common English names
+            Whether to remove common names
 
         sample_size : float (default=1)
             The amount of data to be randomly sampled
@@ -671,10 +672,11 @@ def clean(
     else:
         stop_words = []
 
+    # We lower case after names are removed to allow for filtering out capitalized words
     tokenized_texts = [
         [
             word
-            for word in text.lower().split()
+            for word in text.split()
             if word not in stop_words and not word.isnumeric()
         ]
         for text in texts_no_punctuation
@@ -699,11 +701,17 @@ def clean(
     if remove_names:
         tokens_with_bigrams = [
             [
-                t
-                for t in text
-                if t not in [n.lower() for n in utils.english_names_list()]
+                token.lower()
+                for token in text
+                if token not in names.words("male.txt")
+                and token not in names.words("female.txt")
             ]
             for text in tokens_with_bigrams
+        ]
+    else:
+        # Or simply lower case tokens
+        tokens_with_bigrams = [
+            [token.lower() for token in text] for text in tokens_with_bigrams
         ]
     pbar.update()
 
