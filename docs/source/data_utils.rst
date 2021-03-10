@@ -12,7 +12,6 @@ The :py:mod:`data_utils` module provides needed functions for data loading and p
 * :py:func:`wikirec.data_utils.parse_to_ndjson`
 * :py:func:`wikirec.data_utils._combine_tokens_to_str`
 * :py:func:`wikirec.data_utils._clean_text_strings`
-* :py:func:`wikirec.data_utils._add_digrams`
 * :py:func:`wikirec.data_utils._lower_remove_unwanted`
 * :py:func:`wikirec.data_utils._lemmatize`
 * :py:func:`wikirec.data_utils._subset_and_combine_tokens`
@@ -30,7 +29,6 @@ The :py:mod:`data_utils` module provides needed functions for data loading and p
 .. autofunction:: wikirec.data_utils.parse_to_ndjson
 .. autofunction:: wikirec.data_utils._combine_tokens_to_str
 .. autofunction:: wikirec.data_utils._clean_text_strings
-.. autofunction:: wikirec.data_utils._add_digrams
 .. autofunction:: wikirec.data_utils._lower_remove_unwanted
 .. autofunction:: wikirec.data_utils._lemmatize
 .. autofunction:: wikirec.data_utils._subset_and_combine_tokens

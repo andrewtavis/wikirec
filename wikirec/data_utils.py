@@ -11,7 +11,6 @@ Contents:
     iterate_and_parse_file,
     parse_to_ndjson,
     _combine_tokens_to_str,
-    _add_digrams,
     _lower_remove_unwanted,
     _lemmatize,
     _subset_and_combine_tokens
@@ -526,44 +525,6 @@ def _combine_tokens_to_str(texts):
     return texts_str
 
 
-def _add_digrams(args):
-    """
-    Adds digrams to a tokenized text using gensim.models.Phrases
-
-    Parameters
-    ----------
-        args : list of tuples
-            The following arguments zipped
-
-        text : list
-            A list of tokens
-
-        bigrams : gensim.models.phrases.Phrases
-            Bigrams of the text corpus
-
-        trigrams : gensim.models.phrases.Phrases
-            trigrams of the text corpus
-
-    Returns
-    -------
-        text : list
-            The given text with bigrams and trigrams added
-    """
-    text, bigrams, trigrams = args
-
-    for token in bigrams[text]:
-        if token.count("_") == 1:
-            # Token is a bigram, so add it to the tokens
-            text.insert(0, token)
-
-    for token in trigrams[bigrams[text]]:
-        if token.count("_") == 2:
-            # Token is a trigram, so add it to the tokens
-            text.insert(0, token)
-
-    return text
-
-
 def _lower_remove_unwanted(args):
     """
     Lower cases tokens and removes numbers and possibly names
@@ -759,6 +720,8 @@ def clean(
             t = t.replace(w, "")
 
         texts_no_websites.append(t)
+
+    gc.collect()
     pbar.update()
 
     texts_no_random_punctuation = []
@@ -796,6 +759,8 @@ def clean(
         [word for word in text.split() if word.lower() not in stop_words]
         for text in texts_no_punctuation
     ]
+
+    gc.collect()
     pbar.update()
 
     # Add bigrams and trigrams
@@ -804,24 +769,26 @@ def clean(
     )  # minimum count for a bigram to be included is 3, and half the normal threshold
     trigrams = Phrases(sentences=bigrams[tokenized_texts], min_count=3, threshold=5.0,)
 
-    args = zip(
+    tokens_with_digrams = []
+    for text in tqdm(
         tokenized_texts,
-        [bigrams] * len(tokenized_texts),
-        [trigrams] * len(tokenized_texts),
-    )
+        total=len(tokenized_texts),
+        desc="Digrams generated",
+        unit="text",
+        disable=disable,
+    ):
+        for token in bigrams[text]:
+            if token.count("_") == 1:
+                # Token is a bigram, so add it to the tokens
+                text.insert(0, token)
 
-    num_cores = os.cpu_count()
-    if __name__ == "wikirec.data_utils":
-        with Pool(processes=num_cores) as pool:
-            tokens_with_digrams = list(
-                tqdm(
-                    pool.imap(_add_digrams, args),
-                    total=len(tokenized_texts),
-                    desc="Digrams generated",
-                    unit="text",
-                    disable=disable,
-                )
-            )
+        for token in trigrams[bigrams[text]]:
+            if token.count("_") == 2:
+                # Token is a trigram, so add it to the tokens
+                text.insert(0, token)
+
+        tokens_with_digrams.append(text)
+
     gc.collect()
     pbar.update()
 
@@ -830,6 +797,8 @@ def clean(
         [remove_names] * len(tokens_with_digrams),
         [ignore_words] * len(tokens_with_digrams),
     )
+
+    num_cores = os.cpu_count()
     if __name__ == "wikirec.data_utils":
         with Pool(processes=num_cores) as pool:
             tokens_lower = list(
@@ -888,6 +857,8 @@ def clean(
         else:
             # We cannot lemmatize or stem
             lemmatized_tokens = tokens_lower
+
+    gc.collect()
     pbar.update()
 
     token_frequencies = defaultdict(int)
@@ -916,6 +887,8 @@ def clean(
                 if len(t) >= min_token_len and token_frequencies[t] >= min_token_freq
             ]
         )
+
+    gc.collect()
     pbar.update()
 
     # Save original length for sampling
@@ -936,6 +909,7 @@ def clean(
                     disable=disable,
                 )
             )
+
     gc.collect()
 
     # Sample texts
