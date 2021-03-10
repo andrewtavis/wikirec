@@ -11,6 +11,8 @@ Contents:
     iterate_and_parse_file,
     parse_to_ndjson,
     _combine_tokens_to_str,
+    add_digrams,
+    lower_remove_unwanted,
     lemmatize,
     clean
 
@@ -52,6 +54,10 @@ except:
 
     nltk.download("names")
     from nltk.corpus import names
+
+male_names = names.words("male.txt")
+female_names = names.words("female.txt")
+all_names = set(male_names + female_names)
 
 import spacy
 from stopwordsiso import stopwords
@@ -528,6 +534,80 @@ def _combine_tokens_to_str(texts, ignore_words=None):
     return texts_str
 
 
+def add_digrams(args):
+    """
+    Adds digrams to a tokenized text using gensim.models.Phrases
+
+    Parameters
+    ----------
+        args : list of tuples
+            The following arguments zipped
+
+        text : list
+            A list of tokens
+
+        bigrams : gensim.models.phrases.Phrases
+            Bigrams of the text corpus
+
+        trigrams : gensim.models.phrases.Phrases
+            trigrams of the text corpus
+
+    Returns
+    -------
+        text : list
+            The given text with bigrams and trigrams added
+    """
+    text, bigrams, trigrams = args
+
+    for token in bigrams[text]:
+        if token.count("_") == 1:
+            # Token is a bigram, so add it to the tokens
+            text.insert(0, token)
+
+    for token in trigrams[bigrams[text]]:
+        if token.count("_") == 2:
+            # Token is a trigram, so add it to the tokens
+            text.insert(0, token)
+
+    return text
+
+
+def lower_remove_unwanted(args):
+    """
+    Lower cases tokens and removes numbers and possibly names
+
+    Parameters
+    ----------
+        args : list of tuples
+            The following arguments
+
+        text : list
+            The text to clean
+
+        remove_names : bool
+            Whether to remove names
+
+    Returns
+    -------
+        text_lower : list
+            The text with lowercased tokens and without unwanted tokens
+    """
+    text, remove_names = args
+
+    if remove_names:
+        # Remove names and numbers after digrams have been created
+        text_lower = [
+            token.lower()
+            for token in text
+            if token not in all_names and not token.isnumeric()
+        ]
+    else:
+        # Or simply lower case tokens and remove non-bigrammed numbers
+        text_lower = [token.lower() for token in text if not token.isnumeric()]
+
+    return text_lower
+
+
 def lemmatize(tokens, nlp=None):
     """
     Lemmatizes tokens
@@ -640,7 +720,7 @@ def clean(
 
     texts_no_websites = []
     for t in texts_no_large_spaces:
-        websites = [word for word in t if word[:4] == "http"]
+        websites = [word for word in t.split() if word[:4] == "http"]
 
         for w in websites:
             t = t.replace(w, "")
@@ -664,9 +744,7 @@ def clean(
         texts_no_punctuation.append(
             r.translate(str.maketrans("", "", string.punctuation + "–" + "’"))
         )
-    pbar.update()
 
-    # Remove stopwords and tokenize
     if stopwords(language) != set():  # the input language has stopwords
         stop_words = stopwords(language)
 
@@ -682,58 +760,46 @@ def clean(
 
     # We lower case after names are removed to allow for filtering out capitalized words
     tokenized_texts = [
-        [
-            word
-            for word in text.split()
-            if word not in stop_words and not word.isnumeric()
-        ]
+        [word for word in text.split() if word.lower() not in stop_words]
         for text in texts_no_punctuation
     ]
-    tokenized_texts = [t for t in tokenized_texts if t != []]
     pbar.update()
 
-    # Add bigrams (first_second word combinations that appear often together)
-    tokens_with_bigrams = []
+    # Add bigrams and trigrams
     bigrams = Phrases(
-        sentences=tokenized_texts, min_count=3, threshold=5.0
+        sentences=tokenized_texts, min_count=3, threshold=5.0,
     )  # minimum count for a bigram to be included is 3, and half the normal threshold
-    for i, t in enumerate(tokenized_texts):
-        for token in bigrams[t]:
-            if "_" in token:
-                # Token is a bigram, so add it to the tokens
-                t.insert(0, token)
+    trigrams = Phrases(sentences=bigrams[tokenized_texts], min_count=3, threshold=5.0,)
 
-        tokens_with_bigrams.append(t)
+    args = zip(
+        tokenized_texts,
+        [bigrams] * len(tokenized_texts),
+        [trigrams] * len(tokenized_texts),
+    )
 
-    # Remove names after bigrams have been created
-    if remove_names:
-        tokens_with_bigrams = [
-            [
-                token.lower()
-                for token in text
-                if token not in names.words("male.txt")
-                and token not in names.words("female.txt")
-            ]
-            for text in tokens_with_bigrams
-        ]
-    else:
-        # Or simply lower case tokens
-        tokens_with_bigrams = [
-            [token.lower() for token in text] for text in tokens_with_bigrams
-        ]
+    num_cores = os.cpu_count()
+    if __name__ == "wikirec.data_utils":
+        with Pool(processes=num_cores) as pool:
+            tokens_with_digrams = list(pool.imap(add_digrams, args))
+    pbar.update()
+
+    args = zip(tokens_with_digrams, [remove_names] * len(tokens_with_digrams))
+    if __name__ == "wikirec.data_utils":
+        with Pool(processes=num_cores) as pool:
+            tokens_lower = list(pool.imap(lower_remove_unwanted, args))
     pbar.update()
 
     # Try lemmatization, and if not available stem, and if not available nothing
     nlp = None
     try:
         nlp = spacy.load(language)
-        lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
+        lemmatized_tokens = lemmatize(tokens=tokens_lower, nlp=nlp)
 
     except OSError:
         try:
             os.system("python -m spacy download {}".format(language))
             nlp = spacy.load(language)
-            lemmatized_tokens = lemmatize(tokens=tokens_with_bigrams, nlp=nlp)
+            lemmatized_tokens = lemmatize(tokens=tokens_lower, nlp=nlp)
 
         except:
             pass
@@ -760,13 +826,13 @@ def clean(
         if stemmer != None:
             # Stemming instead of lemmatization
             lemmatized_tokens = []  # still call it lemmatized for consistency
-            for tokens in tokens_with_bigrams:
+            for tokens in tokens_lower:
                 stemmed_tokens = [stemmer.stem(t) for t in tokens]
                 lemmatized_tokens.append(stemmed_tokens)
 
         else:
             # We cannot lemmatize or stem
-            lemmatized_tokens = tokens_with_bigrams
+            lemmatized_tokens = tokens_lower
     pbar.update()
 
     token_frequencies = defaultdict(int)
