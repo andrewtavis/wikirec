@@ -28,14 +28,13 @@ click==7.1.2
 cmarkgfm==0.4.2
 colorama==0.4.4
 coverage==5.5
-cryptography==3.3.1
+cryptography>=3.3.1
 cycler==0.10.0
 cymem==2.0.5
 Cython==0.29.22
 decorator==4.4.2
 defusedxml==0.6.0
 docutils==0.16
-en-core-web-sm==2.3.1
 entrypoints==0.3
 filelock==3.0.12
 future==0.18.2

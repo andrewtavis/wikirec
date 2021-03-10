@@ -32,7 +32,7 @@ dependencies:
   - cmarkgfm=0.4.2
   - colorama=0.4.4
   - coverage=5.5
-  - cryptography=3.3.1
+  - cryptography>=3.3.1
   - cycler=0.10.0
   - cymem=2.0.5
   - cython=0.29.22
@@ -226,7 +226,6 @@ dependencies:
     - alabaster==0.7.12
     - babel==2.9.0
     - beautifulsoup4==4.9.3
-    - en-core-web-sm==2.3.1
     - filelock==3.0.12
     - imagesize==1.2.0
     - ipython==7.10.0
