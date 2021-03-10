@@ -44,7 +44,15 @@ import mwparserfromhell
 from bs4 import BeautifulSoup
 
 from nltk.stem.snowball import SnowballStemmer
-from nltk.corpus import names
+
+try:
+    from nltk.corpus import names
+except ImportError:
+    import nltk
+
+    nltk.download("names")
+    from nltk.corpus import names
+
 import spacy
 from stopwordsiso import stopwords
 from gensim.models import Phrases
