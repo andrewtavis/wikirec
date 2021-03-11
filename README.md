@@ -86,6 +86,7 @@ text_corpus, selected_idxs = data_utils.clean(
     min_token_len=3,
     min_tokens=50,
     max_token_index=-1,
+    verbose=True,
 )
 
 selected_titles = [titles[i] for i in selected_idxs]
