@@ -24,7 +24,7 @@ copyright = "2020-2021, wikirec developers (BSD License)"
 author = "wikirec developers"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.1.5"
+release = "0.1.1.6"
 
 
 # -- General configuration ---------------------------------------------------
@@ -169,7 +169,7 @@ texinfo_documents = [
         "wikirec Documentation",
         author,
         "wikirec",
-        "Open-source recommendation engines based on Wikipedia data",
+        "NLP recommendation engine based on Wikipedia data",
         "Miscellaneous",
     )
 ]

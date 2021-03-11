@@ -40,7 +40,7 @@
 .. |colab| image:: https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252
     :target: https://colab.research.google.com/github/andrewtavis/wikirec
 
-Open-source recommendation engines based on Wikipedia data
+NLP recommendation engine based on Wikipedia data
 
 Installation
 ------------

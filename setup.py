@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setup_args = dict(
     name="wikirec",
-    version="0.1.1.5",
+    version="0.1.1.6",
     author="Andrew Tavis McAllister",
     author_email="andrew.t.mcallister@gmail.com",
     classifiers=[
@@ -26,7 +26,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
-    description="Open-source recommendation engines based on Wikipedia data",
+    description="NLP recommendation engine based on Wikipedia data",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_namespace_packages(),
