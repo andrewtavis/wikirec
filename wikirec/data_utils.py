@@ -556,13 +556,17 @@ def _lower_remove_unwanted(args):
             and not token.isnumeric()
             and token not in ignore_words
             and token != "ref"
+            and token != "-PRON-"
         ]
     else:
         # Or simply lower case tokens and remove non-bigrammed numbers and ignore_words
         text_lower = [
             token.lower()
             for token in text
-            if not token.isnumeric() and token not in ignore_words and token != "ref"
+            if not token.isnumeric()
+            and token not in ignore_words
+            and token != "ref"
+            and token != "-PRON-"
         ]
 
     return text_lower
@@ -594,7 +598,7 @@ def _lemmatize(tokens, nlp=None, verbose=True):
         tokens,
         total=len(tokens),
         desc="Texts lemmatized",
-        unit="text",
+        unit="texts",
         disable=not verbose,
     ):
         combined_tokens = _combine_tokens_to_str(tokens=t)
