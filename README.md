@@ -206,42 +206,40 @@ A sample of TFIDF and BERT book recommendations using cosine similarity follows:
 ```
 --TFIDF--
 Harry Potter and the Philosopher's Stone recommendations:
-[['Harry Potter and the Chamber of Secrets', 0.6644434544958339],
- ['Harry Potter and the Deathly Hallows', 0.6547119201881699],
- ['Harry Potter and the Order of the Phoenix', 0.642515197024424],
- ['Harry Potter and the Half-Blood Prince', 0.6420367483506718],
- ['Harry Potter and the Goblet of Fire', 0.5951892674032896],
- ['The Magical Worlds of Harry Potter', 0.5609077339791474],
- ['Harry Potter and the Methods of Rationality', 0.5379869646546271],
- ['Harry, A History', 0.5360108950074289],
- ['Harry Potter and the Cursed Child', 0.5019619677408425],
- ['Fantastic Beasts and Where to Find Them', 0.48860861798783956]]
-
- Note: The Prisoner of Azkaban is lower due to the prevalence of 'black'
+[['Harry Potter and the Chamber of Secrets', 0.5974588223913879],
+ ['Harry Potter and the Deathly Hallows', 0.5803045645372675],
+ ['Harry Potter and the Goblet of Fire', 0.5752151957878091],
+ ['Harry Potter and the Half-Blood Prince', 0.5673108963392828],
+ ['Harry Potter and the Order of the Phoenix', 0.5662440277414937],
+ ['The Magical Worlds of Harry Potter', 0.5098747039144682],
+ ['Harry Potter and the Methods of Rationality', 0.5016950079654786],
+ ['Harry Potter and the Prisoner of Azkaban', 0.4865186451505909],
+ ['Fantastic Beasts and Where to Find Them', 0.4801163347125484],
+ ['The Casual Vacancy', 0.44319508498475246]]
 
 The Hobbit recommendations:
- [['The History of The Hobbit', 0.6968314428704283],
- ['The Annotated Hobbit', 0.6056439862168547],
- ['The Lord of the Rings', 0.5579023075664765],
- ['The Road to Middle-Earth', 0.5376868352509242],
- ['Mr. Bliss', 0.49951465923170035],
- ['The Letters of J. R. R. Tolkien', 0.49586730946969954],
- ['J. R. R. Tolkien: A Biography', 0.491002699969649],
- ['The Fellowship of the Ring', 0.4725626366254413],
- ['Tolkien: Maker of Middle-earth', 0.46079070209443573],
- ["Bilbo's Last Song", 0.45336292390290156]]
+[['The History of The Hobbit', 0.7744692537347045],
+ ['The Annotated Hobbit', 0.6474663216496771],
+ ['Mr. Bliss', 0.5774314075304691],
+ ['The Lord of the Rings', 0.5626569367072154],
+ ['The Road to Middle-Earth', 0.5386365684368313],
+ ['The Marvellous Land of Snergs', 0.5165174723722297],
+ ['Tolkien: Maker of Middle-earth', 0.5062523572124091],
+ ['The Letters of J. R. R. Tolkien', 0.489393850451095],
+ ['The Tolkien Reader', 0.4862696945481724],
+ ['J. R. R. Tolkien: A Biography', 0.4813258277958349]]
 
 Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
- [['The History of The Hobbit', 0.3630409561901944],
- ['Harry Potter and the Chamber of Secrets', 0.35662779096968417],
- ['Harry Potter and the Deathly Hallows', 0.3525511840389999],
- ['Harry Potter and the Half-Blood Prince', 0.34751621204943556],
- ['Harry Potter and the Order of the Phoenix', 0.3429859797299906],
- ['Harry Potter and the Goblet of Fire', 0.32341644906938327],
- ['The Annotated Hobbit', 0.3146736587107837],
- ['The Lord of the Rings', 0.3108195325708887],
- ['The Magical Worlds of Harry Potter', 0.308962426272421],
- ['Harry Potter and the Methods of Rationality', 0.28898077558075325]]
+[['The History of The Hobbit', 0.4144937936077629],
+ ['Harry Potter and the Chamber of Secrets', 0.34888387038976304],
+ ['The Lord of the Rings', 0.3461664662907625],
+ ['The Annotated Hobbit', 0.3431651523791515],
+ ['Harry Potter and the Deathly Hallows', 0.3336208844683567],
+ ['Harry Potter and the Goblet of Fire', 0.3323377108209634],
+ ['Harry Potter and the Half-Blood Prince', 0.32972615751499673],
+ ['Mr. Bliss', 0.3219122094772891],
+ ['Harry Potter and the Order of the Phoenix', 0.3160426316664049],
+ ['The Magical Worlds of Harry Potter', 0.30770960167033506]]
 
  --BERT--
  Harry Potter and the Philosopher's Stone recommendations:
@@ -284,6 +282,7 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 
 # To-Do [`↩`](#jumpto)
 
+- Devising methods to best combine recommendations for more than one input
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 - Adding methods to analyze model performance and recommendation accuracy
@@ -291,9 +290,6 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
   - Potentially writing scripts to load this data for significant topics
 - Allowing multiple infobox topics to be subsetted for at once in [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) functions
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
-- Making recommendations faster in [wikirec.model.recommend()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
-  - Recommendations can at times take a moment given the for loop to find input names
-  - This could be sped up by converting sim_matrix instances into an indexed data type within `wikirec.model.recommend()` (on average would be faster)
 - Allowing euclidean distance measurements for LDA based recommendations in [wikirec.model.gen_sim_matrix()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
 - Expanding the [documentation](https://wikirec.readthedocs.io/en/latest/)
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
