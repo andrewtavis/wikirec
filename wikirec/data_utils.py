@@ -548,7 +548,7 @@ def _lower_remove_unwanted(args):
     text, remove_names, ignore_words = args
 
     if remove_names:
-        # Remove names and numbers after digrams have been created
+        # Remove names and numbers after n-grams have been created
         text_lower = [
             token.lower()
             for token in text
@@ -728,19 +728,31 @@ def clean(
 
         texts_no_websites.append(t)
 
+    # Remove the references section but maintain the categories if they exist
+    # The reference are in the text, so this just removes the section and external links
+    # References are maintained for references like awards
+    texts_no_references = []
+    for t in texts_no_websites:
+        if "Category:" in t:
+            t = re.sub(r"(?<= ==References==).+?(?= Category)", "", t, flags=re.DOTALL)
+        else:
+            t = t.split("==References==")[0]
+
+        texts_no_references.append(t)
+
     gc.collect()
     pbar.update()
 
     texts_no_random_punctuation = []
-    # Prevent words from being combined when a user types word/word or word-word
-    for r in texts_no_large_spaces:
-        r = r.replace("/", " ")
-        r = r.replace("-", " ")
-        r = r.replace(":", " ")  # split categories
-        r = re.sub("==[^>]+==", "", r)  # remove headers
-        r = re.sub("< !--[^>]+-- >", "", r)  # remove comments
+    # Prevent words from being combined when a user types word/word or word-word or word:word
+    for t in texts_no_references:
+        t = t.replace("/", " ")
+        t = t.replace("-", " ")
+        t = t.replace(":", " ")  # split categories so they can be n-grammed
+        t = re.sub("==[^>]+==", "", t)  # remove headers
+        t = re.sub("< !--[^>]+-- >", "", t)  # remove comments
 
-        texts_no_random_punctuation.append(r)
+        texts_no_random_punctuation.append(t)
 
     texts_no_punctuation = []
     for r in texts_no_random_punctuation:
@@ -748,6 +760,7 @@ def clean(
             r.translate(str.maketrans("", "", string.punctuation + "–" + "’"))
         )
 
+    # Remove stopwords before bigrams are created
     if stopwords(language) != set():  # the input language has stopwords
         stop_words = stopwords(language)
 
@@ -776,11 +789,11 @@ def clean(
     )  # minimum count for a bigram to be included is 3, and half the normal threshold
     trigrams = Phrases(sentences=bigrams[tokenized_texts], min_count=3, threshold=5.0,)
 
-    tokens_with_digrams = []
+    tokens_with_ngrams = []
     for text in tqdm(
         tokenized_texts,
         total=len(tokenized_texts),
-        desc="Digrams generated",
+        desc="n-grams generated",
         unit="text",
         disable=not verbose,
     ):
@@ -794,15 +807,15 @@ def clean(
                 # Token is a trigram, so add it to the tokens
                 text.insert(0, token)
 
-        tokens_with_digrams.append(text)
+        tokens_with_ngrams.append(text)
 
     gc.collect()
     pbar.update()
 
     args = zip(
-        tokens_with_digrams,
-        [remove_names] * len(tokens_with_digrams),
-        [ignore_words] * len(tokens_with_digrams),
+        tokens_with_ngrams,
+        [remove_names] * len(tokens_with_ngrams),
+        [ignore_words] * len(tokens_with_ngrams),
     )
 
     num_cores = os.cpu_count()
@@ -811,7 +824,7 @@ def clean(
             tokens_lower = list(
                 tqdm(
                     pool.imap(_lower_remove_unwanted, args),
-                    total=len(tokens_with_digrams),
+                    total=len(tokens_with_ngrams),
                     desc="Unwanted words removed",
                     unit="text",
                     disable=not verbose,
