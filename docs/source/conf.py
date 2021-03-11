@@ -24,7 +24,7 @@ copyright = "2020-2021, wikirec developers (BSD License)"
 author = "wikirec developers"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.1.4"
+release = "0.1.1.5"
 
 
 # -- General configuration ---------------------------------------------------
