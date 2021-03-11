@@ -53,12 +53,13 @@ Downloading and parsing Wikipedia for the needed data is as simple as:
 from wikirec import data_utils
 
 # Downloads the most recent stable bz2 compressed English Wikipedia dump
-files = data_utils.download_wiki(language="en")
+files = data_utils.download_wiki(language="en", target_dir="enwiki_dump")
 
 # Produces an ndjson of all book articles on Wikipedia
 data_utils.parse_to_ndjson(
     topic="books",
     output_path="enwiki_books.ndjson",
+    input_dir="enwiki_dump",
     limit=None, # articles per file to find
     multicore=True,
     verbose=True,
