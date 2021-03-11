@@ -287,8 +287,6 @@ def iterate_and_parse_file(args):
     output_path = partitions_dir + "/" + file_name
 
     if not os.path.exists(output_path):
-        disable = not verbose
-
         if limit == None:
             pbar = tqdm(
                 total=len(
@@ -305,7 +303,7 @@ def iterate_and_parse_file(args):
                 ),
                 desc="Lines read",
                 unit="lines",
-                disable=disable,
+                disable=not verbose,
             )
             for i, line in enumerate(  # pylint: disable=unused-variable
                 subprocess.Popen(
@@ -322,7 +320,7 @@ def iterate_and_parse_file(args):
         else:
             articles_found = 0
             pbar = tqdm(
-                total=limit, desc="Articles found", unit="article", disable=disable,
+                total=limit, desc="Articles found", unit="article", disable=not verbose,
             )
             for i, line in enumerate(  # pylint: disable=unused-variable
                 subprocess.Popen(
@@ -449,7 +447,6 @@ def parse_to_ndjson(
             [False] * len(target_files),
         )
 
-        disable = not verbose
         if __name__ == "wikirec.data_utils":
             with Pool(processes=num_cores) as pool:
                 for _ in tqdm(
@@ -457,7 +454,7 @@ def parse_to_ndjson(
                     total=len(target_files),
                     desc="Files partitioned",
                     unit="file",
-                    disable=disable,
+                    disable=not verbose,
                 ):
                     pass
 
@@ -591,14 +588,13 @@ def _lemmatize(tokens, nlp=None, verbose=True):
     """
     allowed_pos_tags = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 
-    disable = not verbose
     lemmatized_tokens = []
     for t in tqdm(
         tokens,
         total=len(tokens),
         desc="Texts lemmatized",
         unit="text",
-        disable=disable,
+        disable=not verbose,
     ):
         combined_tokens = _combine_tokens_to_str(tokens=t)
 
@@ -708,8 +704,9 @@ def clean(
     elif ignore_words == None:
         ignore_words = []
 
-    disable = not verbose
-    pbar = tqdm(desc="Cleaning steps complete", total=7, unit="steps", disable=disable)
+    pbar = tqdm(
+        desc="Cleaning steps complete", total=7, unit="steps", disable=not verbose
+    )
     # Remove spaces that are greater that one in length
     texts_no_large_spaces = []
     for t in texts:
@@ -785,7 +782,7 @@ def clean(
         total=len(tokenized_texts),
         desc="Digrams generated",
         unit="text",
-        disable=disable,
+        disable=not verbose,
     ):
         for token in bigrams[text]:
             if token.count("_") == 1:
@@ -817,7 +814,7 @@ def clean(
                     total=len(tokens_with_digrams),
                     desc="Unwanted words removed",
                     unit="text",
-                    disable=disable,
+                    disable=not verbose,
                 )
             )
 
@@ -866,7 +863,7 @@ def clean(
                 total=len(tokens_lower),
                 desc="Texts stemmed",
                 unit="text",
-                disable=disable,
+                disable=not verbose,
             ):
                 stemmed_tokens = [stemmer.stem(t) for t in tokens]
                 base_tokens.append(stemmed_tokens)
@@ -923,7 +920,7 @@ def clean(
                     total=len(min_sized_texts),
                     desc="Texts finalized",
                     unit="text",
-                    disable=disable,
+                    disable=not verbose,
                 )
             )
 

@@ -1,3 +1,3 @@
-.. automodule:: kwx.languages
+.. automodule:: wikirec.languages
    :members:
    :private-members:
