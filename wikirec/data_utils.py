@@ -231,7 +231,7 @@ def _process_article(title, text, template="Infobox book"):
 
     if len(matching_templates) >= 1:
         text = wikicode.strip_code().strip()
-        title = re.sub(r"\(.*?\)", "", title).strip()
+        title = title.strip()
 
         article_data = (title, text)
 
@@ -556,17 +556,13 @@ def _lower_remove_unwanted(args):
             and not token.isnumeric()
             and token not in ignore_words
             and token != "ref"
-            and token != "-PRON-"
         ]
     else:
         # Or simply lower case tokens and remove non-bigrammed numbers and ignore_words
         text_lower = [
             token.lower()
             for token in text
-            if not token.isnumeric()
-            and token not in ignore_words
-            and token != "ref"
-            and token != "-PRON-"
+            if not token.isnumeric() and token not in ignore_words and token != "ref"
         ]
 
     return text_lower
