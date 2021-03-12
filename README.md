@@ -103,10 +103,15 @@ Recommendations in wikirec are generated from similarity matrices derived from t
 ```python
 from wikirec import model
 
+# Remove n-grams for BERT training
+corpus_no_ngrams = [
+    " ".join([t for t in text.split(" ") if "_" not in t]) for text in text_corpus
+]
+
 # We can pass kwargs for sentence_transformers.SentenceTransformer.encode
 bert_embeddings = model.gen_embeddings(
         method="bert",
-        corpus=text_corpus,
+        corpus=corpus_no_ngrams,
         bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
         batch_size=32,
 )
@@ -243,41 +248,40 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 
  --BERT--
  Harry Potter and the Philosopher's Stone recommendations:
- [['Harry Potter and the Goblet of Fire', 0.9275407],
- ['Harry Potter and the Deathly Hallows', 0.92178226],
- ['A Monster Calls', 0.9148517],
- ['Spells', 0.9139519],
- ['Matilda', 0.9071869],
- ['Wildwood', 0.9070556],
- ['The Hobbit', 0.9052026],
- ['Harry Potter and the Order of the Phoenix', 0.9049706],
- ["The Magician's Nephew", 0.9039968],
- ['The Silver Chair', 0.89989555]]
+[['Harry Potter and the Prisoner of Azkaban', 0.8625375],
+ ['Harry Potter and the Chamber of Secrets', 0.8557441],
+ ['Harry Potter and the Half-Blood Prince', 0.8430752],
+ ['Harry Potter and the Goblet of Fire', 0.8258302],
+ ['The Magical Worlds of Harry Potter', 0.82496],
+ ['A Bad Spell in Yurt', 0.82023925],
+ ['Harry Potter and the Order of the Phoenix', 0.80546284],
+ ['So You Want to Be a Wizard', 0.803981],
+ ['The Weirdstone of Brisingamen', 0.8035261],
+ ['Harry Potter and the Cursed Child', 0.79987496]]
 
  The Hobbit recommendations:
- [['The Seeing Stone', 0.9184302],
- ['Charmed Life', 0.9156177],
- ['Spellbound', 0.9137267],
- ['The Little Grey Men', 0.91196114],
- ['The Ring of Solomon', 0.909929],
- ['The Magic Finger', 0.9097778],
- ['I, Coriander', 0.90645945],
- ["Harry Potter and the Philosopher's Stone", 0.9052026],
- ["All Thirteen: The Incredible Cave Rescue of the Thai Boys' Soccer Team",
-  0.9048355],
- ['Miss Hickory', 0.9041687]]
+[['The Lord of the Rings', 0.8724792],
+ ['Beast', 0.8283818],
+ ['The Children of Húrin', 0.8261733],
+ ['The Foundling and Other Tales of Prydain', 0.82471454],
+ ['The Black Cauldron', 0.82060313],
+ ['El Deafo', 0.8167627],
+ ['The Little Grey Men', 0.8116319],
+ ['The Woggle-Bug Book', 0.8109094],
+ ['The Amazing Maurice and His Educated Rodents', 0.8089799],
+ ['Dark Lord of Derkholm', 0.8068354]]
 
  Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
- [['The Little Grey Men', 0.9031571],
- ['The Magic Finger', 0.90149724],
- ['Matilda', 0.9011334],
- ['The Seeing Stone', 0.90090525],
- ['A Monster Calls', 0.9001728],
- ['Spells', 0.89896786],
- ['Charmed Life', 0.89813614],
- ["The Magician's Nephew", 0.896847],
- ['The Lion, the Witch and the Wardrobe', 0.8954387],
- ['I, Coriander', 0.8934685]]
+[['The Weirdstone of Brisingamen', 0.79162943],
+ ['Harry Potter and the Prisoner of Azkaban', 0.7681779],
+ ['A Wizard of Earthsea', 0.7566709],
+ ["The Magician's Nephew", 0.75540984],
+ ["Merlin's Wood", 0.7530513],
+ ['Harry Potter and the Half-Blood Prince', 0.7483348],
+ ['Charmed Life', 0.74817574],
+ ['The Borrowers Avenged', 0.7475477],
+ ["The Inquisitor's Tale", 0.74703705],
+ ['The Ghost of Thomas Kempe', 0.74537575]]
 ```
 
 # To-Do [`↩`](#jumpto)
