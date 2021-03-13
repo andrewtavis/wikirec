@@ -21,7 +21,7 @@
 [//]: # "The '-' after the section links is needed to make them work on GH (because of ↩s)"
 **Jump to:**<a id="jumpto"></a> [Data](#data-) • [Methods](#methods-) • [Recommendations](#recommendations-) • [Comparative Results](#comparative-results-) • [To-Do](#to-do-)
 
-**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data. See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
 # Installation via PyPi
 
@@ -291,7 +291,7 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 # To-Do [`↩`](#jumpto)
 
 - Devising methods to best combine recommendations for more than one input
-- Creating an dictionary of arguments to subset articles by that's indexed by language
+- Creating a dictionary of arguments to subset articles by that's indexed by language
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 - Adding methods to analyze model performance and recommendation accuracy
