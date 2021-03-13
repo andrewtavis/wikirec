@@ -288,6 +288,53 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['The Ghost of Thomas Kempe', 0.74537575]]
 ```
 
+Better results can further be achieved by combining the above two methods:
+
+```python
+tfidf_weight = 0.35
+bert_weight = 1.0 - tfidf_weight
+bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim_matrix
+```
+
+```
+--Weighted BERT and TFIDF--
+ Harry Potter and the Philosopher's Stone recommendations:
+[['Harry Potter and the Chamber of Secrets', 0.7653442323224594],
+ ['Harry Potter and the Half-Blood Prince', 0.7465576592959889],
+ ['Harry Potter and the Goblet of Fire', 0.7381149146065132],
+ ['Harry Potter and the Prisoner of Azkaban', 0.7309308611870757],
+ ['Harry Potter and the Order of the Phoenix', 0.7217362181392408],
+ ['Harry Potter and the Deathly Hallows', 0.7181677376484684],
+ ['The Magical Worlds of Harry Potter', 0.7146800943719254],
+ ['Harry Potter and the Cursed Child', 0.6725872668915877],
+ ['The Ickabog', 0.6218310147923186],
+ ['Fantastic Beasts and Where to Find Them', 0.6161251907593163]]
+
+ The Hobbit recommendations:
+[['The History of The Hobbit', 0.78046806361336],
+ ['The Lord of the Rings', 0.764041360399863],
+ ['The Annotated Hobbit', 0.7444487700381719],
+ ['The Marvellous Land of Snergs', 0.6904192459951058],
+ ['The Children of Húrin', 0.6804096398917605],
+ ['The Road to Middle-Earth', 0.6596135627601877],
+ ['Mr. Bliss', 0.6543540064849226],
+ ['The Silmarillion', 0.640755416461898],
+ ['J. R. R. Tolkien: A Biography', 0.6391232063030203],
+ ['Tolkien: Maker of Middle-earth', 0.6309609890944725]]
+
+ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
+[['Harry Potter and the Half-Blood Prince', 0.6018217616032179],
+ ['Harry Potter and the Prisoner of Azkaban', 0.5989788027468591],
+ ['The Magical Worlds of Harry Potter', 0.5909785871728664],
+ ['Harry Potter and the Order of the Phoenix', 0.5889168038270771],
+ ['The Lord of the Rings', 0.5881581367207107],
+ ['Harry Potter and the Chamber of Secrets', 0.5868542056295735],
+ ['Harry Potter and the Deathly Hallows', 0.5805140956814785],
+ ['The Weirdstone of Brisingamen', 0.5725139741586933],
+ ['The Children of Húrin', 0.5661655486061915],
+ ['Harry Potter and the Goblet of Fire', 0.5653645423523244]]
+```
+
 # To-Do [`↩`](#jumpto)
 
 - Devising methods to best combine recommendations for more than one input
