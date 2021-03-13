@@ -14,7 +14,7 @@
 [![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md)
 [![coc](https://img.shields.io/badge/coc-Contributor%20Covenant-ff69b4.svg)](https://github.com/andrewtavis/wikirec/blob/main/.github/CODE_OF_CONDUCT.md)
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![codestyle](https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252)](https://colab.research.google.com/github/andrewtavis/wikirec)
+[![colab](https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252)](https://colab.research.google.com/github/andrewtavis/wikirec)
 
 ### NLP recommendation engine based on Wikipedia data
 
@@ -104,7 +104,7 @@ Recommendations in wikirec are generated from similarity matrices derived from t
 from wikirec import model
 
 # Remove n-grams for BERT training
-# Clean texts without n-grams has been found to be better than raw texts for BERT
+# Clean texts without n-grams have been found to be better than raw texts for BERT
 corpus_no_ngrams = [
     " ".join([t for t in text.split(" ") if "_" not in t]) for text in text_corpus
 ]
