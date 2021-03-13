@@ -104,6 +104,7 @@ Recommendations in wikirec are generated from similarity matrices derived from t
 from wikirec import model
 
 # Remove n-grams for BERT training
+# Clean texts without n-grams has been found to be better than raw texts for BERT
 corpus_no_ngrams = [
     " ".join([t for t in text.split(" ") if "_" not in t]) for text in text_corpus
 ]
@@ -177,6 +178,8 @@ from wikirec import model
 tfidf_embeddings = model.gen_embeddings(
         method="tfidf",
         corpus=text_corpus,
+        max_features=None,
+        norm='l2',
 )
 tfidf_sim_matrix = model.gen_sim_matrix(
     method="tfidf",
@@ -196,6 +199,7 @@ recs = model.recommend(
     inputs="title_or_list_of_titles",
     titles=selected_titles,
     sim_matrix=chosen_sim_matrix,
+    metric="cosine",  # euclidean
     n=10,
 )
 ```
