@@ -1,4 +1,4 @@
-### wikirec 0.1.7 (March 15, 2021)
+### wikirec 0.1.7 (March 14, 2021)
 
 Changes include:
 
