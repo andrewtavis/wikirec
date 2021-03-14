@@ -1,3 +1,17 @@
+### wikirec 0.1.7 (March 15, 2021)
+
+Changes include:
+
+- Multiple Infobox topics can be subsetted for at the same time
+
+- Users have greater control of the cleaning process
+
+- The cleaning process is verbose and uses multiprocessing
+
+- The workflow for all models has been improved and explained
+
+- Methods have been developed to combine modeling techniques for better results
+
 ### wikirec 0.1.0 (March 8, 2021)
 
 First stable release of wikirec
