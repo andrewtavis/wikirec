@@ -29,6 +29,7 @@ def test__lower_remove_unwanted():
             ["Harry", "Potter", "25", "Zoo", "remove_please"],
             True,
             ["remove_please"],
+            [],
         )
     ) == ["potter", "zoo"]
 
@@ -37,6 +38,7 @@ def test__lower_remove_unwanted():
             ["Harry", "Potter", "25", "Zoo", "remove_please"],
             False,
             ["remove_please"],
+            [],
         )
     ) == ["harry", "potter", "zoo"]
 

@@ -45,7 +45,7 @@ import wikirec
 
 [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topic` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors`.
+Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topics` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. Lists can also be passed if more than one topic is desired. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors` (see [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py)).
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
@@ -57,10 +57,10 @@ files = data_utils.download_wiki(language="en", target_dir="enwiki_dump")
 
 # Produces an ndjson of all book articles on Wikipedia
 data_utils.parse_to_ndjson(
-    topic="books",
+    topics="books",  # ['books', 'short_stories', 'plays']
     output_path="enwiki_books.ndjson",
     input_dir="enwiki_dump",
-    limit=None, # articles per file to find
+    limit=None,  # articles per file to find
     multicore=True,
     verbose=True,
 )
@@ -82,10 +82,11 @@ texts = [b[1] for b in books]
 text_corpus, selected_idxs = data_utils.clean(
     texts=texts,
     language="en",
-    min_token_freq=5,
-    min_token_len=3,
+    min_token_freq=5,  # 0 for Bert
+    min_token_len=3,  # 0 for Bert
     min_tokens=50,
     max_token_index=-1,
+    remove_stopwords=True,  # False for Bert
     verbose=True,
 )
 
@@ -100,11 +101,12 @@ Recommendations in wikirec are generated from similarity matrices derived from t
 
 [Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on NLP models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
 
+wikirec uses [sentence-transformers](https://github.com/UKPLab/sentence-transformers) pretrained models. See their GitHub and [documentation](https://www.sbert.net/) for the available models.
+
 ```python
 from wikirec import model
 
 # Remove n-grams for BERT training
-# Clean texts without n-grams have been found to be better than raw texts for BERT
 corpus_no_ngrams = [
     " ".join([t for t in text.split(" ") if "_" not in t]) for text in text_corpus
 ]
@@ -155,7 +157,7 @@ from wikirec import model
 # We can pass kwargs for gensim.models.ldamulticore.LdaMulticore
 lda_embeddings = model.gen_embeddings(
         method="lda",
-        corpus=text_corpus,
+        corpus=text_corpus,  # will be tokenized
         num_topics=50,
         passes=10,
         decay=0.5,
@@ -337,14 +339,12 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 
 # To-Do [`↩`](#jumpto)
 
-- Devising methods to best combine recommendations for more than one input
-- Creating a dictionary of arguments to subset articles by that's indexed by language
+- Devising methods to best combine recommendations for more than one input (including an option for distinterest)
+- Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
-- Adding methods to analyze model performance and recommendation accuracy
 - Compiling other sources of open-source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
-- Allowing multiple infobox topics to be subsetted for at once in [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) functions
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
 - Allowing euclidean distance measurements for LDA based recommendations in [wikirec.model.gen_sim_matrix()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
 - Expanding the [documentation](https://wikirec.readthedocs.io/en/latest/)

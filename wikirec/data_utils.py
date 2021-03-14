@@ -74,18 +74,23 @@ def input_conversion_dict():
     A dictionary of argument conversions for commonly recommended articles
     """
     input_conversion_dict = {
-        "books": "Infobox book",
-        "authors": "Infobox writer",
-        "albums": "Infobox album",
-        "musicians": "Infobox musical artist",
-        "songs": "Infobox song",
-        "movies": "Infobox film",
-        "tv_series": "Infobox television",
-        "video_games": "Infobox video game",
-        "artists": "Infobox artist",
-        "athletes": "Infobox sportsperson",
-        "politicians": "Infobox officeholder",
-        "people": "Infobox person",
+        "en": {
+            "books": "Infobox book",
+            "short_stories": "Infobox short story",
+            "plays": "Infobox play",
+            "authors": "Infobox writer",
+            "albums": "Infobox album",
+            "musicians": "Infobox musical artist",
+            "songs": "Infobox song",
+            "movies": "Infobox film",
+            "films": "Infobox film",
+            "tv_series": "Infobox television",
+            "video_games": "Infobox video game",
+            "artists": "Infobox artist",
+            "athletes": "Infobox sportsperson",
+            "politicians": "Infobox officeholder",
+            "people": "Infobox person",
+        }
     }
 
     return input_conversion_dict
@@ -201,9 +206,9 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     return file_info
 
 
-def _process_article(title, text, template="Infobox book"):
+def _process_article(title, text, templates="Infobox book"):
     """
-    Process a wikipedia article looking for a given infobox template
+    Process a wikipedia article looking for given infobox templates
 
     Parameters
     ----------
@@ -213,8 +218,8 @@ def _process_article(title, text, template="Infobox book"):
         text : str
             The text to be processed
 
-        template : str (default=Infobox book)
-            The target template for the corpus
+        templates : str (default=Infobox book)
+            The target templates for the corpus
 
     Returns
     -------
@@ -222,11 +227,18 @@ def _process_article(title, text, template="Infobox book"):
             The data from the article
     """
     wikicode = mwparserfromhell.parse(text)
-    matching_templates = wikicode.filter_templates(matches=template)
+
+    if type(templates) == str:
+        templates = [templates]
+
+    matching_templates = []
+    for t in templates:
+        matching_templates.append(wikicode.filter_templates(matches=t))
+
     matching_templates = [
         x
-        for x in matching_templates
-        if x.name.strip_code().strip().lower() == template.lower()
+        for x in [temp for sub_temps in matching_templates for temp in sub_temps]
+        if x.name.strip_code().strip().lower() in [t.lower() for t in templates]
     ]
 
     if len(matching_templates) >= 1:
@@ -247,10 +259,13 @@ def iterate_and_parse_file(args):
         args : tuple
             The below arguments as a tuple to allow for pool.imap_unordered rather than pool.starmap
 
-        topic : str
-            The topics that articles should be subset by.
+        topics : str
+            The topics that articles should be subset by
 
             Note: this corresponds to the type of infobox from Wikipedia articles
+
+        language : str (default=en)
+            The language of Wikipedia that articles are being parsed for
 
         input_path : str
             The path to the data file
@@ -258,27 +273,32 @@ def iterate_and_parse_file(args):
         partitions_dir : str
             The path to where output file should be stored
 
-        limit : int
-            An optional limit of the number of topic articles to find
+        limit : int optional (default=None)
+            An optional limit of the number of articles to find
 
         verbose : bool
             Whether to show a tqdm progress bar for the processes
 
     Returns
     -------
-        A parsed file Wikipedia dump file with articles of the specified topic
+        A parsed file Wikipedia dump file with articles of the specified topics
     """
-    topic, input_path, partitions_dir, limit, verbose = args
+    topics, language, input_path, partitions_dir, limit, verbose = args
 
     if not os.path.exists(partitions_dir):
         print(f"Making {partitions_dir} directory for the partitions")
         os.makedirs(partitions_dir)
 
-    if topic in input_conversion_dict().keys():
-        topic = input_conversion_dict()[topic]
+    if type(topics) == str:
+        topics = [topics]
+
+    for i, t in enumerate(topics):
+        if language in input_conversion_dict().keys():
+            if t in input_conversion_dict()[language].keys():
+                topics[i] = input_conversion_dict()[language][t]
 
     handler = WikiXmlHandler()
-    handler.template = topic
+    handler.templates = topics
     parser = xml.sax.make_parser()
     parser.setContentHandler(handler)
 
@@ -360,7 +380,8 @@ def iterate_and_parse_file(args):
 
 
 def parse_to_ndjson(
-    topic="books",
+    topics="books",
+    language="en",
     output_path="topic_articles",
     input_dir="wikipedia_dump",
     partitions_dir="partitions",
@@ -370,14 +391,17 @@ def parse_to_ndjson(
     verbose=True,
 ):
     """
-    Finds all Wikipedia entries for the given topic and convert them to json files
+    Finds all Wikipedia entries for the given topics and convert them to json files
 
     Parameters
     ----------
-        topic : str (default=books)
+        topics : str (default=books)
             The topics that articles should be subset by.
 
             Note: this corresponds to the type of infobox from Wikipedia articles
+
+        language : str (default=en)
+            The language of Wikipedia that articles are being parsed for
 
         output_path : str (default=topic_articles)
             The name of the final output ndjson file
@@ -402,15 +426,20 @@ def parse_to_ndjson(
 
     Returns
     -------
-        Wikipedia dump files parsed for the given template type and converted to json files
+        Wikipedia dump files parsed for the given template types and converted to json files
     """
     output_dir = "/".join([i for i in output_path.split("/")[:-1]])
     if not os.path.exists(output_dir):
         print(f"Making {output_dir} directory for the output")
         os.makedirs(output_dir)
 
-    if topic in input_conversion_dict().keys():
-        topic = input_conversion_dict()[topic]
+    if type(topics) == str:
+        topics = [topics]
+
+    for i, t in enumerate(topics):
+        if language in input_conversion_dict().keys():
+            if t in input_conversion_dict()[language].keys():
+                topics[i] = input_conversion_dict()[language][t]
 
     if multicore == True:
         num_cores = os.cpu_count()
@@ -440,7 +469,8 @@ def parse_to_ndjson(
         ]
 
         parse_inputs = zip(
-            [topic] * len(target_files),
+            [topics] * len(target_files),
+            [language] * len(target_files),
             target_files,
             [partitions_dir] * len(target_files),
             [limit] * len(target_files),
@@ -483,11 +513,11 @@ def parse_to_ndjson(
         with open(output_file_name, "wt") as fout:
             for f in file_list:
                 fout.write(json.dumps(f) + "\n")
-        print(f"File {output_file_name} with articles for the given topic saved")
+        print(f"File {output_file_name} with articles for the given topics saved")
 
     else:
         print(
-            f"File {output_file_name} with articles for the given topic already exists"
+            f"File {output_file_name} with articles for the given topics already exists"
         )
 
     if delete_parsed_files:
@@ -537,32 +567,39 @@ def _lower_remove_unwanted(args):
         remove_names : bool
             Whether to remove names
 
-        ignore_words : str or list
+        words_to_ignore : str or list
                 Strings that should be removed from the text body
+
+        stop_words : str or list
+            Stopwords for the given language
 
     Returns
     -------
         text_lower : list
             The text with lowercased tokens and without unwanted tokens
     """
-    text, remove_names, ignore_words = args
+    text, remove_names, words_to_ignore, stop_words = args
 
     if remove_names:
-        # Remove names, numbers, and ignore_words after n-grams have been created
+        # Remove names, numbers, words_to_ignore and stop_words after n-grams have been created
         text_lower = [
             token.lower()
             for token in text
             if token not in all_names
             and not token.isnumeric()
-            and token not in ignore_words
+            and token not in words_to_ignore
             and token != "ref"
+            and token not in stop_words
         ]
     else:
-        # Or simply lower case tokens and remove non-bigrammed numbers and ignore_words
+        # Or simply lower case tokens and remove non-bigrammed numbers, words_to_ignore and stop_words
         text_lower = [
             token.lower()
             for token in text
-            if not token.isnumeric() and token not in ignore_words and token != "ref"
+            if not token.isnumeric()
+            and token not in words_to_ignore
+            and token != "ref"
+            and token not in stop_words
         ]
 
     return text_lower
@@ -575,6 +612,7 @@ def _lemmatize(tokens, nlp=None, verbose=True):
     Parameters
     ----------
         tokens : list or list of lists
+            Tokens to be lemmatized
 
         nlp : spacy.load object
             A spacy language model
@@ -647,6 +685,7 @@ def clean(
     min_tokens=0,
     max_token_index=-1,
     min_ngram_count=3,
+    remove_stopwords=True,
     ignore_words=None,
     remove_names=False,
     sample_size=1,
@@ -678,6 +717,9 @@ def clean(
         min_ngram_count : int (default=5)
             The minimum occurrences for an n-gram to be included
 
+        remove_stopwords : bool (default=True)
+            Whether to remove stopwords
+
         ignore_words : str or list
             Strings that should be removed from the text body
 
@@ -705,22 +747,21 @@ def clean(
         texts = [texts]
 
     if type(ignore_words) == str:
-        ignore_words = [ignore_words]
+        words_to_ignore = [ignore_words]
     elif ignore_words == None:
-        ignore_words = []
+        words_to_ignore = []
 
-    if stopwords(language) != set():  # the input language has stopwords
-        stop_words = stopwords(language)
+    stop_words = []
+    if remove_stopwords:
+        if stopwords(language) != set():  # the input language has stopwords
+            stop_words = stopwords(language)
 
-    # Stemming and normal stopwords are still full language names
-    elif language in languages.stem_abbr_dict().keys():
-        stop_words = stopwords(languages.stem_abbr_dict()[language])
+        # Stemming and normal stopwords are still full language names
+        elif language in languages.stem_abbr_dict().keys():
+            stop_words = stopwords(languages.stem_abbr_dict()[language])
 
-    elif language in languages.sw_abbr_dict().keys():
-        stop_words = stopwords(languages.sw_abbr_dict()[language])
-
-    else:
-        stop_words = []
+        elif language in languages.sw_abbr_dict().keys():
+            stop_words = stopwords(languages.sw_abbr_dict()[language])
 
     pbar = tqdm(
         desc="Cleaning steps complete", total=7, unit="step", disable=not verbose
@@ -824,7 +865,8 @@ def clean(
     args = zip(
         tokens_with_ngrams,
         [remove_names] * len(tokens_with_ngrams),
-        [ignore_words] * len(tokens_with_ngrams),
+        [words_to_ignore] * len(tokens_with_ngrams),
+        [stop_words] * len(tokens_with_ngrams),
     )
 
     num_cores = os.cpu_count()
@@ -834,7 +876,7 @@ def clean(
                 tqdm(
                     pool.imap(_lower_remove_unwanted, args),
                     total=len(tokens_with_ngrams),
-                    desc="Unwanted words removed",
+                    desc="Stopwords removed",
                     unit="texts",
                     disable=not verbose,
                 )
@@ -969,7 +1011,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
     def __init__(self):
         xml.sax.handler.ContentHandler.__init__(self)
-        self.template = "Infobox book"
+        self.templates = "Infobox book"
         self._buffer = None
         self._values = {}
         self._current_tag = None
@@ -992,7 +1034,7 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
             self._values[name] = " ".join(self._buffer)
 
         if name == "page":
-            target_article = _process_article(**self._values, template=self.template)
+            target_article = _process_article(**self._values, templates=self.templates)
             if target_article:
                 if "Wikipedia:" not in target_article[0]:  # no archive files
                     self._target_articles.append(target_article)

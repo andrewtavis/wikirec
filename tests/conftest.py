@@ -43,20 +43,22 @@ np.random.seed(42)
 
 input_dir = "../wikirec/enwiki_dump"
 
+language = "en"
+
 files = data_utils.download_wiki(
-    language="en", target_dir=input_dir, file_limit=1, dump_id=False
+    language=language, target_dir=input_dir, file_limit=1, dump_id=False
 )
 
 # To check that it finds already downloaded file
 files = data_utils.download_wiki(
-    language="en", target_dir=input_dir, file_limit=1, dump_id=False
+    language=language, target_dir=input_dir, file_limit=1, dump_id=False
 )
 
 output_path = "../wikirec/enwiki_books.ndjson"
 partitions_dir = "../wikirec/enwiki_partitions"
 limit = 10
 data_utils.parse_to_ndjson(
-    topic="books",
+    topics="books",
     output_path=output_path,
     input_dir=input_dir,
     partitions_dir=partitions_dir,
@@ -68,7 +70,7 @@ data_utils.parse_to_ndjson(
 
 dump_file_path = f"{input_dir}/{os.listdir(input_dir)[0]}"
 
-parse_args = ("books", dump_file_path, partitions_dir, limit, True)
+parse_args = ("books", language, dump_file_path, partitions_dir, limit, True)
 data_utils.iterate_and_parse_file(args=parse_args)
 
 # Again to check that it skips the parse
