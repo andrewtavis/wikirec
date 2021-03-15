@@ -94,7 +94,7 @@ selected_titles = [titles[i] for i in selected_idxs]
 
 # Methods [`↩`](#jumpto)
 
-Recommendations in wikirec are generated from similarity matrices derived from trained models. The matrices represent article-article `cosine` or `euclidean` similarities that can then be sorted and selected from. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py) include:
+Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py) include:
 
 ### BERT
 
@@ -117,11 +117,6 @@ bert_embeddings = model.gen_embeddings(
         bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
         batch_size=32,
 )
-bert_sim_matrix = model.gen_sim_matrix(
-        method="bert",
-        metric="cosine",  # euclidean
-        embeddings=bert_embeddings,
-)
 ```
 
 ### Doc2vec
@@ -138,11 +133,6 @@ d2v_embeddings = model.gen_embeddings(
         vector_size=100,
         epochs=10,
         alpha=0.025,
-)
-doc2vec_sim_matrix = model.gen_sim_matrix(
-    method="doc2vec",
-    metric="cosine",  # euclidean
-    embeddings=d2v_embeddings,
 )
 ```
 
@@ -161,11 +151,6 @@ lda_embeddings = model.gen_embeddings(
         passes=10,
         decay=0.5,
 )
-lda_sim_matrix = model.gen_sim_matrix(
-    method="lda",
-    metric="cosine",  # euclidean not an option at this time
-    embeddings=lda_embeddings,
-)
 ```
 
 ### TFIDF
@@ -182,24 +167,25 @@ tfidf_embeddings = model.gen_embeddings(
         max_features=None,
         norm="l2",
 )
-tfidf_sim_matrix = model.gen_sim_matrix(
-    method="tfidf",
-    metric="cosine",  # euclidean
-    embeddings=tfidf_embeddings,
-)
 ```
 
 # Recommendations [`↩`](#jumpto)
 
-Once a similarity matrix for any of the above methods has been created, generating recommendations is as simple as the following:
+After embeddings have been generated we can then create matrices that represent article-article `cosine` or `euclidean` similarities. These can then be sorted and selected from, with the recommendation process being as simple as the following:
 
 ```python
 from wikirec import model
 
+sim_matrix = model.gen_sim_matrix(
+    method="chosen_method",
+    metric="cosine",  # euclidean
+    embeddings=method_embeddings,
+)
+
 recs = model.recommend(
     inputs="title_or_list_of_titles",
     titles=selected_titles,
-    sim_matrix=chosen_sim_matrix,
+    sim_matrix=sim_matrix,
     metric="cosine",  # euclidean
     n=10,
 )

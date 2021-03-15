@@ -32,8 +32,8 @@ import re
 import requests
 import string
 import time
-import xml.sax
 import warnings
+import xml.sax
 
 import subprocess
 from multiprocessing import Pool

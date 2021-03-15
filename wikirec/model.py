@@ -12,6 +12,7 @@ Contents:
 
 from collections import Counter
 import math
+import warnings
 
 import numpy as np
 
@@ -24,6 +25,7 @@ from gensim.models.ldamulticore import LdaMulticore
 from gensim.models import CoherenceModel
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
+warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 from sentence_transformers import SentenceTransformer
 
 from wikirec import utils
