@@ -876,7 +876,7 @@ def clean(
                 tqdm(
                     pool.imap(_lower_remove_unwanted, args),
                     total=len(tokens_with_ngrams),
-                    desc="Stopwords removed",
+                    desc="Unwanted words removed",
                     unit="texts",
                     disable=not verbose,
                 )

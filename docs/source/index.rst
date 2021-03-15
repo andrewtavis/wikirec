@@ -5,7 +5,7 @@
     :target: https://github.com/andrewtavis/wikirec
 ============
 
-|rtd| |ci| |codecov| |pyversions| |pypi| |pypistatus| |license| |contributions| |coc| |codestyle| |colab|
+|rtd| |ci| |codecov| |pyversions| |pypi| |pypistatus| |license| |coc| |codestyle| |colab|
 
 .. |rtd| image:: https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs
     :target: http://wikirec.readthedocs.io/en/latest/
@@ -26,10 +26,7 @@
     :target: https://pypi.org/project/wikirec/
 
 .. |license| image:: https://img.shields.io/github/license/andrewtavis/wikirec.svg
-    :target: https://github.com/andrewtavis/wikirec/blob/main/LICENSE
-
-.. |contributions| image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg
-    :target: https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md
+    :target: https://github.com/andrewtavis/wikirec/blob/main/LICENSE.txt
 
 .. |coc| image:: https://img.shields.io/badge/coc-Contributor%20Covenant-ff69b4.svg
     :target: https://github.com/andrewtavis/wikirec/blob/main/.github/CODE_OF_CONDUCT.md

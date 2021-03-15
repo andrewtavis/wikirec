@@ -10,8 +10,7 @@
 [![pyversions](https://img.shields.io/pypi/pyversions/wikirec.svg?logo=python&logoColor=FFD43B&color=306998)](https://pypi.org/project/wikirec/)
 [![pypi](https://img.shields.io/pypi/v/wikirec.svg?color=4B8BBE)](https://pypi.org/project/wikirec/)
 [![pypistatus](https://img.shields.io/pypi/status/wikirec.svg)](https://pypi.org/project/wikirec/)
-[![license](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/main/LICENSE)
-[![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md)
+[![license](https://img.shields.io/github/license/andrewtavis/wikirec.svg)](https://github.com/andrewtavis/wikirec/blob/main/LICENSE.txt)
 [![coc](https://img.shields.io/badge/coc-Contributor%20Covenant-ff69b4.svg)](https://github.com/andrewtavis/wikirec/blob/main/.github/CODE_OF_CONDUCT.md)
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![colab](https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252)](https://colab.research.google.com/github/andrewtavis/wikirec)
@@ -57,7 +56,7 @@ files = data_utils.download_wiki(language="en", target_dir="enwiki_dump")
 
 # Produces an ndjson of all book articles on Wikipedia
 data_utils.parse_to_ndjson(
-    topics="books",  # ['books', 'short_stories', 'plays']
+    topics="books",  # ["books", "short_stories", "plays"]
     output_path="enwiki_books.ndjson",
     input_dir="enwiki_dump",
     limit=None,  # articles per file to find
@@ -157,7 +156,7 @@ from wikirec import model
 # We can pass kwargs for gensim.models.ldamulticore.LdaMulticore
 lda_embeddings = model.gen_embeddings(
         method="lda",
-        corpus=text_corpus,  # will be tokenized
+        corpus=text_corpus,  # automatically tokenized for LDA
         num_topics=50,
         passes=10,
         decay=0.5,
@@ -181,7 +180,7 @@ tfidf_embeddings = model.gen_embeddings(
         method="tfidf",
         corpus=text_corpus,
         max_features=None,
-        norm='l2',
+        norm="l2",
 )
 tfidf_sim_matrix = model.gen_sim_matrix(
     method="tfidf",
