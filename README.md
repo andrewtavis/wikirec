@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://github.com/andrewtavis/wikirec"><img src="https://github.com/andrewtavis/wikirec/blob/main/resources/wikirec_logo_transparent.png" width="529" height="169"></a>
+  <a href="https://github.com/andrewtavis/wikirec"><img src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png" width="529" height="169"></a>
 </div>
 
 --------------------------------------
