@@ -23,7 +23,7 @@
 
 # Installation via PyPi
 
-wikirec can be downloaded from pypi via pip or sourced directly from this repository:
+wikirec can be downloaded from pypi via PyPI or sourced directly from this repository:
 
 ```bash
 pip install wikirec
