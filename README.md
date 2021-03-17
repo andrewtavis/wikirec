@@ -17,7 +17,7 @@
 
 ### NLP recommendation engine based on Wikipedia data
 
-**Jump to:**<a id="jumpto"></a> [Data](#data) • [Methods](#methods) • [Recommendations](#recommendations) • [Comparative Results](#comparative-results) • [To-Do](#to-do)
+**Contents:**<a id="contents"></a> [Data](#data) • [Methods](#methods) • [Recommendations](#recommendations) • [Comparative Results](#comparative-results) • [To-Do](#to-do)
 
 **wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data. See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
@@ -39,7 +39,7 @@ python setup.py install
 import wikirec
 ```
 
-# Data [`↩`](#jumpto) <a id="data"></a>
+# Data [`↩`](#contents) <a id="data"></a>
 
 [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
@@ -91,7 +91,7 @@ text_corpus, selected_idxs = data_utils.clean(
 selected_titles = [titles[i] for i in selected_idxs]
 ```
 
-# Methods [`↩`](#jumpto) <a id="methods"></a>
+# Methods [`↩`](#contents) <a id="methods"></a>
 
 Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py) include:
 
@@ -168,7 +168,7 @@ tfidf_embeddings = model.gen_embeddings(
 )
 ```
 
-# Recommendations [`↩`](#jumpto) <a id="recommendations"></a>
+# Recommendations [`↩`](#contents) <a id="recommendations"></a>
 
 After embeddings have been generated we can then create matrices that represent article-article `cosine` or `euclidean` similarities. These can then be sorted and selected from, with the recommendation process being as simple as the following:
 
@@ -190,7 +190,7 @@ recs = model.recommend(
 )
 ```
 
-# Comparative Results [`↩`](#jumpto) <a id="comparative-results"></a>
+# Comparative Results [`↩`](#contents) <a id="comparative-results"></a>
 
 TFIDF generally outperformed all other methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest. The other strong performing model is BERT, as it does the best job of providing novel but sensible recommendations. LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT. Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
 
@@ -321,7 +321,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
  ['Harry Potter and the Goblet of Fire', 0.5653645423523244]]
 ```
 
-# To-Do [`↩`](#jumpto) <a id="to-do"></a>
+# To-Do [`↩`](#contents) <a id="to-do"></a>
 
 - Devising methods to best combine recommendations for more than one input (including an option for distinterest)
 - Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
