@@ -1036,5 +1036,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         if name == "page":
             target_article = _process_article(**self._values, templates=self.templates)
             if target_article:
-                if "Wikipedia:" not in target_article[0]:  # no archive files
+                if (
+                    "Wikipedia:" not in target_article[0]
+                    and "Draft:" not in target_article[0]
+                ):  # no archive files or drafts
                     self._target_articles.append(target_article)
