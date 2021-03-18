@@ -51,13 +51,13 @@ Downloading and parsing Wikipedia for the needed data is as simple as:
 from wikirec import data_utils
 
 # Downloads the most recent stable bz2 compressed English Wikipedia dump
-files = data_utils.download_wiki(language="en", target_dir="enwiki_dump")
+files = data_utils.download_wiki(language="en", target_dir="./enwiki_dump")
 
 # Produces an ndjson of all book articles on Wikipedia
 data_utils.parse_to_ndjson(
     topics="books",  # ["books", "short_stories", "plays"]
-    output_path="enwiki_books.ndjson",
-    input_dir="enwiki_dump",
+    output_path="./enwiki_books.ndjson",
+    input_dir="./enwiki_dump",
     limit=None,  # articles per file to find
     multicore=True,
     verbose=True,
@@ -71,7 +71,7 @@ The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) direct
 ```python
 import json
 
-with open("enwiki_books.ndjson", "r") as f:
+with open("./enwiki_books.ndjson", "r") as f:
     books = [json.loads(l) for l in f]
 
 titles = [b[0] for b in books]
@@ -114,6 +114,7 @@ bert_embeddings = model.gen_embeddings(
         method="bert",
         corpus=corpus_no_ngrams,
         bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
+        show_progress_bar=True,
         batch_size=32,
 )
 ```
