@@ -7,7 +7,7 @@
 [![rtd](https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs)](http://wikirec.readthedocs.io/en/latest/)
 [![ci](https://img.shields.io/github/workflow/status/andrewtavis/wikirec/CI?logo=github)](https://github.com/andrewtavis/wikirec/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/andrewtavis/wikirec/branch/main/graphs/badge.svg)](https://codecov.io/gh/andrewtavis/wikirec)
-[![quality](https://img.shields.io/codacy/grade/96812281c0a1488fbf6e1a09281b485f?logo=codacy)](https://app.codacy.com/gh/andrewtavis/wikirepo/dashboard)
+[![quality](https://img.shields.io/codacy/grade/96812281c0a1488fbf6e1a09281b485f?logo=codacy)](https://app.codacy.com/gh/andrewtavis/wikirec/dashboard)
 [![pyversions](https://img.shields.io/pypi/pyversions/wikirec.svg?logo=python&logoColor=FFD43B&color=306998)](https://pypi.org/project/wikirec/)
 [![pypi](https://img.shields.io/pypi/v/wikirec.svg?color=4B8BBE)](https://pypi.org/project/wikirec/)
 [![pypistatus](https://img.shields.io/pypi/status/wikirec.svg)](https://pypi.org/project/wikirec/)
