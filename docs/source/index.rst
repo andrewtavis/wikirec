@@ -5,7 +5,7 @@
     :target: https://github.com/andrewtavis/wikirec
 ============
 
-|rtd| |ci| |codecov| |pyversions| |pypi| |pypistatus| |license| |coc| |codestyle| |colab|
+|rtd| |ci| |codecov| |quality| |pyversions| |pypi| |pypistatus| |license| |coc| |codestyle| |colab|
 
 .. |rtd| image:: https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs
     :target: http://wikirec.readthedocs.io/en/latest/
@@ -15,6 +15,9 @@
 
 .. |codecov| image:: https://codecov.io/gh/andrewtavis/wikirec/branch/main/graphs/badge.svg
     :target: https://codecov.io/gh/andrewtavis/wikirec
+
+.. |quality| image:: https://img.shields.io/codacy/grade/96812281c0a1488fbf6e1a09281b485f?logo=codacy
+    :target: https://app.codacy.com/gh/andrewtavis/wikirec/dashboard
 
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/wikirec.svg?logo=python&logoColor=FFD43B&color=306998
     :target: https://pypi.org/project/wikirec/
