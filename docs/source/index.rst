@@ -5,7 +5,7 @@
     :target: https://github.com/andrewtavis/wikirec
 ============
 
-|rtd| |ci| |codecov| |pyversions| |pypi| |pypistatus| |license| |coc| |codestyle| |colab|
+|rtd| |ci| |codecov| |quality| |pyversions| |pypi| |pypistatus| |license| |coc| |codestyle| |colab|
 
 .. |rtd| image:: https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs
     :target: http://wikirec.readthedocs.io/en/latest/
@@ -14,6 +14,9 @@
     :target: https://github.com/andrewtavis/wikirec/actions?query=workflow%3ACI
 
 .. |codecov| image:: https://codecov.io/gh/andrewtavis/wikirec/branch/main/graphs/badge.svg
+    :target: https://codecov.io/gh/andrewtavis/wikirec
+
+.. |quality| image:: https://codecov.io/gh/andrewtavis/wikirec/branch/main/graphs/badge.svg
     :target: https://codecov.io/gh/andrewtavis/wikirec
 
 .. |pyversions| image:: https://img.shields.io/pypi/pyversions/wikirec.svg?logo=python&logoColor=FFD43B&color=306998
