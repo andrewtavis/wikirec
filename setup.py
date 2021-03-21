@@ -2,7 +2,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-from setuptools import find_namespace_packages
+from setuptools import find_packages
 import os
 
 with open("README.md", "r") as fh:
@@ -10,7 +10,9 @@ with open("README.md", "r") as fh:
 
 setup_args = dict(
     name="wikirec",
-    version="0.1.2.2",
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
+    version="0.1.2.3",
     author="Andrew Tavis McAllister",
     author_email="andrew.t.mcallister@gmail.com",
     classifiers=[
@@ -29,7 +31,6 @@ setup_args = dict(
     description="NLP recommendation engine based on Wikipedia data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=find_namespace_packages(),
     license="new BSD",
     url="https://github.com/andrewtavis/wikirec",
 )

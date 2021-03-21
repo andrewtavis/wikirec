@@ -41,7 +41,7 @@ from wikirec.utils import graph_lda_topic_evals
 
 np.random.seed(42)
 
-input_dir = "../wikirec/enwiki_dump"
+input_dir = "./test_files"
 
 language = "en"
 
@@ -54,8 +54,8 @@ files = data_utils.download_wiki(
     language=language, target_dir=input_dir, file_limit=1, dump_id=False
 )
 
-output_path = "../wikirec/enwiki_books.ndjson"
-partitions_dir = "../wikirec/enwiki_partitions"
+output_path = "./test_files/enwiki_books.ndjson"
+partitions_dir = "./test_files/enwiki_partitions"
 limit = 10
 data_utils.parse_to_ndjson(
     topics="books",
