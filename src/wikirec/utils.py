@@ -34,29 +34,26 @@ def _check_str_args(arguments, valid_args):
     """
     Checks whether a str argument is valid, and makes suggestions if not
     """
-    if type(arguments) == str:
+    if isinstance(arguments, str):
         if arguments in valid_args:
             return arguments
 
-        else:
-            suggestions = []
-            for v in valid_args:
-                similarity_score = round(
-                    _check_str_similarity(str_1=arguments, str_2=v), 2
-                )
-                arg_and_score = (v, similarity_score)
-                suggestions.append(arg_and_score)
+        suggestions = []
+        for v in valid_args:
+            similarity_score = round(_check_str_similarity(str_1=arguments, str_2=v), 2)
+            arg_and_score = (v, similarity_score)
+            suggestions.append(arg_and_score)
 
-            ordered_suggestions = sorted(suggestions, key=lambda x: x[1], reverse=True)
+        ordered_suggestions = sorted(suggestions, key=lambda x: x[1], reverse=True)
 
-            print(f"'{arguments}' is not a valid argument for the given function.")
-            print(f"The closest valid options to '{arguments}' are:")
-            for item in ordered_suggestions[:5]:
-                print(item)
+        print(f"'{arguments}' is not a valid argument for the given function.")
+        print(f"The closest valid options to '{arguments}' are:")
+        for item in ordered_suggestions[:5]:
+            print(item)
 
-            return
+        return
 
-    elif type(arguments) == list:
+    elif isinstance(arguments, list):
         # Check arguments, and remove them if they're invalid
         for a in arguments:
             _check_str_args(arguments=a, valid_args=valid_args)
@@ -114,7 +111,7 @@ def graph_lda_topic_evals(
     if metrics == True:
         metrics = ["stability", "coherence"]
 
-    if type(corpus[0]) != list:
+    if not isinstance(corpus[0], list):
         corpus = [c.split() for c in corpus]
 
     def jaccard_similarity(topic_1, topic_2):

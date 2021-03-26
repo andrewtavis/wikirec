@@ -28,7 +28,7 @@ def lem_abbr_dict():
         lem_abbr_dict : dict
             A dictionary with languages as keys and their abbreviations as items
     """
-    lem_abbr_dict = {
+    return {
         "chinese": "zh",
         "danish": "da",
         "dutch": "nl",
@@ -46,8 +46,6 @@ def lem_abbr_dict():
         "spanish": "es",
     }
 
-    return lem_abbr_dict
-
 
 def stem_abbr_dict():
     """
@@ -62,14 +60,12 @@ def stem_abbr_dict():
         stem_abbr_dict : dict
             A dictionary with languages as keys and their abbreviations as items
     """
-    stem_abbr_dict = {
+    return {
         "arabic": "ar",
         "finnish": "fi",
         "hungarian": "hu",
         "swedish": "sv",
     }
-
-    return stem_abbr_dict
 
 
 def sw_abbr_dict():
@@ -85,7 +81,7 @@ def sw_abbr_dict():
         sw_abbr_dict : dict
             A dictionary with languages as keys and their abbreviations as items
     """
-    sw_abbr_dict = {
+    return {
         "afrikaans": "af",
         "bulgarian": "bg",
         "bengali": "bn",
@@ -128,5 +124,3 @@ def sw_abbr_dict():
         "yoruba": "yo",
         "zulu": "zu",
     }
-
-    return sw_abbr_dict

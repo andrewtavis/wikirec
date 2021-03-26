@@ -326,14 +326,22 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 # To-Do [`↩`](#contents) <a id="to-do"></a>
 
 - Devising methods to best combine recommendations for more than one input (including an option for distinterest)
+
 - Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
+
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
+
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
+
 - Compiling other sources of open-source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
+
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
+
 - Allowing euclidean distance measurements for LDA based recommendations in [wikirec.model.gen_sim_matrix()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
+
 - Expanding the [documentation](https://wikirec.readthedocs.io/en/latest/)
+
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
 
 # References

@@ -10,7 +10,7 @@ from wikirec import data_utils
 
 
 def test_input_conversion_dict():
-    assert type(data_utils.input_conversion_dict()) == dict
+    assert isinstance(data_utils.input_conversion_dict(), dict)
 
 
 def test__combine_tokens_to_str():

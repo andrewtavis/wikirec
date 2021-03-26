@@ -130,7 +130,7 @@ def gen_embeddings(
         return embeddings
 
     elif method == "lda":
-        if type(corpus[0]) != list:
+        if not isinstance(corpus[0], list):
             corpus = [c.split() for c in corpus]
 
         dictionary = corpora.Dictionary(corpus)
@@ -206,7 +206,7 @@ def gen_sim_matrix(
             )
         )
 
-    if method == "bert" or method == "doc2vec":
+    if method in ["bert", "doc2vec"]:
         if metric == "cosine":
             sim_matrix = cosine_similarity(embeddings)
 
@@ -270,7 +270,7 @@ def recommend(
         recommendations : list of lists
             Those items that are most similar to the inputs and their similarity scores
     """
-    if type(inputs) == str:
+    if isinstance(inputs, str):
         inputs = [inputs]
 
     first_input = True
@@ -279,7 +279,7 @@ def recommend(
         num_missing = 0
         for i in range(len(titles)):
             if titles[i] == inpt:
-                if first_input == True:
+                if first_input:
                     sims = sim_matrix[i]
 
                     first_input = False
