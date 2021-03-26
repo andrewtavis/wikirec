@@ -22,9 +22,9 @@
 
 **wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data. See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
-# Installation via PyPi
+# Installation
 
-wikirec can be downloaded from pypi via PyPI or sourced directly from this repository:
+wikirec can be downloaded from PyPI via pip or sourced directly from this repository:
 
 ```bash
 pip install wikirec
