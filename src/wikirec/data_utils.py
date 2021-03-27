@@ -161,10 +161,9 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     else:
         dl_files = True
 
-    try:
-        cache_subdir = target_dir.split("/")[-1]
-        cache_dir = "/".join(target_dir.split("/")[:-1])
-    except:
+    cache_subdir = target_dir.split("/")[-1]
+    cache_dir = "/".join(target_dir.split("/")[:-1])
+    if cache_dir == "":
         cache_subdir = target_dir
         cache_dir = "."
 
