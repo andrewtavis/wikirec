@@ -200,7 +200,7 @@ See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/exampl
 
 A sample of TFIDF and BERT book recommendations using cosine similarity follows:
 
-```
+```_output
 --TFIDF--
 Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.5974588223913879],
@@ -284,7 +284,7 @@ bert_weight = 1.0 - tfidf_weight
 bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim_matrix
 ```
 
-```
+```_output
 --Weighted BERT and TFIDF--
  Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.7653442323224594],
