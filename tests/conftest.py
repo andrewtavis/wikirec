@@ -12,11 +12,7 @@ from sentence_transformers import (  # pylint: disable=unused-import
     SentenceTransformer,
 )  # required or the import within wikirec.visuals will fail
 
-import wikirec
-
-from wikirec import data_utils
-
-from wikirec import model
+from wikirec import data_utils, model
 
 np.random.seed(42)
 

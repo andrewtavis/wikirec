@@ -50,7 +50,7 @@ from nltk.stem.snowball import SnowballStemmer
 
 try:
     from nltk.corpus import names
-except:
+except ImportError:
     import nltk
 
     nltk.download("names")
