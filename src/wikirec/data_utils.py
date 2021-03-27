@@ -121,8 +121,8 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
         file_info : list of lists
             Information on the downloaded Wikipedia dump files
     """
-    assert (
-        type(file_limit) == int
+    assert isinstance(
+        file_limit, int
     ), "The 'file_limit' argument must be an integer to subset the available file list by as an upper bound."
 
     if not os.path.exists(target_dir):
@@ -135,9 +135,8 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
 
     all_dumps = [a["href"] for a in soup_index.find_all("a") if a.has_attr("href")]
     target_dump = all_dumps[-3]
-    if dump_id != False:
-        if dump_id in all_dumps:
-            target_dump = dump_id
+    if dump_id != False and dump_id in all_dumps:
+        target_dump = dump_id
 
     dump_url = base_url + target_dump
     dump_html = requests.get(dump_url).text
@@ -170,7 +169,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
         cache_subdir = target_dir
         cache_dir = "."
 
-    if dl_files == True:
+    if dl_files:
         for f in files_to_download:
             file_path = target_dir + "/" + f
             if not os.path.exists(file_path):
@@ -228,13 +227,10 @@ def _process_article(title, text, templates="Infobox book"):
     """
     wikicode = mwparserfromhell.parse(text)
 
-    if type(templates) == str:
+    if isinstance(templates, str):
         templates = [templates]
 
-    matching_templates = []
-    for t in templates:
-        matching_templates.append(wikicode.filter_templates(matches=t))
-
+    matching_templates = [wikicode.filter_templates(matches=t) for t in templates]
     matching_templates = [
         x
         for x in [temp for sub_temps in matching_templates for temp in sub_temps]
@@ -245,9 +241,7 @@ def _process_article(title, text, templates="Infobox book"):
         text = wikicode.strip_code().strip()
         title = title.strip()
 
-        article_data = (title, text)
-
-        return article_data
+        return title, text
 
 
 def iterate_and_parse_file(args):
@@ -289,13 +283,15 @@ def iterate_and_parse_file(args):
         print(f"Making {partitions_dir} directory for the partitions")
         os.makedirs(partitions_dir)
 
-    if type(topics) == str:
+    if isinstance(topics, str):
         topics = [topics]
 
     for i, t in enumerate(topics):
-        if language in input_conversion_dict().keys():
-            if t in input_conversion_dict()[language].keys():
-                topics[i] = input_conversion_dict()[language][t]
+        if (
+            language in input_conversion_dict().keys()
+            and t in input_conversion_dict()[language].keys()
+        ):
+            topics[i] = input_conversion_dict()[language][t]
 
     handler = WikiXmlHandler()
     handler.templates = topics
@@ -307,7 +303,7 @@ def iterate_and_parse_file(args):
     output_path = partitions_dir + "/" + file_name
 
     if not os.path.exists(output_path):
-        if limit == None:
+        if limit is None:
             pbar = tqdm(
                 total=len(
                     [
@@ -433,7 +429,7 @@ def parse_to_ndjson(
         print(f"Making {output_dir} directory for the output")
         os.makedirs(output_dir)
 
-    if type(topics) == str:
+    if isinstance(topics, str):
         topics = [topics]
 
     for i, t in enumerate(topics):
@@ -445,7 +441,7 @@ def parse_to_ndjson(
         num_cores = os.cpu_count()
     elif multicore == False:
         num_cores = 1
-    elif type(multicore) == int:
+    elif isinstance(multicore, int):
         num_cores = multicore
 
     if output_path == None:
@@ -542,14 +538,12 @@ def _combine_tokens_to_str(tokens):
         texts_str : str
             A string of the full text with unwanted words removed
     """
-    if type(tokens[0]) == list:
+    if isinstance(tokens[0], list):
         flat_words = [word for sublist in tokens for word in sublist]
     else:
         flat_words = tokens
 
-    texts_str = " ".join([word for word in flat_words])
-
-    return texts_str
+    return " ".join(flat_words)
 
 
 def _lower_remove_unwanted(args):
@@ -582,7 +576,7 @@ def _lower_remove_unwanted(args):
 
     if remove_names:
         # Remove names, numbers, words_to_ignore and stop_words after n-grams have been created
-        text_lower = [
+        return [
             token.lower()
             for token in text
             if token not in all_names
@@ -593,7 +587,7 @@ def _lower_remove_unwanted(args):
         ]
     else:
         # Or simply lower case tokens and remove non-bigrammed numbers, words_to_ignore and stop_words
-        text_lower = [
+        return [
             token.lower()
             for token in text
             if not token.isnumeric()
@@ -601,8 +595,6 @@ def _lower_remove_unwanted(args):
             and token != "ref"
             and token not in stop_words
         ]
-
-    return text_lower
 
 
 def _lemmatize(tokens, nlp=None, verbose=True):
@@ -648,6 +640,7 @@ def _lemmatize(tokens, nlp=None, verbose=True):
 
 
 def _subset_and_combine_tokens(args):
+    # sourcery skip: inline-immediately-returned-variable
     """
         Subsets a text by a maximum length and combines it to a string.
 
@@ -669,12 +662,10 @@ def _subset_and_combine_tokens(args):
         """
     text, max_token_index = args
 
-    sub_comb_text = [
+    return [
         text[0],
         _combine_tokens_to_str(tokens=text[1][:max_token_index]),
     ]
-
-    return sub_comb_text
 
 
 def clean(
@@ -743,12 +734,12 @@ def clean(
     if language in languages.lem_abbr_dict().keys():
         language = languages.lem_abbr_dict()[language]
 
-    if type(texts) == str:
+    if isinstance(texts, str):
         texts = [texts]
 
-    if type(ignore_words) == str:
+    if isinstance(ignore_words, str):
         words_to_ignore = [ignore_words]
-    elif ignore_words == None:
+    elif ignore_words is None:
         words_to_ignore = []
 
     stop_words = []
@@ -813,11 +804,10 @@ def clean(
 
         texts_no_random_punctuation.append(t)
 
-    texts_no_punctuation = []
-    for r in texts_no_random_punctuation:
-        texts_no_punctuation.append(
-            r.translate(str.maketrans("", "", string.punctuation + "–" + "’"))
-        )
+    texts_no_punctuation = [
+        r.translate(str.maketrans("", "", string.punctuation + "–" + "’"))
+        for r in texts_no_random_punctuation
+    ]
 
     # We lower case after names are removed to allow for filtering out capitalized words
     tokenized_texts = [text.split() for text in texts_no_punctuation]
@@ -900,7 +890,7 @@ def clean(
         except:
             pass
 
-    if nlp == None:
+    if nlp is None:
         # Lemmatization failed, so try stemming
         stemmer = None
         if language in SnowballStemmer.languages:
@@ -919,7 +909,11 @@ def clean(
         elif language == "sv":
             stemmer = SnowballStemmer("swedish")
 
-        if stemmer != None:
+        if stemmer is None:
+            # We cannot lemmatize or stem
+            base_tokens = tokens_lower
+
+        else:
             # Stemming instead of lemmatization
             base_tokens = []
             for tokens in tqdm(
@@ -932,10 +926,6 @@ def clean(
                 stemmed_tokens = [stemmer.stem(t) for t in tokens]
                 base_tokens.append(stemmed_tokens)
 
-        else:
-            # We cannot lemmatize or stem
-            base_tokens = tokens_lower
-
     gc.collect()
     pbar.update()
 
@@ -944,27 +934,26 @@ def clean(
         for t in list(set(tokens)):
             token_frequencies[t] += 1
 
-    if min_token_len == None or min_token_len == False:
+    if min_token_len is None or min_token_len == False:
         min_token_len = 0
-    if min_token_freq == None or min_token_freq == False:
+    if min_token_freq is None or min_token_freq == False:
         min_token_freq = 0
 
-    assert (
-        type(min_token_len) == int
+    assert isinstance(
+        min_token_len, int
     ), "The 'min_token_len' argument must be an integer if used"
-    assert (
-        type(min_token_freq) == int
+    assert isinstance(
+        min_token_freq, int
     ), "The 'min_token_freq' argument must be an integer if used"
 
-    min_len_freq_tokens = []
-    for tokens in base_tokens:
-        min_len_freq_tokens.append(
-            [
-                t
-                for t in tokens
-                if len(t) >= min_token_len and token_frequencies[t] >= min_token_freq
-            ]
-        )
+    min_len_freq_tokens = [
+        [
+            t
+            for t in tokens
+            if len(t) >= min_token_len and token_frequencies[t] >= min_token_freq
+        ]
+        for tokens in base_tokens
+    ]
 
     gc.collect()
     pbar.update()
@@ -1035,9 +1024,8 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
 
         if name == "page":
             target_article = _process_article(**self._values, templates=self.templates)
-            if target_article:
-                if (
-                    "Wikipedia:" not in target_article[0]
-                    and "Draft:" not in target_article[0]
-                ):  # no archive files or drafts
-                    self._target_articles.append(target_article)
+            if target_article and (
+                "Wikipedia:" not in target_article[0]
+                and "Draft:" not in target_article[0]
+            ):  # no archive files or drafts
+                self._target_articles.append(target_article)

@@ -21,14 +21,14 @@ def test_gen_sim_matrix(text_corpus):
         method="bert", metric="euclidean", embeddings=bert_embeddings,
     )
 
-    assert type(sim_matrix) == np.ndarray
+    assert isinstance(sim_matrix, np.ndarray)
     assert len(sim_matrix) == len(text_corpus)
 
     sim_matrix = model.gen_sim_matrix(
         method="bert", metric="cosine", embeddings=bert_embeddings,
     )
 
-    assert type(sim_matrix) == np.ndarray
+    assert isinstance(sim_matrix, np.ndarray)
     assert len(sim_matrix) == len(text_corpus)
 
     d2v_embeddings = model.gen_embeddings(method="doc2vec", corpus=text_corpus,)
@@ -36,7 +36,7 @@ def test_gen_sim_matrix(text_corpus):
         method="doc2vec", metric="euclidean", embeddings=d2v_embeddings,
     )
 
-    assert type(sim_matrix) == np.ndarray
+    assert isinstance(sim_matrix, np.ndarray)
     assert len(sim_matrix) == len(text_corpus)
 
     lda_embeddings = model.gen_embeddings(method="lda", corpus=text_corpus,)
@@ -44,14 +44,14 @@ def test_gen_sim_matrix(text_corpus):
         method="lda", metric="cosine", embeddings=lda_embeddings,
     )
 
-    assert type(sim_matrix) == np.ndarray
+    assert isinstance(sim_matrix, np.ndarray)
     assert len(sim_matrix) == len(text_corpus)
 
     sim_matrix = model.gen_sim_matrix(
         method="lda", metric="euclidean", embeddings=lda_embeddings,
     )
 
-    assert sim_matrix == None
+    assert sim_matrix is None
 
     tfidf_embeddings = model.gen_embeddings(method="tfidf", corpus=text_corpus,)
 
@@ -59,7 +59,7 @@ def test_gen_sim_matrix(text_corpus):
         method="tfidf", metric="euclidean", embeddings=tfidf_embeddings,
     )
 
-    assert type(sim_matrix) == np.ndarray
+    assert isinstance(sim_matrix, np.ndarray)
     assert len(sim_matrix) == len(text_corpus)
 
     with pytest.raises(ValueError):
@@ -96,4 +96,4 @@ def test_recommend(titles, sim_matrix_cosine, sim_matrix_euclidean):
     )
 
     assert len(recs) == n
-    assert recs[0][1] == max([r[1] for r in recs])
+    assert recs[0][1] == max(r[1] for r in recs)
