@@ -2,7 +2,7 @@
 utils
 -----
 
-Utility functions for data loading and cleaning
+Utility functions for data loading and cleaning.
 
 Contents:
     _check_str_similarity,
@@ -11,7 +11,6 @@ Contents:
     english_names_list
 """
 
-import os
 from difflib import SequenceMatcher
 
 import numpy as np
@@ -26,13 +25,13 @@ from gensim.models import CoherenceModel
 
 
 def _check_str_similarity(str_1, str_2):
-    """Checks the similarity of two strings"""
+    """Checks the similarity of two strings."""
     return SequenceMatcher(None, str_1, str_2).ratio()
 
 
 def _check_str_args(arguments, valid_args):
     """
-    Checks whether a str argument is valid, and makes suggestions if not
+    Checks whether a str argument is valid, and makes suggestions if not.
     """
     if isinstance(arguments, str):
         if arguments in valid_args:
@@ -70,7 +69,7 @@ def graph_lda_topic_evals(
     **kwargs,
 ):
     """
-    Graphs metrics for the given models over the given number of topics
+    Graphs metrics for the given models over the given number of topics.
 
     Parameters
     ----------
@@ -116,7 +115,7 @@ def graph_lda_topic_evals(
 
     def jaccard_similarity(topic_1, topic_2):
         """
-        Derives the Jaccard similarity of two topics
+        Derives the Jaccard similarity of two topics.
 
         Notes
         -----

@@ -2,7 +2,7 @@
 model
 -----
 
-Functions for modeling text corpuses and producing recommendations
+Functions for modeling text corpuses and producing recommendations.
 
 Contents:
     gen_embeddings,
@@ -10,8 +10,6 @@ Contents:
     recommend
 """
 
-from collections import Counter
-import math
 import warnings
 
 import numpy as np
@@ -19,10 +17,8 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-import gensim
-from gensim import corpora, models, similarities
+from gensim import corpora, similarities
 from gensim.models.ldamulticore import LdaMulticore
-from gensim.models import CoherenceModel
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
@@ -38,7 +34,7 @@ def gen_embeddings(
     **kwargs,
 ):
     """
-    Generates embeddings given a modeling method and text corpus
+    Generates embeddings given a modeling method and text corpus.
 
     Parameters
     ----------
@@ -124,8 +120,7 @@ def gen_embeddings(
             )
 
         embeddings = np.zeros((len(tagged_data), v_size))
-        for i in range(len(embeddings)):
-            embeddings[i] = model_d2v.docvecs[i]
+        embeddings = [model_d2v.docvecs[i] for i, e in enumerate(embeddings)]
 
         return embeddings
 
@@ -153,7 +148,7 @@ def gen_sim_matrix(
     method="lda", metric="cosine", embeddings=None,
 ):
     """
-    Derives a similarity matrix from document embeddings
+    Derives a similarity matrix from document embeddings.
 
     Parameters
     ----------
@@ -244,7 +239,7 @@ def recommend(
     inputs=None, titles=None, sim_matrix=None, metric="cosine", n=10,
 ):
     """
-    Recommends similar items given an input or list of inputs of interest
+    Recommends similar items given an input or list of inputs of interest.
 
     Parameters
     ----------
@@ -277,17 +272,15 @@ def recommend(
     for inpt in inputs:
         checked = 0
         num_missing = 0
-        for i in range(len(titles)):
-            if titles[i] == inpt:
+        for i, t in enumerate(titles):
+            if t == inpt:
                 if first_input:
                     sims = sim_matrix[i]
 
                     first_input = False
 
                 else:
-                    sims = [
-                        np.mean([sims[j], sim_matrix[i][j]]) for j in range(len(sims))
-                    ]
+                    sims = [np.mean([s, sim_matrix[i][j]]) for j, s in enumerate(sims)]
 
             else:
                 checked += 1
@@ -301,7 +294,7 @@ def recommend(
                             "None of the provided inputs were found in the index. Please check them and reference Wikipedia for valid inputs via article names."
                         )
 
-    titles_and_scores = [[titles[i], sims[i]] for i in range(len(titles))]
+    titles_and_scores = [[t, sims[i]] for i, t in enumerate(titles)]
 
     if metric == "cosine":
         # Cosine similarities have been used (higher is better)

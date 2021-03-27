@@ -56,6 +56,7 @@ else:
         "tqdm",
         "beautifulsoup4",
         "mwparserfromhell",
+        "defusedxml",
     ]
 
 if __name__ == "__main__":

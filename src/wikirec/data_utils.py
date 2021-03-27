@@ -2,7 +2,7 @@
 data
 ----
 
-Module for downloading and preparing data
+Module for downloading and preparing data.
 
 Contents:
     input_conversion_dict,
@@ -34,6 +34,7 @@ import string
 import time
 import warnings
 import xml.sax
+import defusedxml.sax
 
 import subprocess
 from multiprocessing import Pool
@@ -66,14 +67,14 @@ from gensim.models import Phrases
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 import tensorflow as tf
 
-from wikirec import languages, utils
+from wikirec import languages
 
 
 def input_conversion_dict():
     """
-    A dictionary of argument conversions for commonly recommended articles
+    A dictionary of argument conversions for commonly recommended articles.
     """
-    input_conversion_dict = {
+    return {
         "en": {
             "books": "Infobox book",
             "short_stories": "Infobox short story",
@@ -93,12 +94,10 @@ def input_conversion_dict():
         }
     }
 
-    return input_conversion_dict
-
 
 def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=False):
     """
-    Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory
+    Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory.
 
     Parameters
     ----------
@@ -207,7 +206,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
 
 def _process_article(title, text, templates="Infobox book"):
     """
-    Process a wikipedia article looking for given infobox templates
+    Process a wikipedia article looking for given infobox templates.
 
     Parameters
     ----------
@@ -246,7 +245,7 @@ def _process_article(title, text, templates="Infobox book"):
 
 def iterate_and_parse_file(args):
     """
-    Creates partitions of desired articles
+    Creates partitions of desired articles.
 
     Parameters
     ----------
@@ -295,7 +294,7 @@ def iterate_and_parse_file(args):
 
     handler = WikiXmlHandler()
     handler.templates = topics
-    parser = xml.sax.make_parser()
+    parser = defusedxml.sax.make_parser()
     parser.setContentHandler(handler)
 
     file_name = input_path.split("/")[-1].split("-")[-1].split(".")[-2]
@@ -387,7 +386,7 @@ def parse_to_ndjson(
     verbose=True,
 ):
     """
-    Finds all Wikipedia entries for the given topics and convert them to json files
+    Finds all Wikipedia entries for the given topics and convert them to json files.
 
     Parameters
     ----------
@@ -485,7 +484,7 @@ def parse_to_ndjson(
                     pass
 
         def read_and_combine_json(file_path):
-            """Read in json data from a file_path"""
+            """Read in json data from a file_path."""
             data = []
 
             with open(file_path, "r") as f:
@@ -526,7 +525,7 @@ def parse_to_ndjson(
 
 def _combine_tokens_to_str(tokens):
     """
-    Combines the texts into one string
+    Combines the texts into one string.
 
     Parameters
     ----------
@@ -548,7 +547,7 @@ def _combine_tokens_to_str(tokens):
 
 def _lower_remove_unwanted(args):
     """
-    Lower cases tokens and removes numbers and possibly names
+    Lower cases tokens and removes numbers and possibly names.
 
     Parameters
     ----------
@@ -599,7 +598,7 @@ def _lower_remove_unwanted(args):
 
 def _lemmatize(tokens, nlp=None, verbose=True):
     """
-    Lemmatizes tokens
+    Lemmatizes tokens.
 
     Parameters
     ----------
@@ -640,7 +639,6 @@ def _lemmatize(tokens, nlp=None, verbose=True):
 
 
 def _subset_and_combine_tokens(args):
-    # sourcery skip: inline-immediately-returned-variable
     """
         Subsets a text by a maximum length and combines it to a string.
 
@@ -683,7 +681,7 @@ def clean(
     verbose=True,
 ):
     """
-    Cleans text body to prepare it for analysis
+    Cleans text body to prepare it for analysis.
 
     Parameters
     ----------
@@ -876,7 +874,6 @@ def clean(
     pbar.update()
 
     # Try lemmatization, and if not available stem, and if not available nothing
-    nlp = None
     try:
         nlp = spacy.load(language)
         base_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp, verbose=verbose)
@@ -887,8 +884,8 @@ def clean(
             nlp = spacy.load(language)
             base_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp, verbose=verbose)
 
-        except:
-            pass
+        except OSError:
+            nlp = None
 
     if nlp is None:
         # Lemmatization failed, so try stemming
@@ -996,7 +993,7 @@ def clean(
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
-    """Parse through XML data using SAX"""
+    """Parse through XML data using SAX."""
 
     def __init__(self):
         xml.sax.handler.ContentHandler.__init__(self)
@@ -1007,18 +1004,18 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self._target_articles = []
 
     def characters(self, content):
-        """Characters between opening and closing tags"""
+        """Characters between opening and closing tags."""
         if self._current_tag:
             self._buffer.append(content)
 
     def startElement(self, name, attrs):
-        """Opening tag of element"""
+        """Opening tag of element."""
         if name in ("title", "text"):
             self._current_tag = name
             self._buffer = []
 
     def endElement(self, name):
-        """Closing tag of element"""
+        """Closing tag of element."""
         if name == self._current_tag:
             self._values[name] = " ".join(self._buffer)
 

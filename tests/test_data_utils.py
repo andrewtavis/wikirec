@@ -46,7 +46,7 @@ def test__lower_remove_unwanted():
 def test__lemmatize():
     try:
         nlp = spacy.load("en")
-    except:
+    except OSError:
         os.system("python -m spacy download {}".format("en"))
         nlp = spacy.load("en")
     assert data_utils._lemmatize([["better"], ["walking"], ["dogs"]], nlp=nlp) == [

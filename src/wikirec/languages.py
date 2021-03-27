@@ -2,7 +2,7 @@
 languages
 ---------
 
-Module for organizing language dependencies for text cleaning
+Module for organizing language dependencies for text cleaning.
 
 The following languages have been selected because their stopwords can be removed via https://github.com/stopwords-iso/stopwords-iso/tree/master/python
 
@@ -15,7 +15,7 @@ Contents:
 
 def lem_abbr_dict():
     """
-    Calls a dictionary of languages and their abbreviations for lemmatization
+    Calls a dictionary of languages and their abbreviations for lemmatization.
 
     Notes
     -----
@@ -49,7 +49,7 @@ def lem_abbr_dict():
 
 def stem_abbr_dict():
     """
-    Calls a dictionary of languages and their abbreviations for stemming
+    Calls a dictionary of languages and their abbreviations for stemming.
 
     Notes
     -----
@@ -70,7 +70,7 @@ def stem_abbr_dict():
 
 def sw_abbr_dict():
     """
-    Calls a dictionary of languages and their abbreviations for stop word removal
+    Calls a dictionary of languages and their abbreviations for stop word removal.
 
     Notes
     -----

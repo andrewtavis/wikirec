@@ -8,21 +8,15 @@ import json
 
 import pytest
 import numpy as np
-from sentence_transformers import (
+from sentence_transformers import (  # pylint: disable=unused-import
     SentenceTransformer,
 )  # required or the import within wikirec.visuals will fail
 
 import wikirec
 
 from wikirec import data_utils
-from wikirec.data_utils import download_wiki
-from wikirec.data_utils import iterate_and_parse_file
-from wikirec.data_utils import parse_to_ndjson
-from wikirec.data_utils import clean
 
 from wikirec import model
-from wikirec.model import gen_embeddings
-from wikirec.model import gen_sim_matrix
 
 np.random.seed(42)
 
