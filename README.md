@@ -325,7 +325,9 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 
 # To-Do [`↩`](#contents) <a id="to-do"></a>
 
-- Devising methods to best combine recommendations for more than one input (including an option for distinterest)
+Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md) if you are interested in contributing to this project. Work that is in progress or could be implemented includes:
+
+- Devising methods to best combine recommendations for more than one input (including an option for disinterest)
 
 - Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
 
