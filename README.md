@@ -18,7 +18,12 @@
 
 ### NLP recommendation engine based on Wikipedia data
 
-**Contents:**<a id="contents"></a> [Data](#data) • [Methods](#methods) • [Recommendations](#recommendations) • [Comparative Results](#comparative-results) • [To-Do](#to-do)
+**Contents:**<a id="contents"></a>
+- [Data](#data)
+- [Methods](#methods)
+- [Recommendations](#recommendations)
+- [Comparative Results](#comparative-results)
+- [To-Do](#to-do)
 
 **wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data. See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
