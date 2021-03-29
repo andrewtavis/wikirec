@@ -5,7 +5,6 @@ Utilities Tests
 
 import numpy as np
 import pytest
-
 from wikirec import model
 
 np.random.seed(42)

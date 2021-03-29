@@ -3,15 +3,14 @@ Fixtures
 --------
 """
 
-import os
 import json
+import os
 
-import pytest
 import numpy as np
-from sentence_transformers import (  # pylint: disable=unused-import
+import pytest
+from sentence_transformers import (
     SentenceTransformer,
-)  # required or the import within wikirec.visuals will fail
-
+)  # pylint: disable=unused-import; required or the import within wikirec.visuals will fail
 from wikirec import data_utils, model
 
 np.random.seed(42)

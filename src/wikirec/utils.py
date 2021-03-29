@@ -13,15 +13,13 @@ Contents:
 
 from difflib import SequenceMatcher
 
-import numpy as np
-from tqdm.auto import tqdm
-
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
-
 from gensim import corpora
-from gensim.models.ldamulticore import LdaMulticore
 from gensim.models import CoherenceModel
+from gensim.models.ldamulticore import LdaMulticore
+from tqdm.auto import tqdm
 
 
 def _check_str_similarity(str_1, str_2):

@@ -23,30 +23,27 @@ Contents:
         endElement
 """
 
-from collections import defaultdict
 import gc
-from itertools import chain
 import json
 import os
 import re
-import requests
 import string
+import subprocess
 import time
 import warnings
 import xml.sax
-import defusedxml.sax
-
-import subprocess
+from collections import defaultdict
+from itertools import chain
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as Threadpool
 
-import numpy as np
-from tqdm.auto import tqdm
-
+import defusedxml.sax
 import mwparserfromhell
+import numpy as np
+import requests
 from bs4 import BeautifulSoup
-
 from nltk.stem.snowball import SnowballStemmer
+from tqdm.auto import tqdm
 
 try:
     from nltk.corpus import names
@@ -61,8 +58,8 @@ female_names = names.words("female.txt")
 all_names = set(list(male_names) + list(female_names))
 
 import spacy
-from stopwordsiso import stopwords
 from gensim.models import Phrases
+from stopwordsiso import stopwords
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 import tensorflow as tf

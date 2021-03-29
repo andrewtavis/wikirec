@@ -4,8 +4,8 @@ Data Tests
 """
 
 import os
-import spacy
 
+import spacy
 from wikirec import data_utils
 
 

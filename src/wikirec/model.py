@@ -13,13 +13,11 @@ Contents:
 import warnings
 
 import numpy as np
-
-from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
-from sklearn.feature_extraction.text import TfidfVectorizer
-
 from gensim import corpora, similarities
-from gensim.models.ldamulticore import LdaMulticore
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from gensim.models.ldamulticore import LdaMulticore
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 from sentence_transformers import SentenceTransformer
