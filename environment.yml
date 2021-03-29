@@ -2,13 +2,10 @@ name: wikirec-dev
 channels:
   - defaults
 dependencies:
-  - _tflow_select=2.3.0
-  - absl-py=0.12.0
   - aiohttp=3.7.4
   - appdirs=1.4.4
   - appnope=0.1.2
   - argon2-cffi=20.1.0
-  - astor=0.8.1
   - astroid=2.5
   - async-timeout=3.0.1
   - async_generator=1.10
@@ -18,10 +15,9 @@ dependencies:
   - blas=1.0
   - bleach=3.3.0
   - boto=2.49.0
-  - boto3=1.17.27
-  - botocore=1.20.29
+  - boto3=1.17.28
+  - botocore=1.20.36
   - brotlipy=0.7.0
-  - c-ares=1.17.1
   - ca-certificates=2021.1.19
   - cachetools=4.2.1
   - catalogue=1.0.0
@@ -32,34 +28,28 @@ dependencies:
   - cmarkgfm=0.4.2
   - colorama=0.4.4
   - coverage=5.5
-  - cryptography=3.4.6
+  - cryptography=3.4.7
   - cycler=0.10.0
   - cymem=2.0.5
-  - cython=0.29.22
   - cython-blis=0.7.4
   - dbus=1.13.18
   - decorator=4.4.2
   - defusedxml=0.7.1
   - docutils=0.16
   - entrypoints=0.3
-  - expat=2.2.10
+  - expat=2.3.0
   - freetype=2.10.4
   - future=0.18.2
-  - gast=0.2.2
   - gensim=3.8.3
   - gettext=0.19.8.1
-  - glib=2.67.4
+  - glib=2.68.0
   - google-api-core=1.25.1
   - google-auth=1.28.0
   - google-cloud-core=1.6.0
-  - google-cloud-storage=1.36.2
+  - google-cloud-storage=1.37.0
   - google-crc32c=1.1.2
-  - google-pasta=0.2.0
   - google-resumable-media=1.2.0
   - googleapis-common-protos=1.52.0
-  - grpcio=1.36.1
-  - h5py=2.10.0
-  - hdf5=1.10.6
   - icu=58.2
   - idna=2.10
   - importlib-metadata=3.7.3
@@ -69,7 +59,7 @@ dependencies:
   - ipykernel=5.3.4
   - ipython_genutils=0.2.0
   - ipywidgets=7.6.3
-  - isort=5.7.0
+  - isort=5.8.0
   - jedi=0.17.0
   - jinja2=2.11.3
   - jmespath=0.10.0
@@ -78,17 +68,13 @@ dependencies:
   - jsonschema=3.0.2
   - jupyter=1.0.0
   - jupyter_client=6.1.7
-  - jupyter_console=6.3.0
+  - jupyter_console=6.4.0
   - jupyter_core=4.7.1
   - jupyterlab_pygments=0.1.2
   - jupyterlab_widgets=1.0.0
-  - keras=2.3.1
-  - keras-applications=1.0.8
-  - keras-base=2.3.1
-  - keras-preprocessing=1.1.2
   - keyring=22.3.0
   - kiwisolver=1.3.1
-  - lazy-object-proxy=1.5.2
+  - lazy-object-proxy=1.6.0
   - lcms2=2.11
   - libcrc32c=1.1.1
   - libcxx=10.0.0
@@ -102,7 +88,6 @@ dependencies:
   - libwebp-base=1.2.0
   - llvm-openmp=10.0.0
   - lz4-c=1.9.3
-  - markdown=3.3.4
   - markupsafe=1.1.1
   - matplotlib=3.3.4
   - matplotlib-base=3.3.4
@@ -123,12 +108,11 @@ dependencies:
   - ncurses=6.2
   - nest-asyncio=1.5.1
   - nltk=3.5
-  - notebook=6.2.0
+  - notebook=6.3.0
   - numpy=1.19.2
   - numpy-base=1.19.2
   - olefile=0.46
-  - openssl=1.1.1j
-  - opt_einsum=3.1.0
+  - openssl=1.1.1k
   - packaging=20.9
   - pandas=1.2.2
   - pandoc=2.12
@@ -145,8 +129,8 @@ dependencies:
   - pluggy=0.13.1
   - preshed=3.0.2
   - prometheus_client=0.9.0
-  - prompt-toolkit=3.0.8
-  - prompt_toolkit=3.0.8
+  - prompt-toolkit=3.0.17
+  - prompt_toolkit=3.0.17
   - protobuf=3.14.0
   - ptyprocess=0.7.0
   - py=1.10.0
@@ -167,19 +151,19 @@ dependencies:
   - pytz=2021.1
   - pyzmq=20.0.0
   - qt=5.9.7
-  - qtconsole=5.0.2
+  - qtconsole=5.0.3
   - qtpy=1.9.0
   - readline=8.1
   - readme_renderer=24.0
-  - regex=2020.11.13
+  - regex=2021.3.17
   - requests=2.25.1
   - requests-toolbelt=0.9.1
   - rfc3986=1.4.0
   - rope=0.18.0
   - rsa=4.7.2
-  - s3transfer=0.3.4
+  - s3transfer=0.3.6
   - scikit-learn=0.24.1
-  - scipy=1.6.1
+  - scipy=1.6.2
   - seaborn=0.11.1
   - send2trash=1.5.0
   - setuptools=52.0.0
@@ -187,19 +171,14 @@ dependencies:
   - six=1.15.0
   - smart_open=4.2.0
   - spacy=2.3.5
-  - sqlite=3.35.1
+  - sqlite=3.35.2
   - srsly=1.0.5
-  - tensorboard=2.0.0
-  - tensorflow=2.0.0
-  - tensorflow-base=2.0.0
-  - tensorflow-estimator=2.0.0
-  - termcolor=1.1.0
   - terminado=0.9.3
   - testpath=0.4.4
   - thinc=7.4.5
   - threadpoolctl=2.1.0
   - tk=8.6.10
-  - toml=0.10.1
+  - toml=0.10.2
   - tornado=6.1
   - tqdm=4.59.0
   - traitlets=5.0.5
@@ -211,23 +190,29 @@ dependencies:
   - wasabi=0.8.2
   - wcwidth=0.2.5
   - webencodings=0.5.1
-  - werkzeug=1.0.1
   - wheel=0.36.2
   - widgetsnbextension=3.5.1
   - wrapt=1.12.1
   - xz=5.2.5
-  - yaml=0.2.5
   - yarl=1.5.1
   - zeromq=4.3.4
   - zipp=3.4.1
   - zlib=1.2.11
   - zstd=1.4.5
   - pip:
+    - absl-py==0.12.0
     - alabaster==0.7.12
+    - astunparse==1.6.3
     - babel==2.9.0
     - beautifulsoup4==4.9.3
     - check-wheel-contents==0.2.0
     - filelock==3.0.12
+    - flatbuffers==1.12
+    - gast==0.3.3
+    - google-auth-oauthlib==0.4.4
+    - google-pasta==0.2.0
+    - grpcio==1.32.0
+    - h5py==2.10.0
     - humanfriendly==9.1
     - imagesize==1.2.0
     - ipython==7.10.0
@@ -236,10 +221,16 @@ dependencies:
     - jupyter-highlight-selected-word==0.2.0
     - jupyter-latex-envs==1.4.6
     - jupyter-nbextensions-configurator==0.4.1
+    - keras==2.4.3
+    - keras-preprocessing==1.1.2
     - lxml==4.6.3
+    - markdown==3.3.4
     - mwparserfromhell==0.6
+    - oauthlib==3.1.0
+    - opt-einsum==3.3.0
     - property-manager==3.0
     - pyyaml==5.4.1
+    - requests-oauthlib==1.3.0
     - sacremoses==0.0.43
     - sentence-transformers==0.4.1.2
     - sentencepiece==0.1.95
@@ -254,9 +245,15 @@ dependencies:
     - sphinxcontrib-qthelp==1.0.3
     - sphinxcontrib-serializinghtml==1.1.4
     - stopwordsiso==0.6.1
+    - tensorboard==2.4.1
+    - tensorboard-plugin-wit==1.8.0
+    - tensorflow==2.4.1
+    - tensorflow-estimator==2.4.0
+    - termcolor==1.1.0
     - tokenizers==0.10.1
     - torch==1.7.1
     - transformers==4.3.3
     - verboselogs==1.7
+    - werkzeug==1.0.1
     - wheel-filename==1.3.0
     - wikirec==0.1.2.1
