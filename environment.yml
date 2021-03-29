@@ -256,4 +256,3 @@ dependencies:
     - verboselogs==1.7
     - werkzeug==1.0.1
     - wheel-filename==1.3.0
-    - wikirec==0.1.2.1
