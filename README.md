@@ -47,9 +47,9 @@ import wikirec
 
 # Data [`↩`](#contents) <a id="data"></a>
 
-[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
-Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topics` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. Lists can also be passed if more than one topic is desired. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors` (see [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py)).
+Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topics` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. Lists can also be passed if more than one topic is desired. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors` (see [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py)).
 
 Downloading and parsing Wikipedia for the needed data is as simple as:
 
@@ -72,7 +72,7 @@ data_utils.parse_to_ndjson(
 
 The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) directory has a compressed copy of `enwiki_books.ndjson` for testing purposes.
 
-[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the loaded articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) for a full breakdown of what is available for each language. Generating a clean text corpus is achieved through the following:
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the loaded articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) for a full breakdown of what is available for each language. Generating a clean text corpus is achieved through the following:
 
 ```python
 import json
@@ -99,7 +99,7 @@ selected_titles = [titles[i] for i in selected_idxs]
 
 # Methods [`↩`](#contents) <a id="methods"></a>
 
-Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py) include:
+Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) include:
 
 ### BERT
 
@@ -334,18 +334,18 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 - Devising methods to best combine recommendations for more than one input (including an option for disinterest)
 
-- Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
+- Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
 
-- Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
+- Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py)
 
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
 - Compiling other sources of open-source data that can be used to augment input data
   - Potentially writing scripts to load this data for significant topics
 
-- Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
+- Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
 
-- Allowing euclidean distance measurements for LDA based recommendations in [wikirec.model.gen_sim_matrix()](https://github.com/andrewtavis/wikirec/blob/main/wikirec/model.py)
+- Allowing euclidean distance measurements for LDA based recommendations in [wikirec.model.gen_sim_matrix()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py)
 
 - Expanding the [documentation](https://wikirec.readthedocs.io/en/latest/)
 
