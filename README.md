@@ -332,11 +332,13 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 
 Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md) if you are interested in contributing to this project. Work that is in progress or could be implemented includes:
 
-- Devising methods to best combine recommendations for more than one input (including an option for disinterest)
+- Allowing a user to express disinterest in [wikirec.model.recommend](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) [(see issue)](https://github.com/andrewtavis/wikirec/issues/33)
+
+- Devising methods to best combine recommendations for more than one input [(see issue)](https://github.com/andrewtavis/wikirec/issues/32)
 
 - Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
 
-- Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py)
+- Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) [(see issue)](https://github.com/andrewtavis/wikirec/issues/31)
 
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
