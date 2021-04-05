@@ -336,7 +336,7 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 - Devising methods to best combine recommendations for more than one input [(see issue)](https://github.com/andrewtavis/wikirec/issues/32)
 
-- Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments
+- Adding arguments to [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) based on Wikipedia languages to simplify parsing arguments [(see issue)](https://github.com/andrewtavis/wikirec/issues/34)
 
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) [(see issue)](https://github.com/andrewtavis/wikirec/issues/31)
 
