@@ -340,6 +340,8 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 - Adding and refining methods for recommendations in [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) [(see issue)](https://github.com/andrewtavis/wikirec/issues/31)
 
+- Adding embeddings visualization methods to wikirec [(see issue)](https://github.com/andrewtavis/wikirec/issues/35)
+
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
 - Compiling other sources of open-source data that can be used to augment input data
