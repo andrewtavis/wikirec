@@ -332,7 +332,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 
 Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md) if you are interested in contributing to this project. Work that is in progress or could be implemented includes:
 
-- Creating concise [requirements.txt](https://github.com/andrewtavis/wikirec/blob/main/requirements.txt) and [environment.yml](https://github.com/andrewtavis/wikirec/blob/main/environment.yml) files [(see issue)](https://github.com/andrewtavis/wikirec/issues/27)
+- Creating concise [requirements.txt](https://github.com/andrewtavis/wikirec/blob/main/requirements.txt) and [environment.yml](https://github.com/andrewtavis/wikirec/blob/main/environment.yml) files [(see issue)](https://github.com/andrewtavis/wikirec/issues/37)
 
 - Allowing a user to express disinterest in [wikirec.model.recommend](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) [(see issue)](https://github.com/andrewtavis/wikirec/issues/33)
 
