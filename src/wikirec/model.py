@@ -234,7 +234,7 @@ def gen_sim_matrix(
 
 
 def recommend(
-    inputs=None, titles=None, sim_matrix=None, metric="cosine", n=10,
+    inputs=None, ratings = None, titles=None, sim_matrix=None, metric="cosine", n=10,
 ):
     """
     Recommends similar items given an input or list of inputs of interest.
@@ -265,9 +265,13 @@ def recommend(
     """
     if isinstance(inputs, str):
         inputs = [inputs]
+        
+    if ratings:
+        # compute weights based on number of inputs
+        weights = np.divide(ratings, sum(ratings))
 
     first_input = True
-    for inpt in inputs:
+    for r, inpt in enumerate(inputs):
         checked = 0
         num_missing = 0
         for i, t in enumerate(titles):
@@ -276,10 +280,16 @@ def recommend(
                     sims = sim_matrix[i]
 
                     first_input = False
+                    
+                    if ratings:
+                        sims = sims * weights[0]
 
                 else:
-                    sims = [np.mean([s, sim_matrix[i][j]]) for j, s in enumerate(sims)]
-
+                    if ratings: # Currently only supports ratings if multiple inputs are given     
+                        sims = [np.mean([s, weights[r] * sim_matrix[i][j]]) for j, s in enumerate(sims)]
+                    else:
+                        sims = [np.mean([s, sim_matrix[i][j]]) for j, s in enumerate(sims)]
+                    
             else:
                 checked += 1
                 if checked == len(titles):
