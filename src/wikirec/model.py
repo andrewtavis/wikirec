@@ -243,6 +243,9 @@ def recommend(
     ----------
         inputs : str or list (default=None)
             The name of an item or items of interest
+            
+        ratings : list (default=None)
+            A list of ratings that correspond to each input. len(ratings) must equal len(inputs)
 
         titles : lists (default=None)
             The titles of the articles
@@ -267,8 +270,11 @@ def recommend(
         inputs = [inputs]
         
     if ratings:
-        # compute weights based on number of inputs
-        weights = np.divide(ratings, sum(ratings))
+        if any([True for k in ratings if (k > 10) | (k < 0)]):
+            raise ValueError(
+                "Ratings must be between 0 and 10."
+            )
+        weights = np.divide(ratings, 10)
 
     first_input = True
     for r, inpt in enumerate(inputs):
@@ -285,11 +291,12 @@ def recommend(
                         sims = sims * weights[0]
 
                 else:
-                    if ratings: # Currently only supports ratings if multiple inputs are given     
-                        sims = [np.mean([s, weights[r] * sim_matrix[i][j]]) for j, s in enumerate(sims)]
+                    if ratings:
+                        sims = [np.mean([s, weights[r] * sim_matrix[i][j]]) for j, s in enumerate(sims)]    
                     else:
                         sims = [np.mean([s, sim_matrix[i][j]]) for j, s in enumerate(sims)]
-                    
+                
+
             else:
                 checked += 1
                 if checked == len(titles):
