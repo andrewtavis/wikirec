@@ -18,7 +18,9 @@
 
 ### NLP recommendation engine based on Wikipedia data
 
-**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data. See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
+**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. Along with NLP based similarity recommendations, user ratings can also be used to weight inputs and indicate preferences. The gaol is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
+
+See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
 # **Contents**<a id="contents"></a>
 - [Data](#data)
@@ -190,6 +192,7 @@ sim_matrix = model.gen_sim_matrix(
 
 recs = model.recommend(
     inputs="title_or_list_of_titles",
+    ratings=None,  # list of ints/floats between 0 and 10
     titles=selected_titles,
     sim_matrix=sim_matrix,
     metric="cosine",  # euclidean
@@ -201,7 +204,9 @@ recs = model.recommend(
 
 TFIDF generally outperformed all other methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest. The other strong performing model is BERT, as it does the best job of providing novel but sensible recommendations. LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT. Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
 
-See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for fully detailed usage with model comparisons, or open these notebooks in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) to experiment yourself.
+See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for fully detailed usage with model comparisons, with [examples/rec_ratings](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_ratings.ipynb) further demonstrating how to leverage user ratings.
+
+These notebooks can also be opened in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) for direct experimentation.
 
 A sample of TFIDF and BERT book recommendations using cosine similarity follows:
 
