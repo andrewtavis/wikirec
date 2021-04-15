@@ -246,7 +246,8 @@ Samples of TFIDF and BERT book recommendations using cosine similarity follow:
 Recommendations for single and multiple inputs follow:
 
 ```_output
---TFIDF--
+-- TFIDF --
+
 Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.5974588223913879],
  ['Harry Potter and the Deathly Hallows', 0.5803045645372675],
@@ -283,7 +284,8 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['Harry Potter and the Order of the Phoenix', 0.3160426316664049],
  ['The Magical Worlds of Harry Potter', 0.30770960167033506]]
 
- --BERT--
+ -- BERT --
+
  Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Prisoner of Azkaban', 0.8625375],
  ['Harry Potter and the Chamber of Secrets', 0.8557441],
@@ -336,7 +338,8 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 ```
 
 ```_output
---Weighted BERT and TFIDF--
+-- Weighted BERT and TFIDF --
+
  Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.7653442323224594],
  ['Harry Potter and the Half-Blood Prince', 0.7465576592959889],
