@@ -103,7 +103,7 @@ selected_titles = [titles[i] for i in selected_idxs]
 
 Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) include:
 
-<details><summary><strong>BERT<strong></summary>
+<details><summary><strong>BERT</strong></summary>
 <p>
 
 [Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on NLP models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
@@ -131,7 +131,7 @@ bert_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<details><summary><strong>Doc2vec<strong></summary>
+<details><summary><strong>Doc2vec</strong></summary>
 <p>
 
 A generalization of [Word2vec](https://en.wikipedia.org/wiki/Word2vec), Doc2vec is an NLP algorithm for deriving vector representations of documents from contextual word interrelations. These representations are then used as a baseline for recommendations.
@@ -152,7 +152,7 @@ d2v_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<details><summary><strong>LDA<strong></summary>
+<details><summary><strong>LDA</strong></summary>
 <p>
 
 [Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of wikirec, Wikipedia articles are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics. These topic-word relations are then used to determine article similarities and then make recommendations.
@@ -173,7 +173,7 @@ lda_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<details><summary><strong>TFIDF<strong></summary>
+<details><summary><strong>TFIDF</strong></summary>
 <p>
 
 [Term Frequency Inverse Document Frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. In case of wikirec, word importances are combined and compared to derive article similarities and thus provide recommendations.
@@ -224,7 +224,7 @@ See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/exampl
 
 Samples of TFIDF and BERT book recommendations using cosine similarity follow:
 
-<details><summary><strong>Baseline NLP Models<strong></summary>
+<details><summary><strong>Baseline NLP Models</strong></summary>
 <p>
 
 ```_output
@@ -306,7 +306,7 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 <p>
 </details>
 
-<details><summary><strong>Weighted NLP Approach<strong></summary>
+<details><summary><strong>Weighted NLP Approach</strong></summary>
 <p>
 
 Better results can be achieved by combining TFIDF and BERT:
@@ -359,7 +359,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 <p>
 </details>
 
-<details><summary><strong>Adding User Ratings<strong></summary>
+<details><summary><strong>Adding User Ratings</strong></summary>
 <p>
 
 Users can further input ratings for the titles of interest to weight recommendations accordingly:
@@ -425,7 +425,7 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
 
 # References
-<details><summary><strong>List of references<strong></summary>
+<details><summary><strong>List of references</strong></summary>
 <p>
 
 - https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9
