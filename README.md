@@ -103,7 +103,8 @@ selected_titles = [titles[i] for i in selected_idxs]
 
 Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) include:
 
-### BERT
+<details><summary><strong>BERT<strong></summary>
+<p>
 
 [Bidirectional Encoder Representations from Transformers](https://github.com/google-research/bert) derives representations of words based on NLP models ran over open source Wikipedia data. These representations are leveraged to derive article similarities that are then used to deliver recommendations.
 
@@ -127,7 +128,11 @@ bert_embeddings = model.gen_embeddings(
 )
 ```
 
-### Doc2vec
+<p>
+</details>
+
+<details><summary><strong>Doc2vec<strong></summary>
+<p>
 
 A generalization of [Word2vec](https://en.wikipedia.org/wiki/Word2vec), Doc2vec is an NLP algorithm for deriving vector representations of documents from contextual word interrelations. These representations are then used as a baseline for recommendations.
 
@@ -144,7 +149,11 @@ d2v_embeddings = model.gen_embeddings(
 )
 ```
 
-### LDA
+<p>
+</details>
+
+<details><summary><strong>LDA<strong></summary>
+<p>
 
 [Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. In the case of wikirec, Wikipedia articles are posited to be a mixture of a given number of topics, and the presence of each word in a text body comes from its relation to these derived topics. These topic-word relations are then used to determine article similarities and then make recommendations.
 
@@ -161,7 +170,11 @@ lda_embeddings = model.gen_embeddings(
 )
 ```
 
-### TFIDF
+<p>
+</details>
+
+<details><summary><strong>TFIDF<strong></summary>
+<p>
 
 [Term Frequency Inverse Document Frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. In case of wikirec, word importances are combined and compared to derive article similarities and thus provide recommendations.
 
@@ -176,6 +189,9 @@ tfidf_embeddings = model.gen_embeddings(
         norm="l2",
 )
 ```
+
+<p>
+</details>
 
 # Recommendations [`↩`](#contents) <a id="recommendations"></a>
 
@@ -204,11 +220,12 @@ recs = model.recommend(
 
 TFIDF generally outperformed all other methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest. The other strong performing model is BERT, as it does the best job of providing novel but sensible recommendations. LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT. Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
 
-See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for fully detailed demonstrations with model comparisons, as well as [examples/rec_ratings](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_ratings.ipynb) for how to leverage user ratings.
+See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for detailed demonstrations with model comparisons, as well as [examples/rec_ratings](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_ratings.ipynb) for how to leverage user ratings. These notebooks can also be opened in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) for direct experimentation.
 
-These notebooks can also be opened in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) for direct experimentation.
+Samples of TFIDF and BERT book recommendations using cosine similarity follow:
 
-A sample of TFIDF and BERT book recommendations using cosine similarity follows:
+<details><summary><strong>Baseline NLP Models<strong></summary>
+<p>
 
 ```_output
 --TFIDF--
@@ -286,7 +303,13 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['The Ghost of Thomas Kempe', 0.74537575]]
 ```
 
-Better results can further be achieved by combining the above two methods:
+<p>
+</details>
+
+<details><summary><strong>Weighted NLP Approach<strong></summary>
+<p>
+
+Better results can be achieved by combining TFIDF and BERT:
 
 ```python
 tfidf_weight = 0.35
@@ -332,6 +355,45 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
  ['The Children of Húrin', 0.5661655486061915],
  ['Harry Potter and the Goblet of Fire', 0.5653645423523244]]
 ```
+
+<p>
+</details>
+
+<details><summary><strong>Adding User Ratings<strong></summary>
+<p>
+
+Users can further input ratings for the titles of interest to weight recommendations accordingly:
+
+```python
+model.recommend(
+    inputs=[
+        "Harry Potter and the Philosopher's Stone",
+        "The Hobbit",
+        "The Hunger Games",
+    ],
+    ratings=[7, 5, 9],
+    titles=selected_titles,
+    sim_matrix=tfidf_sim_matrix,
+    n=10,
+    metric="cosine",
+)
+```
+
+```_output
+[['Mockingjay', 0.2833900475601968],
+ ['Catching Fire', 0.2667058570158859],
+ ['Harry Potter and the Deathly Hallows', 0.2441572424724626],
+ ['Harry Potter and the Order of the Phoenix', 0.24185900215519326],
+ ['Harry Potter and the Goblet of Fire', 0.2361172970905478],
+ ['Harry Potter and the Chamber of Secrets', 0.2351746504405977],
+ ['Harry Potter and the Half-Blood Prince', 0.2279300124518356],
+ ['Harry Potter and the Prisoner of Azkaban', 0.21689561851501843],
+ ['The History of The Hobbit', 0.21330459347629357],
+ ['The Magical Worlds of Harry Potter', 0.20485904169643493]]
+```
+
+<p>
+</details>
 
 # To-Do [`↩`](#contents) <a id="to-do"></a>
 
