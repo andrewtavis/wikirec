@@ -293,12 +293,12 @@ def recommend(
                 else:
                     if ratings:
                         sims = [
-                            np.mean([s, weights[r] * sim_matrix[i][j]])
+                            np.mean([r * s, weights[r] * sim_matrix[i][j]])
                             for j, s in enumerate(sims)
                         ]
                     else:
                         sims = [
-                            np.mean([s, sim_matrix[i][j]]) for j, s in enumerate(sims)
+                            np.mean([r * s, sim_matrix[i][j]]) for j, s in enumerate(sims)
                         ]
 
             else:
