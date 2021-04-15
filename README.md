@@ -53,7 +53,12 @@ import wikirec
 
 Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topics` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. Lists can also be passed if more than one topic is desired. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors` (see [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py)).
 
-Downloading and parsing Wikipedia for the needed data is as simple as:
+Data processing in wikirec involves the following steps:
+
+<details><summary><strong>Downloading and Parsing Articles</strong></summary>
+<p>
+
+Downloading and parsing Wikipedia articles is as simple as:
 
 ```python
 from wikirec import data_utils
@@ -74,7 +79,13 @@ data_utils.parse_to_ndjson(
 
 The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) directory has a compressed copy of `enwiki_books.ndjson` for testing purposes.
 
-[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the loaded articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) for a full breakdown of what is available for each language. Generating a clean text corpus is achieved through the following:
+<p>
+</details>
+
+<details><summary><strong>Cleaning Parsed Articles</strong></summary>
+<p>
+
+[wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) also provides a standardized multilingual cleaning process for the parsed articles. See [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) for a full breakdown of what is available for each language. Generating a clean text corpus is achieved through the following:
 
 ```python
 import json
@@ -98,6 +109,11 @@ text_corpus, selected_idxs = data_utils.clean(
 
 selected_titles = [titles[i] for i in selected_idxs]
 ```
+
+From here `text_corpus` would be used to derive article similarities that are then used to make recommendations for any title found in `selected_titles`.
+
+<p>
+</details>
 
 # Methods [`↩`](#contents) <a id="methods"></a>
 
@@ -226,6 +242,8 @@ Samples of TFIDF and BERT book recommendations using cosine similarity follow:
 
 <details><summary><strong>Baseline NLP Models</strong></summary>
 <p>
+
+Recommendations for single and multiple inputs follow:
 
 ```_output
 --TFIDF--
@@ -362,7 +380,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 <details><summary><strong>Adding User Ratings</strong></summary>
 <p>
 
-Users can further input ratings for the titles of interest to weight recommendations accordingly:
+The `ratings` argument of [wikirec.model.recommend](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) allows users to weight recommendations according to their interests:
 
 ```python
 model.recommend(
