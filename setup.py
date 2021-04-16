@@ -14,7 +14,7 @@ setup_args = dict(
     name="wikirec",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    version="0.1.2.5",
+    version="0.2.0",
     author="Andrew Tavis McAllister",
     author_email="andrew.t.mcallister@gmail.com",
     classifiers=[

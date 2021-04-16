@@ -1,4 +1,16 @@
-### wikirec 0.1.7 (March 14, 2021)
+### wikirec 0.2.0 (April 16, 2021)
+
+Changes include:
+
+- Users can now input ratings to weigh recommendations
+- Fixes for how multiple inputs recommendations were being calculated
+- Switching over to an src structure
+- Code quality is now checked with Codacy
+- Extensive code formatting to improve quality and style
+- Bug fixes and a more explicit use of exceptions
+- More extensive contributing guidelines
+
+### wikirec 0.1.1.7 (March 14, 2021)
 
 Changes include:
 
