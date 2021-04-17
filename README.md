@@ -392,25 +392,35 @@ model.recommend(
         "The Hobbit",
         "The Hunger Games",
     ],
-    ratings=[7, 5, 9],
+    ratings=[7, 6, 9],
     titles=selected_titles,
-    sim_matrix=tfidf_sim_matrix,
-    n=10,
+    sim_matrix=bert_tfidf_sim_matrix,  # weighted BERT and TFIDF embeddings
+    n=20,
     metric="cosine",
 )
 ```
 
 ```_output
-[['Mockingjay', 0.2833900475601968],
- ['Catching Fire', 0.2667058570158859],
- ['Harry Potter and the Deathly Hallows', 0.2441572424724626],
- ['Harry Potter and the Order of the Phoenix', 0.24185900215519326],
- ['Harry Potter and the Goblet of Fire', 0.2361172970905478],
- ['Harry Potter and the Chamber of Secrets', 0.2351746504405977],
- ['Harry Potter and the Half-Blood Prince', 0.2279300124518356],
- ['Harry Potter and the Prisoner of Azkaban', 0.21689561851501843],
- ['The History of The Hobbit', 0.21330459347629357],
- ['The Magical Worlds of Harry Potter', 0.20485904169643493]]
+[['Mockingjay', 0.5847107027999907],
+ ['Harry Potter and the Order of the Phoenix', 0.5846454899012506],
+ ['The Lord of the Rings', 0.5758166462534925],
+ ['Harry Potter and the Half-Blood Prince', 0.5677581220645922],
+ ['Harry Potter and the Deathly Hallows', 0.5591667887082767],
+ ['Harry Potter and the Prisoner of Azkaban', 0.5584267832698454],
+ ['Catching Fire', 0.5582404750962344],
+ ['Gregor and the Curse of the Warmbloods', 0.5527128074677247],
+ ['Harry Potter and the Chamber of Secrets', 0.5524299731616052],
+ ['The Weirdstone of Brisingamen', 0.5520358627555212],
+ ['The Magical Worlds of Harry Potter', 0.5506942177737976],
+ ['The Bone Season', 0.547984210564344],
+ ['The Book of Three', 0.5459088891490478],
+ ['Fantastic Beasts and Where to Find Them', 0.5443195045210549],
+ ['The Marvellous Land of Snergs', 0.5398665287849369],
+ ['A Wrinkle in Time', 0.5373739646822866],
+ ['The Casual Vacancy', 0.5358385211606874],
+ ['Harry Potter and the Goblet of Fire', 0.5346379229854734],
+ ['The Children of Húrin', 0.5340832788476909],
+ ['A Wizard of Earthsea', 0.5297755576425843]]
 ```
 
 <p>
