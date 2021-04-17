@@ -401,7 +401,7 @@ model.recommend(
 ```
 
 ```_output
--- Weighted BERT and TFIDF With Ratings--
+-- Weighted BERT and TFIDF With Ratings --
 
 [['Mockingjay', 0.5847107027999907],
  ['Harry Potter and the Order of the Phoenix', 0.5846454899012506],
