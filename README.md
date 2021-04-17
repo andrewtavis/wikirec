@@ -392,7 +392,47 @@ model.recommend(
         "The Hobbit",
         "The Hunger Games",
     ],
-    ratings=[7, 6, 9],
+    ratings=None,  # averaging their similarity scores
+    titles=selected_titles,
+    sim_matrix=bert_tfidf_sim_matrix,  # weighted BERT and TFIDF embeddings
+    n=20,
+    metric="cosine",
+)
+```
+
+```_output
+-- Weighted BERT and TFIDF No Ratings --
+
+[['The Lord of the Rings', 0.8129448240195865],
+ ['Harry Potter and the Order of the Phoenix', 0.8058152446026797],
+ ['Harry Potter and the Half-Blood Prince', 0.7899741862008424],
+ ['Harry Potter and the Prisoner of Azkaban', 0.7795265344828326],
+ ['Harry Potter and the Deathly Hallows', 0.774902922811441],
+ ['The Weirdstone of Brisingamen', 0.7718548190275306],
+ ['The Magical Worlds of Harry Potter', 0.7691708768967348],
+ ['Harry Potter and the Chamber of Secrets', 0.7669100258159494],
+ ['Gregor and the Curse of the Warmbloods', 0.762141807244329],
+ ['The Marvellous Land of Snergs', 0.7591230587892558],
+ ['Mockingjay', 0.7585438304114571],
+ ['Fantastic Beasts and Where to Find Them', 0.757280478510476],
+ ['The Children of Húrin', 0.7570409672927969],
+ ['The Book of Three', 0.7497114647690369],
+ ['Harry Potter and the Goblet of Fire', 0.7414905999564945],
+ ['The Bone Season', 0.7401901103966402],
+ ['A Wrinkle in Time', 0.7392014390129485],
+ ['A Wizard of Earthsea', 0.7337085913181924],
+ ['The Casual Vacancy', 0.7306041913659236],
+ ['Krindlekrax', 0.7301903731240345]]
+```
+
+```python
+model.recommend(
+    inputs=[
+        "Harry Potter and the Philosopher's Stone",
+        "The Hobbit",
+        "The Hunger Games",
+    ],
+    ratings=[7, 6, 9],  # similarity scores weighted by ratings
     titles=selected_titles,
     sim_matrix=bert_tfidf_sim_matrix,  # weighted BERT and TFIDF embeddings
     n=20,
