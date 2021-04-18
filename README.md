@@ -23,13 +23,15 @@
 See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
 # **Contents**<a id="contents"></a>
+ <!-- no toc -->
+- [Installation](#installation)
 - [Data](#data)
 - [Methods](#methods)
 - [Recommendations](#recommendations)
 - [Comparative Results](#comparative-results)
 - [To-Do](#to-do)
 
-# Installation
+# Installation [`↩`](#contents) <a id="installation"></a>
 
 wikirec can be downloaded from PyPI via pip or sourced directly from this repository:
 
