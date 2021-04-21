@@ -64,6 +64,7 @@ autodoc_mock_imports = [
     "tqdm",
     "bs4",
     "mwparserfromhell",
+    "defusedxml",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
