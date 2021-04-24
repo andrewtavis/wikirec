@@ -97,6 +97,7 @@ with open("./enwiki_books.ndjson", "r") as f:
 
 titles = [b[0] for b in books]
 texts = [b[1] for b in books]
+wikilinks = [b[2] for b in books]  # internal wikipedia links for NN approach
 
 text_corpus, selected_idxs = data_utils.clean(
     texts=texts,
@@ -205,6 +206,27 @@ tfidf_embeddings = model.gen_embeddings(
         corpus=text_corpus,
         max_features=None,
         norm="l2",
+)
+```
+
+<p>
+</details>
+
+<details><summary><strong>Wikilink NN (WIP)</strong></summary>
+<p>
+
+WIP - see [the issue](https://github.com/andrewtavis/wikirec/issues/36)
+
+Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilink neural network approach makes the assumption that Wikipedia articles that are linked to the same articles will themselves be similar.
+
+`Pseudocode` follows:
+
+```python
+from wikirec import model
+
+nn_wikilink_embeddings = model.gen_embeddings(
+        method="nn_wikilink",
+        corpus=wikilinks,
 )
 ```
 
