@@ -217,7 +217,7 @@ def _process_article(title, text, templates="Infobox book"):
 
     Returns
     -------
-        article_data : tuple
+        title, text, wikilinks: string, string, list
             The data from the article
     """
     wikicode = mwparserfromhell.parse(text)
@@ -232,11 +232,12 @@ def _process_article(title, text, templates="Infobox book"):
         if x.name.strip_code().strip().lower() in [t.lower() for t in templates]
     ]
 
-    if len(matching_templates) >= 1:
-        text = wikicode.strip_code().strip()
+    if matching_templates:
         title = title.strip()
+        text = wikicode.strip_code().strip()
+        wikilinks = [x.title.strip_code().strip() for x in wikicode.filter_wikilinks()]
 
-        return title, text
+        return title, text, wikilinks
 
 
 def iterate_and_parse_file(args):
