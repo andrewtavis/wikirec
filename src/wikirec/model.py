@@ -94,7 +94,7 @@ def gen_embeddings(
     """
     method = method.lower()
 
-    valid_methods = ["bert", "doc2vec", "lda", "tfidf"]
+    valid_methods = ["bert", "doc2vec", "lda", "tfidf", "wikilinks"]
 
     if method not in valid_methods:
         raise ValueError(
