@@ -163,7 +163,7 @@ def gen_embeddings(
             embeddings = weights / np.linalg.norm(weights, axis = 1).reshape((-1, 1))
             return embeddings
         else:
-            embeddings = _wikilinks_nn()
+            embeddings = _wikilinks_nn('./enwiki_books.ndjson', 50)
             return embeddings
 
 
