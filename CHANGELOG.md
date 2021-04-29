@@ -1,3 +1,11 @@
+### wikirec 0.2.1 (April 29, 2021)
+
+Changes include:
+
+- Support has been added for gensim 3.8.x and 4.x
+- Wikipedia links are now an output of data_utils.parse_to_ndjson
+- Dependencies in requirement and environment files are now condensed
+
 ### wikirec 0.2.0 (April 16, 2021)
 
 Changes include:
