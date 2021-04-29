@@ -57,6 +57,7 @@ male_names = names.words("male.txt")
 female_names = names.words("female.txt")
 all_names = set(list(male_names) + list(female_names))
 
+import gensim
 import spacy
 from gensim.models import Phrases
 from stopwordsiso import stopwords
@@ -811,18 +812,33 @@ def clean(
     pbar.update()
 
     # Add bigrams and trigrams
-    bigrams = Phrases(
-        sentences=tokenized_texts,
-        min_count=min_ngram_count,
-        threshold=5.0,
-        common_terms=stop_words,
-    )  # half the normal threshold
-    trigrams = Phrases(
-        sentences=bigrams[tokenized_texts],
-        min_count=min_ngram_count,
-        threshold=5.0,
-        common_terms=stop_words,
-    )
+    # Half the normal threshold
+    if gensim.__version__[0] == "4":
+        bigrams = Phrases(
+            sentences=tokenized_texts,
+            min_count=min_ngram_count,
+            threshold=5.0,
+            connector_words=stop_words,
+        )  # half the normal threshold
+        trigrams = Phrases(
+            sentences=bigrams[tokenized_texts],
+            min_count=min_ngram_count,
+            threshold=5.0,
+            connector_words=stop_words,
+        )
+    else:
+        bigrams = Phrases(  # pylint: disable=unexpected-keyword-arg
+            sentences=tokenized_texts,
+            min_count=min_ngram_count,
+            threshold=5.0,
+            common_terms=stop_words,
+        )
+        trigrams = Phrases(  # pylint: disable=unexpected-keyword-arg
+            sentences=bigrams[tokenized_texts],
+            min_count=min_ngram_count,
+            threshold=5.0,
+            common_terms=stop_words,
+        )
 
     tokens_with_ngrams = []
     for text in tqdm(
