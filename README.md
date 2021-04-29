@@ -2,7 +2,7 @@
   <a href="https://github.com/andrewtavis/wikirec"><img src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png" width="529" height="169"></a>
 </div>
 
---------------------------------------
+---
 
 [![rtd](https://img.shields.io/readthedocs/wikirec.svg?logo=read-the-docs)](http://wikirec.readthedocs.io/en/latest/)
 [![ci](https://img.shields.io/github/workflow/status/andrewtavis/wikirec/CI?logo=github)](https://github.com/andrewtavis/wikirec/actions?query=workflow%3ACI)
@@ -23,13 +23,18 @@
 See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
 # **Contents**<a id="contents"></a>
+
  <!-- no toc -->
-- [Installation](#installation)
-- [Data](#data)
-- [Methods](#methods)
-- [Recommendations](#recommendations)
-- [Comparative Results](#comparative-results)
-- [To-Do](#to-do)
+
+- [**Contents**<a id="contents"></a>](#contents)
+- [Installation `↩` <a id="installation"></a>](#installation--)
+- [Data `↩` <a id="data"></a>](#data--)
+- [Methods `↩` <a id="methods"></a>](#methods--)
+- [Recommendations `↩` <a id="recommendations"></a>](#recommendations--)
+- [Comparative Results `↩` <a id="comparative-results"></a>](#comparative-results--)
+- [To-Do `↩` <a id="to-do"></a>](#to-do--)
+- [References](#references)
+- [Powered By](#powered-by)
 
 # Installation [`↩`](#contents) <a id="installation"></a>
 
@@ -509,6 +514,7 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
 - Compiling other sources of open-source data that can be used to augment input data
+
   - Potentially writing scripts to load this data for significant topics
 
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
@@ -520,6 +526,7 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
 
 # References
+
 <details><summary><strong>List of references</strong></summary>
 <p>
 

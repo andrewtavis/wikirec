@@ -4,26 +4,26 @@ channels:
   - anaconda
   - defaults
 dependencies:
-  - black=19.10b0
-  - certifi=2020.12.5
-  - defusedxml=0.7.1
-  - gensim=3.8.3
-  - matplotlib=3.3.4
-  - nltk=3.5
-  - numpy=1.19.2
-  - packaging=20.9
-  - pandas=1.2.2
-  - pyopenssl=20.0.1
-  - pytest=6.2.2
-  - pytest-cov=2.11.1
-  - scikit-learn=0.24.1
-  - seaborn=0.11.1
-  - spacy=2.3.5
-  - tqdm=4.59.0
+  - black>=19.10b0
+  - certifi>=2020.12.5
+  - defusedxml>=0.7.1
+  - gensim>=3.8.3
+  - matplotlib>=3.3.4
+  - nltk>=3.5
+  - numpy>=1.19.2
+  - packaging>=20.9
+  - pandas>=1.2.2
+  - pyopenssl>=20.0.1
+  - pytest>=6.2.2
+  - pytest-cov>=2.11.1
+  - scikit-learn>=0.24.1
+  - seaborn>=0.11.1
+  - spacy>=2.3.5
+  - tqdm>=4.59.0
   - pip:
-    - beautifulsoup4==4.9.3
-    - keras==2.4.3
-    - mwparserfromhell==0.6
-    - sentence-transformers==0.4.1.2
-    - stopwordsiso==0.6.1
-    - tensorflow==2.4.1
+    - beautifulsoup4>=4.9.3
+    - keras>=2.4.3
+    - mwparserfromhell>=0.6
+    - sentence-transformers>=0.4.1.2
+    - stopwordsiso>=0.6.1
+    - tensorflow>=2.4.1
