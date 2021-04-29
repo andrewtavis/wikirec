@@ -12,6 +12,7 @@ Contents:
 
 import warnings
 
+import gensim
 import numpy as np
 from gensim import corpora, similarities
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
@@ -101,21 +102,21 @@ def gen_embeddings(
             TaggedDocument(words=tc_i, tags=[i]) for i, tc_i in enumerate(corpus)
         ]
 
-        if "vector_size" in kwargs:
-            v_size = kwargs.get("vector_size")
-            model_d2v = Doc2Vec(**kwargs)
+        v_size = kwargs.get("vector_size") if "vector_size" in kwargs else 100
+
+        if gensim.__version__[0] == "4":
+            model_d2v = Doc2Vec(documents=tagged_data, vector_size=v_size, **kwargs)
+
         else:
-            v_size = 100
             model_d2v = Doc2Vec(vector_size=v_size, **kwargs)
+            model_d2v.build_vocab(tagged_data)
 
-        model_d2v.build_vocab(tagged_data)
-
-        for _ in range(v_size):
-            model_d2v.train(
-                documents=tagged_data,
-                total_examples=model_d2v.corpus_count,
-                epochs=model_d2v.epochs,
-            )
+            for _ in range(v_size):
+                model_d2v.train(
+                    documents=tagged_data,
+                    total_examples=model_d2v.corpus_count,
+                    epochs=model_d2v.epochs,
+                )
 
         embeddings = np.zeros((len(tagged_data), v_size))
         embeddings = [model_d2v.docvecs[i] for i, e in enumerate(embeddings)]
@@ -298,7 +299,8 @@ def recommend(
                         ]
                     else:
                         sims = [
-                            np.mean([r * s, sim_matrix[i][j]]) for j, s in enumerate(sims)
+                            np.mean([r * s, sim_matrix[i][j]])
+                            for j, s in enumerate(sims)
                         ]
 
             else:
