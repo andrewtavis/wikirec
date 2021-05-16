@@ -16,7 +16,7 @@ def test__check_str_args():
         "word_0",
         "word_1",
     ]
-    assert utils._check_str_args("word_2", ["word_0", "word_1"]) == None
+    assert utils._check_str_args("word_2", ["word_0", "word_1"]) is None
 
 
 def test_graph_lda_topic_evals(monkeypatch, text_corpus):

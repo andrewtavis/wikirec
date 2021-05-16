@@ -16,9 +16,9 @@
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![colab](https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252)](https://colab.research.google.com/github/andrewtavis/wikirec)
 
-### NLP recommendation engine based on Wikipedia data
+### Recommendation engine framework based on Wikipedia data
 
-**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations based on unsupervised natural language processing. Along with NLP based similarity recommendations, user ratings can also be leveraged to weigh inputs and indicate preferences. The goal is for wikirec to both refine and deploy models that provide accurate content recommendations based solely on open-source data.
+**wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations for the given content. Recommendations are based on unsupervised natural language processing over article texts, with ratings being leveraged to weigh inputs and indicate preferences. The goal is for wikirec to both refine and deploy models that provide accurate content recommendations with only open-source data.
 
 See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
@@ -212,23 +212,22 @@ tfidf_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<details><summary><strong>Wikilink NN (WIP)</strong></summary>
+<details><summary><strong>Wikilink NN</strong></summary>
 <p>
 
-WIP - see [the issue](https://github.com/andrewtavis/wikirec/issues/36)
-
-Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilink neural network method makes the assumption that Wikipedia articles that are linked to the same articles will themselves be similar.
-
-`Pseudocode` follows:
+Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilinks neural network method makes the assumption that content will be similar if they are linked to the same Wikipedia articles. A corpus of internal wikilinks per article is passed, and embeddings based on these internal references are then derived.
 
 ```python
 from wikirec import model
 
-wikilink_nn_embeddings = model.gen_embeddings(
-        method="wikilink_nn",
-        corpus=wikilinks,
+wikilink_embeddings = model.gen_embeddings(
+        method="WikilinkNN",
+        path_to_json="./enwiki_books.ndjson",  # json used instead of a corpus
+        embedding_size=50,
 )
 ```
+
+The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) directory has a copy of `books_embedding_model.h5` for testing purposes.
 
 <p>
 </details>
@@ -258,11 +257,15 @@ recs = model.recommend(
 
 # Comparative Results [`↩`](#contents) <a id="comparative-results"></a>
 
-TFIDF generally outperformed all other methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest. The other strong performing model is BERT, as it does the best job of providing novel but sensible recommendations. LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT. Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
+- TFIDF generally outperformed all other NLP methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest.
+- The other strong performing NLP model is BERT, as it does the best job of providing novel but sensible recommendations.
+- The wikilink neural network also provides very sensible results, giving wikirec effective modeling options using different methods.
+- LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT.
+- Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
 
 See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for detailed demonstrations with model comparisons, as well as [examples/rec_ratings](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_ratings.ipynb) for how to leverage user ratings. These notebooks can also be opened in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) for direct experimentation.
 
-Samples of TFIDF and BERT book recommendations using cosine similarity follow:
+Samples of TFIDF, BERT and WikilinkNN book recommendations using cosine similarity follow:
 
 <details><summary><strong>Baseline NLP Models</strong></summary>
 <p>
@@ -487,6 +490,18 @@ model.recommend(
  ['Harry Potter and the Goblet of Fire', 0.5346379229854734],
  ['The Children of Húrin', 0.5340832788476909],
  ['A Wizard of Earthsea', 0.5297755576425843]]
+```
+
+<p>
+</details>
+
+<details><summary><strong>Wikilink NN</strong></summary>
+<p>
+
+```_output
+-- Wikilink Neural Network Ratings --
+
+[]
 ```
 
 <p>

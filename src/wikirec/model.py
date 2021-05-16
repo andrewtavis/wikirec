@@ -10,13 +10,20 @@ Contents:
     recommend
 """
 
+import json
+import os
+import random
 import warnings
+from collections import Counter, OrderedDict
+from itertools import chain
 
 import gensim
 import numpy as np
 from gensim import corpora, similarities
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.ldamulticore import LdaMulticore
+from keras.layers import Dot, Embedding, Input, Reshape
+from keras.models import Model, load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
@@ -25,20 +32,14 @@ from sentence_transformers import SentenceTransformer
 
 from wikirec import utils
 
-import os
-import json
-import random
-from itertools import chain
-from collections import Counter, OrderedDict
-from keras.models import load_model
-from keras.layers import Input, Embedding, Dot, Reshape, Dense
-from keras.models import Model
-
 
 def gen_embeddings(
-    method="lda",
+    method="bert",
     corpus=None,
     bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
+    path_to_json=None,
+    path_to_embedding_model="wikilinks_embedding_model",
+    embedding_size=50,
     **kwargs,
 ):
     """
@@ -46,69 +47,75 @@ def gen_embeddings(
 
     Parameters
     ----------
-        method : str (default=lda)
-            The modelling method
+        method : str (default=bert)
+            The modelling method.
 
             Options:
                 BERT: Bidirectional Encoder Representations from Transformers
 
-                    - Words embeddings are derived via Google Neural Networks
+                    - Words embeddings are derived via Google Neural Networks.
 
-                    - Embeddings are then used to derive similarities
+                    - Embeddings are then used to derive similarities.
 
                 Doc2vec : Document to Vector
 
-                    - An entire document is converted to a vector
+                    - An entire document is converted to a vector.
 
-                    - Based on word2vec, but maintains the document context
+                    - Based on word2vec, but maintains the document context.
 
                 LDA: Latent Dirichlet Allocation
 
-                    - Text data is classified into a given number of categories
+                    - Text data is classified into a given number of categories.
 
-                    - These categories are then used to classify individual entries given the percent they fall into categories
+                    - These categories are then used to classify individual entries given the percent they fall into categories.
 
                 TFIDF: Term Frequency Inverse Document Frequency
 
-                    - Word importance increases proportionally to the number of times a word appears in the document while being offset by the number of documents in the corpus that contain the word
+                    - Word importance increases proportionally to the number of times a word appears in the document while being offset by the number of documents in the corpus that contain the word.
 
-                    - These importances are then vectorized and used to relate documents
-                    
-                Wikilinks
-                    
-                    - Generate an embedding using a neural network trained on the connections between articles and the internal wikilinks
+                    - These importances are then vectorized and used to relate documents.
+
+                WikilinkNN: Wikilinks Neural Network
+
+                    - Generate embeddings using a neural network trained on the connections between articles and their internal wikilinks.
 
         corpus : list of lists (default=None)
-            The text corpus over which analysis should be done
+            The text corpus over which analysis should be done.
 
         bert_st_model : str (deafault=xlm-r-bert-base-nli-stsb-mean-tokens)
-            The BERT model to use
+            The BERT model to use.
+
+        path_to_json : str (default=None)
+            The path to the parsed json file.
+
+        path_to_embedding_model : str (default=wikilinks_embedding_model)
+            The name of the embedding model to load or create.
+
+        embedding_size : int (default=50)
+            The length of the embedding vectors between the articles and the links.
 
         **kwargs : keyword arguments
-            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer
+            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer.
 
     Returns
     -------
-        embeddings :
-            Embeddings to be used to create article-article similarity matrices
+        embeddings : np.ndarray
+            Embeddings to be used to create article-article similarity matrices.
     """
     method = method.lower()
 
-    valid_methods = ["bert", "doc2vec", "lda", "tfidf", "wikilinks"]
+    valid_methods = ["bert", "doc2vec", "lda", "tfidf", "wikilinknn"]
 
     if method not in valid_methods:
         raise ValueError(
-            "The value for the 'method' argument is invalid. Please choose one of ".join(
-                valid_methods
-            )
+            "The value for the 'method' argument is invalid. Please choose one of "
+            + ", ".join(valid_methods)
         )
 
     if method == "bert":
         bert_model = SentenceTransformer(bert_st_model)
 
-        embeddings = bert_model.encode(corpus, **kwargs)
-
-        return embeddings
+        return bert_model.encode(corpus, **kwargs)
 
     elif method == "doc2vec":
         tagged_data = [
@@ -132,9 +139,8 @@ def gen_embeddings(
                 )
 
         embeddings = np.zeros((len(tagged_data), v_size))
-        embeddings = [model_d2v.docvecs[i] for i, e in enumerate(embeddings)]
 
-        return embeddings
+        return [model_d2v.docvecs[i] for i, e in enumerate(embeddings)]
 
     elif method == "lda":
         if not isinstance(corpus[0], list):
@@ -144,84 +150,95 @@ def gen_embeddings(
         bow_corpus = [dictionary.doc2bow(text) for text in corpus]
 
         model_lda = LdaMulticore(corpus=bow_corpus, id2word=dictionary, **kwargs)
-        embeddings = model_lda[bow_corpus]
 
-        return embeddings
+        return model_lda[bow_corpus]
 
     elif method == "tfidf":
         tfidfvectoriser = TfidfVectorizer(**kwargs)
         tfidfvectoriser.fit(corpus)
-        embeddings = tfidfvectoriser.transform(corpus)
 
-        return embeddings
-    
-    elif method == "wikilinks":
-        if os.path.isfile("./wikilinks_embedding_model.h5"):
-            model = load_model("./wikilinks_embedding_model.h5")
-            layer = model.get_layer('book_embedding')
-            weights = layer.get_weights()[0]
-            embeddings = weights / np.linalg.norm(weights, axis = 1).reshape((-1, 1))
-            return embeddings
-        else:
-            embeddings = _wikilinks_nn('./enwiki_books.ndjson', 50)
-            return embeddings
+        return tfidfvectoriser.transform(corpus)
+
+    elif method == "wikilinknn":
+        if path_to_embedding_model[-3:] != ".h5":
+            path_to_embedding_model += ".h5"
+
+        model_name = path_to_embedding_model.split("/")[-1]
+
+        if not os.path.isfile(path_to_embedding_model):
+            print(f"Generating {model_name}.")
+            return _wikilinks_nn(
+                path_to_json=path_to_json,
+                path_to_embedding_model=path_to_embedding_model,
+                embedding_size=embedding_size,
+            )
+
+        print(f"Loading {model_name}.")
+        model = load_model(path_to_embedding_model)
+        layer = model.get_layer("article_embedding")
+        weights = layer.get_weights()[0]
+
+        return weights / np.linalg.norm(weights, axis=1).reshape((-1, 1))
 
 
 def gen_sim_matrix(
-    method="lda", metric="cosine", embeddings=None,
+    method="bert", metric="cosine", embeddings=None,
 ):
     """
     Derives a similarity matrix from document embeddings.
 
     Parameters
     ----------
-        method : str (default=lda)
-            The modelling method
+        method : str (default=bert)
+            The modelling method.
 
             Options:
                 BERT: Bidirectional Encoder Representations from Transformers
 
-                    - Words embeddings are derived via Google Neural Networks
+                    - Words embeddings are derived via Google Neural Networks.
 
-                    - Embeddings are then used to derive similarities
+                    - Embeddings are then used to derive similarities.
 
                 Doc2vec : Document to Vector
 
-                    - An entire document is converted to a vector
+                    - An entire document is converted to a vector.
 
-                    - Based on word2vec, but maintains the document context
+                    - Based on word2vec, but maintains the document context.
 
                 LDA: Latent Dirichlet Allocation
 
-                    - Text data is classified into a given number of categories
+                    - Text data is classified into a given number of categories.
 
-                    - These categories are then used to classify individual entries given the percent they fall into categories
+                    - These categories are then used to classify individual entries given the percent they fall into categories.
 
                 TFIDF: Term Frequency Inverse Document Frequency
 
-                    - Word importance increases proportionally to the number of times a word appears in the document while being offset by the number of documents in the corpus that contain the word
+                    - Word importance increases proportionally to the number of times a word appears in the document while being offset by the number of documents in the corpus that contain the word.
 
-                    - These importances are then vectorized and used to relate documents
+                    - These importances are then vectorized and used to relate documents.
+
+                WikilinkNN: Wikilinks Neural Network
+
+                    - Generate embeddings using a neural network trained on the connections between articles and their internal wikilinks.
 
         metric : str (default=cosine)
-            The metric to be used when comparing vectorized corpus entries
+            The metric to be used when comparing vectorized corpus entries.
 
-            Options include: cosine and euclidean
+            Note: options include cosine and euclidean.
 
     Returns
     -------
         sim_matrix : gensim.interfaces.TransformedCorpus or numpy.ndarray
-            The similarity sim_matrix for the corpus from the given model
+            The similarity sim_matrix for the corpus from the given model.
     """
     method = method.lower()
 
-    valid_methods = ["bert", "doc2vec", "lda", "tfidf"]
+    valid_methods = ["bert", "doc2vec", "lda", "tfidf", "wikilinknn"]
 
     if method not in valid_methods:
         raise ValueError(
-            "The value for the 'method' argument is invalid. Please choose one of ".join(
-                valid_methods
-            )
+            "The value for the 'method' argument is invalid. Please choose one of "
+            + ", ".join(valid_methods)
         )
 
     if method in ["bert", "doc2vec"]:
@@ -267,26 +284,26 @@ def recommend(
     Parameters
     ----------
         inputs : str or list (default=None)
-            The name of an item or items of interest
+            The name of an item or items of interest.
 
         ratings : list (default=None)
-            A list of ratings that correspond to each input
+            A list of ratings that correspond to each input.
 
-            Note: len(ratings) must equal len(inputs)
+            Note: len(ratings) must equal len(inputs).
 
         titles : lists (default=None)
-            The titles of the articles
+            The titles of the articles.
 
         sim_matrix : gensim.interfaces.TransformedCorpus or np.ndarray (default=None)
-            The similarity sim_matrix for the corpus from the given model
+            The similarity sim_matrix for the corpus from the given model.
 
         n : int (default=10)
-            The number of items to recommend
+            The number of items to recommend.
 
         metric : str (default=cosine)
-            The metric to be used when comparing vectorized corpus entries
+            The metric to be used when comparing vectorized corpus entries.
 
-            Options include: cosine and euclidean
+            Note: options include cosine and euclidean.
 
     Returns
     -------
@@ -342,143 +359,166 @@ def recommend(
     titles_and_scores = [[t, sims[i]] for i, t in enumerate(titles)]
 
     if metric == "cosine":
-        # Cosine similarities have been used (higher is better)
+        # Cosine similarities have been used (higher is better).
         recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=True)
     elif metric == "euclidean":
-        # Euclidean distances have been used (lower is better)
+        # Euclidean distances have been used (lower is better).
         recommendations = sorted(titles_and_scores, key=lambda x: x[1], reverse=False)
 
     recommendations = [r for r in recommendations if r[0] not in inputs][:n]
 
     return recommendations
 
-def _wikilinks_nn(path_to_json = None, embedding_size = 50):
+
+def _wikilinks_nn(
+    path_to_json=None,
+    path_to_embedding_model="wikilinks_embedding_model",
+    embedding_size=50,
+):
     """
-    Generates embeddings of wikilinks and articles by training a neural network. Currently only trained on books.  
-   
+    Generates embeddings of wikilinks and articles by training a neural network.
+
     Parameters
     ----------
         path_to_json : str (default=None)
-            The path to the parsed json file. 
-        
-        embedding_size : int (default = 50)
+            The path to the parsed json file.
+
+        path_to_embedding_model : str (default=wikilinks_embedding_model)
+            The name of the embedding model to load or create.
+
+        embedding_size : int (default=50)
             The length of the embedding vectors between the articles and the links.
-            
+
     Returns
     -------
-        book_weights : np.array
-            The normalized embedding vectors for each of the articles. 
-            
-            Shape of book_weights is (len(books), embedding_size)
-    
+        weights : np.array (len(corpus), embedding_size)
+            The normalized embedding vectors for each of the articles.
     """
     if os.path.isfile(path_to_json):
         with open(path_to_json, "r") as fin:
-            books = [json.loads(l) for l in fin]
+            articles = [json.loads(l) for l in fin]
     else:
-        raise Exception("Need to parse json for books.")
-        
-    # Find set of wikilinks for each book and convert to a flattened list
-    unique_wikilinks = list(chain(*[list(set(book[2])) for book in books]))
+        raise Exception("Need to parse json for articles.")
+
+    # Find set of wikilinks for each article and convert to a flattened list.
+    unique_wikilinks = list(chain(*[list(set(a[2])) for a in articles]))
     wikilinks = [link.lower() for link in unique_wikilinks]
-    to_remove = ['hardcover', 'paperback', 'hardback', 'e-book', 'wikipedia:wikiproject books', 'wikipedia:wikiproject novels']
+    to_remove = [
+        "hardcover",
+        "paperback",
+        "hardback",
+        "e-book",
+        "wikipedia:wikiproject books",
+        "wikipedia:wikiproject novels",
+    ]
     wikilinks = [item for item in wikilinks if item not in to_remove]
 
-    # Limit to wikilinks that occur more than 4 times
+    # Limit to wikilinks that occur more than 4 times.
     wikilinks_counts = Counter(wikilinks)
-    wikilinks_counts = sorted(wikilinks_counts.items(), key = lambda x: x[1], reverse = True)
+    wikilinks_counts = sorted(
+        wikilinks_counts.items(), key=lambda x: x[1], reverse=True
+    )
     wikilinks_counts = OrderedDict(wikilinks_counts)
     links = [t[0] for t in wikilinks_counts.items() if t[1] >= 4]
-    
-    # map books to their indices, and map links to indices as well 
-    book_index = {book[0]: idx for idx, book in enumerate(books)}
-    link_index = {link: idx for idx, link in enumerate(links)} 
-    
-    #Create data from pairs of (book, wikilink) for training the neural network embedding
-    pairs = []
-    for book in books:
-        title = book[0]
-        book_links = book[2]
-        # Iterate through wikilinks in book article
-        for link in book_links:
-            # Add index of book and index of link to pairs
-            if link.lower() in links:
-                pairs.append((book_index[title], link_index[link.lower()]))
-    pairs_set = set(pairs)
-    
-    # Neural network architecture
-    # Both inputs are 1-dimensional
-    book_input = Input(name = 'book', shape = [1])
-    link_input = Input(name = 'link', shape = [1])
-    
-    # Embedding the book (shape will be (None, 1, 50))
-    book_embedding = Embedding(name = 'book_embedding',
-                               input_dim = len(book_index),
-                               output_dim = embedding_size)(book_input)
-    
-    # Embedding the link (shape will be (None, 1, 50))
-    link_embedding = Embedding(name = 'link_embedding',
-                               input_dim = len(link_index),
-                               output_dim = embedding_size)(link_input)
-    
-    # Merge the layers with a dot product along the second axis 
-    # (shape will be (None, 1, 1))
-    merged = Dot(name = 'dot_product', normalize = True, 
-                 axes = 2)([book_embedding, link_embedding])
-    
-    # Reshape to be a single number (shape will be (None, 1))
-    merged = Reshape(target_shape = [1])(merged)
-    
-    model = Model(inputs = [book, link], outputs = merged)
-    model.compile(optimizer = 'Adam', loss = 'mse')
-    
-    # Function that creates a generator for training data 
-    def _generate_batch(pairs, n_positive = 50, negative_ratio = 1.0):
-        """Generate batches of samples for training. 
-           Random select positive samples
-           from pairs and randomly select negatives."""
 
-        # Create empty array to hold batch
+    # Map articles to their indices, and map links to indices as well.
+    article_index = {a[0]: idx for idx, a in enumerate(articles)}
+    link_index = {link: idx for idx, link in enumerate(links)}
+
+    # Create data from pairs of (article, wikilink) for training the neural network embedding.
+    pairs = []
+    for article in articles:
+        title = article[0]
+        article_links = article[2]
+        # Iterate through wikilinks in article.
+        for link in article_links:
+            # Add index of article and index of link to pairs.
+            if link.lower() in links:
+                pairs.append((article_index[title], link_index[link.lower()]))
+
+    pairs_set = set(pairs)
+
+    # Neural network architecture.
+    # Both inputs are 1-dimensional.
+    article_input = Input(name="article", shape=[1])
+    link_input = Input(name="link", shape=[1])
+
+    # Embedding the article (shape will be (None, 1, embedding_size)).
+    article_embedding = Embedding(
+        name="article_embedding",
+        input_dim=len(article_index),
+        output_dim=embedding_size,
+    )(article_input)
+
+    # Embedding the link (shape will be (None, 1, embedding_size)).
+    link_embedding = Embedding(
+        name="link_embedding", input_dim=len(link_index), output_dim=embedding_size
+    )(link_input)
+
+    # Merge the layers with a dot product along the second axis
+    # (shape will be (None, 1, 1)).
+    merged = Dot(name="dot_product", normalize=True, axes=2)(
+        [article_embedding, link_embedding]
+    )
+
+    # Reshape to be a single number (shape will be (None, 1)).
+    merged = Reshape(target_shape=[1])(merged)
+
+    model = Model(inputs=[article, link], outputs=merged)
+    model.compile(optimizer="Adam", loss="mse")
+
+    # Function that creates a generator for training data.
+    def _generate_batch(pairs, n_positive=embedding_size, negative_ratio=1.0):
+        """
+        Generate random positive and negative samples for training.
+        """
+        # Create empty array to hold batch.
         batch_size = n_positive * (1 + negative_ratio)
         batch = np.zeros((batch_size, 3))
 
-        # Continue to yield samples
+        # Continue to yield samples.
         while True:
-            # Randomly choose positive examples
-            for idx, (book_id, link_id) in enumerate(random.sample(pairs, n_positive)):
-                batch[idx, :] = (book_id, link_id, 1)
+            # Randomly choose positive examples.
+            for idx, (article_id, link_id) in enumerate(
+                random.sample(pairs, n_positive)
+            ):
+                batch[idx, :] = (article_id, link_id, 1)
             idx += 1
 
-            # Add negative examples until reach batch size
+            # Add negative examples until reach batch size.
             while idx < batch_size:
 
                 # Random selection
-                random_book = random.randrange(len(book_index))
+                random_article = random.randrange(len(article_index))
                 random_link = random.randrange(len(link_index))
 
-                # Check to make sure this is not a positive example
-                if (random_book, random_link) not in pairs_set:
+                # Check to make sure this is not a positive example.
+                if (random_article, random_link) not in pairs_set:
 
-                    # Add to batch and increment index
-                    batch[idx, :] = (random_book, random_link, 0)
+                    # Add to batch and increment index.
+                    batch[idx, :] = (random_article, random_link, 0)
                     idx += 1
 
-            # Make sure to shuffle order
+            # Make sure to shuffle order.
             np.random.shuffle(batch)
-            yield {'book': batch[:, 0], 'link': batch[:, 1]}, batch[:, 2]
+            yield {"article": batch[:, 0], "link": batch[:, 1]}, batch[:, 2]
 
     n_positive = 1024
-    gen = _generate_batch(pairs, n_positive, negative_ratio = 2)
-    h = model.fit_generator(gen, epochs = 15, steps_per_epoch = len(pairs) // n_positive)
-    
-    # Save the model and extract embeddings 
-    model.save('./wikilinks_embedding_model.h5')
-    
-    # Extract embeddings
-    book_layer = model.get_layer('book_embedding')
-    book_weights = book_layer.get_weights()[0]
-    
-    # Normalize the weights to have norm of 1 
-    book_weights = book_weights / np.linalg.norm(book_weights, axis = 1).reshape((-1, 1))
-    
-    return book_weights
+    gen = _generate_batch(pairs, n_positive, negative_ratio=2)
+    h = model.fit_generator(  # pylint: disable=unused-variable
+        gen, epochs=15, steps_per_epoch=len(pairs) // n_positive,
+    )
+
+    # Save the model and extract embeddings.
+    model.save(path_to_embedding_model)
+
+    # Extract embeddings.
+    article_layer = model.get_layer("article_embedding")
+    article_weights = article_layer.get_weights()[0]
+
+    # Normalize the weights to have norm of 1.
+    article_weights = article_weights / np.linalg.norm(article_weights, axis=1).reshape(
+        (-1, 1)
+    )
+
+    return article_weights

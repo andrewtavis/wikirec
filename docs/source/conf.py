@@ -170,7 +170,7 @@ texinfo_documents = [
         "wikirec Documentation",
         author,
         "wikirec",
-        "NLP recommendation engine based on Wikipedia data",
+        "Recommendation engine framework based on Wikipedia data",
         "Miscellaneous",
     )
 ]

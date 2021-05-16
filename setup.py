@@ -30,7 +30,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
-    description="NLP recommendation engine based on Wikipedia data",
+    description="Recommendation engine framework based on Wikipedia data",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="new BSD",

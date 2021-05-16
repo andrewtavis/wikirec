@@ -23,7 +23,7 @@ files = data_utils.download_wiki(
     language=language, target_dir=input_dir, file_limit=1, dump_id=False
 )
 
-# To check that it finds already downloaded file
+# To check that it finds already downloaded file.
 files = data_utils.download_wiki(
     language=language, target_dir=input_dir, file_limit=1, dump_id=False
 )
@@ -47,7 +47,7 @@ dump_file_path = f"{input_dir}/{os.listdir(input_dir)[0]}"
 parse_args = ("books", language, dump_file_path, partitions_dir, limit, True)
 data_utils.iterate_and_parse_file(args=parse_args)
 
-# Again to check that it skips the parse
+# Again to check that it skips the parse.
 data_utils.iterate_and_parse_file(args=parse_args)
 
 with open(output_path, "r") as f:
