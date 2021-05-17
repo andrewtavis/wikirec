@@ -10,26 +10,6 @@ from wikirec import model
 np.random.seed(42)
 
 
-# def test_wikilinksnn(titles):
-#     n = 5
-
-#     wikilink_embeddings = model.gen_embeddings(
-#         method="WikilinkNN",
-#         path_to_json="./test_files/enwiki_books.ndjson",  # json used instead of a corpus
-#         embedding_size=50,
-#     )
-
-#     recs = model.recommend(
-#         inputs=titles[0],
-#         titles=titles,
-#         sim_matrix=wikilink_embeddings,
-#         n=n,
-#         metric="euclidean",
-#     )
-
-#     assert len(recs) == n
-
-
 def test_gen_sim_matrix(text_corpus):
     bert_embeddings = model.gen_embeddings(
         method="bert",

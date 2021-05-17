@@ -212,10 +212,10 @@ tfidf_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<details><summary><strong>Wikilink NN</strong></summary>
+<details><summary><strong>WikilinkNN</strong></summary>
 <p>
 
-Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilinks neural network method makes the assumption that content will be similar if they are linked to the same Wikipedia articles. A corpus of internal wikilinks per article is passed, and embeddings based on these internal references are then derived.
+Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilink neural network method makes the assumption that content will be similar if they are linked to the same Wikipedia articles. A corpus of internal wikilinks per article is passed, and embeddings based on these internal references are then derived.
 
 ```python
 from wikirec import model
@@ -223,7 +223,10 @@ from wikirec import model
 wikilink_embeddings = model.gen_embeddings(
         method="WikilinkNN",
         path_to_json="./enwiki_books.ndjson",  # json used instead of a corpus
-        embedding_size=50,
+        path_to_embedding_model="books_embedding_model.h5",
+        embedding_size=75,
+        epochs=20,
+        verbose=True,
 )
 ```
 
@@ -259,22 +262,18 @@ recs = model.recommend(
 
 - TFIDF generally outperformed all other NLP methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest.
 - The other strong performing NLP model is BERT, as it does the best job of providing novel but sensible recommendations.
-- The wikilink neural network also provides very sensible results, giving wikirec effective modeling options using different methods.
+- WikilinkNN also provides very sensible results, giving wikirec effective modeling options using different kinds of inputs.
 - LDA with the second shortest runtime provides novel recommendations along with what is expected, but recommends things that seem out of place more often than BERT.
 - Doc2vec performs very poorly in that most results are nonsense, and it further takes the longest to train.
 
 See [examples/rec_books](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_books.ipynb) and [examples/rec_movies](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_movies.ipynb) for detailed demonstrations with model comparisons, as well as [examples/rec_ratings](https://github.com/andrewtavis/wikirec/blob/main/examples/rec_ratings.ipynb) for how to leverage user ratings. These notebooks can also be opened in [Google Colab](https://colab.research.google.com/github/andrewtavis/wikirec) for direct experimentation.
 
-Samples of TFIDF, BERT and WikilinkNN book recommendations using cosine similarity follow:
+Sample recommendations for single and multiple inputs are found in the following dropdowns:
 
-<details><summary><strong>Baseline NLP Models</strong></summary>
+<details><summary><strong>TFIDF</strong></summary>
 <p>
 
-Recommendations for single and multiple inputs follow:
-
 ```_output
--- TFIDF --
-
 Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.5974588223913879],
  ['Harry Potter and the Deathly Hallows', 0.5803045645372675],
@@ -310,10 +309,16 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['Mr. Bliss', 0.3219122094772891],
  ['Harry Potter and the Order of the Phoenix', 0.3160426316664049],
  ['The Magical Worlds of Harry Potter', 0.30770960167033506]]
+```
 
- -- BERT --
+<p>
+</details>
 
- Harry Potter and the Philosopher's Stone recommendations:
+<details><summary><strong>BERT</strong></summary>
+<p>
+
+```_output
+Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Prisoner of Azkaban', 0.8625375],
  ['Harry Potter and the Chamber of Secrets', 0.8557441],
  ['Harry Potter and the Half-Blood Prince', 0.8430752],
@@ -325,7 +330,7 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['The Weirdstone of Brisingamen', 0.8035261],
  ['Harry Potter and the Cursed Child', 0.79987496]]
 
- The Hobbit recommendations:
+The Hobbit recommendations:
 [['The Lord of the Rings', 0.8724792],
  ['Beast', 0.8283818],
  ['The Children of Húrin', 0.8261733],
@@ -337,7 +342,7 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
  ['The Amazing Maurice and His Educated Rodents', 0.8089799],
  ['Dark Lord of Derkholm', 0.8068354]]
 
- Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
+Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 [['The Weirdstone of Brisingamen', 0.79162943],
  ['Harry Potter and the Prisoner of Azkaban', 0.7681779],
  ['A Wizard of Earthsea', 0.7566709],
@@ -353,7 +358,52 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 <p>
 </details>
 
-<details><summary><strong>Weighted NLP Approach</strong></summary>
+<details><summary><strong>WikilinkNN</strong></summary>
+<p>
+
+```_output
+Harry Potter and the Philosopher's Stone recommendations:
+[['Harry Potter and the Chamber of Secrets', 0.9697026],
+ ['Harry Potter and the Goblet of Fire', 0.969065],
+ ['Harry Potter and the Deathly Hallows', 0.9685888],
+ ['Harry Potter and the Half-Blood Prince', 0.9635748],
+ ['Harry Potter and the Prisoner of Azkaban', 0.9569129],
+ ['Harry Potter and the Order of the Phoenix', 0.94091964],
+ ['Harry Potter and the Cursed Child', 0.9358928],
+ ['My Immortal (fan fiction)', 0.91195196],
+ ['Eragon', 0.89236057],
+ ['Quidditch Through the Ages', 0.8891448]]
+
+The Hobbit recommendations:
+[['The Lord of the Rings', 0.94245297],
+ ['The Silmarillion', 0.9160445],
+ ['Beren and Lúthien', 0.90604335],
+ ['The Fall of Gondolin', 0.9044683],
+ ['The Children of Húrin', 0.895282],
+ ['The Book of Lost Tales', 0.89020956],
+ ['The Road to Middle-Earth', 0.88268256],
+ ["The Magician's Nephew", 0.8816683],
+ ['The History of The Hobbit', 0.87789804],
+ ['Farmer Giles of Ham', 0.87786204]]
+
+Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
+[['The Lord of the Rings', 0.8367433249950409],
+ ['Harry Potter and the Deathly Hallows', 0.8294640183448792],
+ ['The Children of Húrin', 0.8240831792354584],
+ ['Harry Potter and the Prisoner of Azkaban', 0.8158660233020782],
+ ['Harry Potter and the Goblet of Fire', 0.8150344789028168],
+ ['Eragon', 0.8118217587471008],
+ ['Harry Potter and the Chamber of Secrets', 0.8101150393486023],
+ ['Fantastic Beasts and Where to Find Them', 0.8092647194862366],
+ ['Watership Down', 0.8012698292732239],
+ ['Harry Potter and the Half-Blood Prince', 0.7979166805744171]]
+
+```
+
+<p>
+</details>
+
+<details><summary><strong>Weighted Model Approach</strong></summary>
 <p>
 
 Better results can be achieved by combining TFIDF and BERT:
@@ -367,7 +417,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 ```_output
 -- Weighted BERT and TFIDF --
 
- Harry Potter and the Philosopher's Stone recommendations:
+Harry Potter and the Philosopher's Stone recommendations:
 [['Harry Potter and the Chamber of Secrets', 0.7653442323224594],
  ['Harry Potter and the Half-Blood Prince', 0.7465576592959889],
  ['Harry Potter and the Goblet of Fire', 0.7381149146065132],
@@ -379,7 +429,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
  ['The Ickabog', 0.6218310147923186],
  ['Fantastic Beasts and Where to Find Them', 0.6161251907593163]]
 
- The Hobbit recommendations:
+The Hobbit recommendations:
 [['The History of The Hobbit', 0.78046806361336],
  ['The Lord of the Rings', 0.764041360399863],
  ['The Annotated Hobbit', 0.7444487700381719],
@@ -391,7 +441,7 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
  ['J. R. R. Tolkien: A Biography', 0.6391232063030203],
  ['Tolkien: Maker of Middle-earth', 0.6309609890944725]]
 
- Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
+Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 [['Harry Potter and the Half-Blood Prince', 0.6018217616032179],
  ['Harry Potter and the Prisoner of Azkaban', 0.5989788027468591],
  ['The Magical Worlds of Harry Potter', 0.5909785871728664],
@@ -402,6 +452,16 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
  ['The Weirdstone of Brisingamen', 0.5725139741586933],
  ['The Children of Húrin', 0.5661655486061915],
  ['Harry Potter and the Goblet of Fire', 0.5653645423523244]]
+```
+
+The WikilinkNN model can be combined with other models by subsetting the similarity matrix for titles derived in the cleaning process:
+
+```python
+wikilink_sims_copy = wikilink_sims.copy()
+not_selected_idxs = [i for i in range(len(titles)) if i not in selected_idxs]
+
+wikilink_sims_copy = np.delete(wikilink_sims_copy, not_selected_idxs, axis=0)
+wikilink_sims_copy = np.delete(wikilink_sims_copy, not_selected_idxs, axis=1)
 ```
 
 <p>
@@ -490,18 +550,6 @@ model.recommend(
  ['Harry Potter and the Goblet of Fire', 0.5346379229854734],
  ['The Children of Húrin', 0.5340832788476909],
  ['A Wizard of Earthsea', 0.5297755576425843]]
-```
-
-<p>
-</details>
-
-<details><summary><strong>Wikilink NN</strong></summary>
-<p>
-
-```_output
--- Wikilink Neural Network Ratings --
-
-[]
 ```
 
 <p>

@@ -8,9 +8,9 @@ import os
 
 import numpy as np
 import pytest
-from sentence_transformers import (
-    SentenceTransformer,
-)  # pylint: disable=unused-import; required or the import within wikirec.visuals will fail
+
+# Required or the import within wikirec.visuals will fail
+from sentence_transformers import SentenceTransformer  # pylint: disable=unused-import
 from wikirec import data_utils, model
 
 np.random.seed(42)
@@ -102,6 +102,35 @@ def sim_matrix_cosine(request):
 def sim_matrix_euclidean(request):
     return request.param
 
+
+def test_wikilinknn(titles):
+    n = 5
+    wikilink_model_path = "./test_files/books_embedding_model.h5"
+
+    wikilink_embeddings = model.gen_embeddings(
+        method="WikilinkNN",
+        path_to_json=output_path,  # json used instead of a corpus
+        path_to_embedding_model=wikilink_model_path,
+        embedding_size=10,
+        epochs=5,
+        verbose=True,
+    )
+
+    wikilink_sims = model.gen_sim_matrix(
+        method="WikilinkNN", metric="cosine", embeddings=wikilink_embeddings,
+    )
+
+    recs = model.recommend(
+        inputs=titles[0], titles=titles, sim_matrix=wikilink_sims, n=n, metric="cosine",
+    )
+
+    assert len(recs) == n
+    assert recs[0][1] == max(r[1] for r in recs)
+
+    os.system(f"rm -rf {wikilink_model_path}")
+
+
+test_wikilinknn(titles=book_titles)
 
 os.system(f"rm -rf {input_dir}")
 os.system(f"rm -rf {partitions_dir}")

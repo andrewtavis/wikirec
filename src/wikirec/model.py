@@ -7,7 +7,8 @@ Functions for modeling text corpuses and producing recommendations.
 Contents:
     gen_embeddings,
     gen_sim_matrix,
-    recommend
+    recommend,
+    _wikilink_nn
 """
 
 import json
@@ -26,6 +27,7 @@ from keras.layers import Dot, Embedding, Input, Reshape
 from keras.models import Model, load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from tqdm.auto import tqdm
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
 from sentence_transformers import SentenceTransformer
@@ -38,8 +40,10 @@ def gen_embeddings(
     corpus=None,
     bert_st_model="xlm-r-bert-base-nli-stsb-mean-tokens",
     path_to_json=None,
-    path_to_embedding_model="wikilinks_embedding_model",
-    embedding_size=50,
+    path_to_embedding_model="wikilink_embedding_model",
+    embedding_size=75,
+    epochs=20,
+    verbose=True,
     **kwargs,
 ):
     """
@@ -88,11 +92,17 @@ def gen_embeddings(
         path_to_json : str (default=None)
             The path to the parsed json file.
 
-        path_to_embedding_model : str (default=wikilinks_embedding_model)
+        path_to_embedding_model : str (default=wikilink_embedding_model)
             The name of the embedding model to load or create.
 
-        embedding_size : int (default=50)
+        embedding_size : int (default=75)
             The length of the embedding vectors between the articles and the links.
+
+        epochs : int (default=20)
+            The number of modeling iterations through the training dataset.
+
+        verbose : bool (default=True)
+            Whether to show a tqdm progress bar for the model creation.
 
         **kwargs : keyword arguments
             Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer.
@@ -167,10 +177,12 @@ def gen_embeddings(
 
         if not os.path.isfile(path_to_embedding_model):
             print(f"Generating {model_name}.")
-            return _wikilinks_nn(
+            return _wikilink_nn(
                 path_to_json=path_to_json,
                 path_to_embedding_model=path_to_embedding_model,
                 embedding_size=embedding_size,
+                epochs=epochs,
+                verbose=verbose,
             )
 
         print(f"Loading {model_name}.")
@@ -263,11 +275,14 @@ def gen_sim_matrix(
             )
             return
 
-    elif method == "tfidf":
-        if metric == "cosine":
+    elif method in ["tfidf", "wikilinknn"]:
+        if metric == "cosine" and method == "tfidf":
             sim_matrix = np.dot(  # pylint: disable=no-member
                 embeddings, embeddings.T
             ).toarray()
+
+        elif metric == "cosine" and method == "wikilinknn":
+            sim_matrix = np.dot(embeddings, embeddings.T)  # pylint: disable=no-member
 
         elif metric == "euclidean":
             sim_matrix = euclidean_distances(embeddings)
@@ -370,10 +385,12 @@ def recommend(
     return recommendations
 
 
-def _wikilinks_nn(
+def _wikilink_nn(
     path_to_json=None,
-    path_to_embedding_model="wikilinks_embedding_model",
-    embedding_size=50,
+    path_to_embedding_model="wikilink_embedding_model",
+    embedding_size=75,
+    epochs=20,
+    verbose=True,
 ):
     """
     Generates embeddings of wikilinks and articles by training a neural network.
@@ -383,11 +400,17 @@ def _wikilinks_nn(
         path_to_json : str (default=None)
             The path to the parsed json file.
 
-        path_to_embedding_model : str (default=wikilinks_embedding_model)
+        path_to_embedding_model : str (default=wikilink_embedding_model)
             The name of the embedding model to load or create.
 
-        embedding_size : int (default=50)
+        embedding_size : int (default=75)
             The length of the embedding vectors between the articles and the links.
+
+        epochs : int (default=20)
+            The number of modeling iterations through the training dataset.
+
+        verbose : bool (default=True)
+            Whether to show a tqdm progress bar for the model creation.
 
     Returns
     -------
@@ -398,7 +421,7 @@ def _wikilinks_nn(
         with open(path_to_json, "r") as fin:
             articles = [json.loads(l) for l in fin]
     else:
-        raise Exception("Need to parse json for articles.")
+        raise FileNotFoundError("Need to parse json for articles.")
 
     # Find set of wikilinks for each article and convert to a flattened list.
     unique_wikilinks = list(chain(*[list(set(a[2])) for a in articles]))
@@ -411,7 +434,7 @@ def _wikilinks_nn(
         "wikipedia:wikiproject books",
         "wikipedia:wikiproject novels",
     ]
-    wikilinks = [item for item in wikilinks if item not in to_remove]
+    wikilinks = [link for link in wikilinks if link not in to_remove]
 
     # Limit to wikilinks that occur more than 4 times.
     wikilinks_counts = Counter(wikilinks)
@@ -419,21 +442,24 @@ def _wikilinks_nn(
         wikilinks_counts.items(), key=lambda x: x[1], reverse=True
     )
     wikilinks_counts = OrderedDict(wikilinks_counts)
-    links = [t[0] for t in wikilinks_counts.items() if t[1] >= 4]
+    desired_links = [t[0] for t in wikilinks_counts.items() if t[1] >= 4]
 
     # Map articles to their indices, and map links to indices as well.
     article_index = {a[0]: idx for idx, a in enumerate(articles)}
-    link_index = {link: idx for idx, link in enumerate(links)}
+    link_index = {link: idx for idx, link in enumerate(desired_links)}
 
     # Create data from pairs of (article, wikilink) for training the neural network embedding.
     pairs = []
-    for article in articles:
+    disable = not verbose
+    for article in tqdm(
+        iterable=articles, desc="Article-link pairs made", disable=disable
+    ):
         title = article[0]
         article_links = article[2]
         # Iterate through wikilinks in article.
         for link in article_links:
             # Add index of article and index of link to pairs.
-            if link.lower() in links:
+            if link.lower() in desired_links:
                 pairs.append((article_index[title], link_index[link.lower()]))
 
     pairs_set = set(pairs)
@@ -464,7 +490,7 @@ def _wikilinks_nn(
     # Reshape to be a single number (shape will be (None, 1)).
     merged = Reshape(target_shape=[1])(merged)
 
-    model = Model(inputs=[article, link], outputs=merged)
+    model = Model(inputs=[article_input, link_input], outputs=merged)
     model.compile(optimizer="Adam", loss="mse")
 
     # Function that creates a generator for training data.
@@ -504,12 +530,26 @@ def _wikilinks_nn(
             yield {"article": batch[:, 0], "link": batch[:, 1]}, batch[:, 2]
 
     n_positive = 1024
+    # For testing purposes so that the sample is not larger.
+    while n_positive >= len(pairs):
+        n_positive -= 1
+
     gen = _generate_batch(pairs, n_positive, negative_ratio=2)
-    h = model.fit_generator(  # pylint: disable=unused-variable
-        gen, epochs=15, steps_per_epoch=len(pairs) // n_positive,
+
+    if verbose == True:
+        fit_verbose = 1
+    else:
+        fit_verbose = 0
+    h = model.fit(  # pylint: disable=unused-variable
+        gen,
+        epochs=epochs,
+        steps_per_epoch=len(pairs) // n_positive,
+        verbose=fit_verbose,
     )
 
     # Save the model and extract embeddings.
+    model_name = path_to_embedding_model.split("/")[-1]
+    print(f"Saving {model_name}.")
     model.save(path_to_embedding_model)
 
     # Extract embeddings.
