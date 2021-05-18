@@ -100,23 +100,23 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     Parameters
     ----------
         language : str (default=en)
-            The language of Wikipedia to download
+            The language of Wikipedia to download.
 
         target_dir : str (default=wiki_dump)
-            The directory in the pwd into which files should be downloaded
+            The directory in the pwd into which files should be downloaded.
 
         file_limit : int (default=-1, all files)
-            The limit for the number of files to download
+            The limit for the number of files to download.
 
         dump_id : str (default=False)
-            The id of an explicit Wikipedia dump that the user wants to download
+            The id of an explicit Wikipedia dump that the user wants to download.
 
-            Note: a value of False will select the third from the last (latest stable dump)
+            Note: a value of False will select the third from the last (latest stable dump).
 
     Returns
     -------
         file_info : list of lists
-            Information on the downloaded Wikipedia dump files
+            Information on the downloaded Wikipedia dump files.
     """
     assert isinstance(
         file_limit, int
@@ -208,18 +208,18 @@ def _process_article(title, text, templates="Infobox book"):
     Parameters
     ----------
         title : str
-            The title of the article
+            The title of the article.
 
         text : str
-            The text to be processed
+            The text to be processed.
 
         templates : str (default=Infobox book)
-            The target templates for the corpus
+            The target templates for the corpus.
 
     Returns
     -------
         title, text, wikilinks: string, string, list
-            The data from the article
+            The data from the article.
     """
     wikicode = mwparserfromhell.parse(text)
 
@@ -248,31 +248,31 @@ def iterate_and_parse_file(args):
     Parameters
     ----------
         args : tuple
-            The below arguments as a tuple to allow for pool.imap_unordered rather than pool.starmap
+            The below arguments as a tuple to allow for pool.imap_unordered rather than pool.starmap.
 
         topics : str
-            The topics that articles should be subset by
+            The topics that articles should be subset by.
 
-            Note: this corresponds to the type of infobox from Wikipedia articles
+            Note: this corresponds to the type of infobox from Wikipedia articles.
 
         language : str (default=en)
-            The language of Wikipedia that articles are being parsed for
+            The language of Wikipedia that articles are being parsed for.
 
         input_path : str
-            The path to the data file
+            The path to the data file.
 
         partitions_dir : str
-            The path to where output file should be stored
+            The path to where output file should be stored.
 
         limit : int optional (default=None)
-            An optional limit of the number of articles to find
+            An optional limit of the number of articles to find.
 
         verbose : bool
-            Whether to show a tqdm progress bar for the processes
+            Whether to show a tqdm progress bar for the processes.
 
     Returns
     -------
-        A parsed file Wikipedia dump file with articles of the specified topics
+        A parsed file Wikipedia dump file with articles of the specified topics.
     """
     topics, language, input_path, partitions_dir, limit, verbose = args
 
@@ -391,35 +391,35 @@ def parse_to_ndjson(
         topics : str (default=books)
             The topics that articles should be subset by.
 
-            Note: this corresponds to the type of infobox from Wikipedia articles
+            Note: this corresponds to the type of infobox from Wikipedia articles.
 
         language : str (default=en)
-            The language of Wikipedia that articles are being parsed for
+            The language of Wikipedia that articles are being parsed for.
 
         output_path : str (default=topic_articles)
-            The name of the final output ndjson file
+            The name of the final output ndjson file.
 
         input_dir : str (default=wikipedia_dump)
-            The path to the directory where the data is stored
+            The path to the directory where the data is stored.
 
         partitions_dir : str (default=partitions)
-            The path to the directory where the output should be stored
+            The path to the directory where the output should be stored.
 
         limit : int (default=None)
-            An optional limit of the number of topic articles per dump file to find
+            An optional limit of the number of topic articles per dump file to find.
 
         delete_parsed_files : bool (default=False)
-            Whether to delete the separate parsed files after combining them
+            Whether to delete the separate parsed files after combining them.
 
         multicore : bool (default=True)
-            Whether to use multicore processesing
+            Whether to use multicore processesing.
 
         verbose : bool (default=True)
-            Whether to show a tqdm progress bar for the processes
+            Whether to show a tqdm progress bar for the processes.
 
     Returns
     -------
-        Wikipedia dump files parsed for the given template types and converted to json files
+        Wikipedia dump files parsed for the given template types and converted to json files.
     """
     output_dir = "/".join([i for i in output_path.split("/")[:-1]])
     if not os.path.exists(output_dir):
@@ -482,7 +482,9 @@ def parse_to_ndjson(
                     pass
 
         def read_and_combine_json(file_path):
-            """Read in json data from a file_path."""
+            """
+            Read in json data from a file_path.
+            """
             data = []
 
             with open(file_path, "r") as f:
@@ -528,12 +530,12 @@ def _combine_tokens_to_str(tokens):
     Parameters
     ----------
         tokens : str or list
-            The texts to be combined
+            The texts to be combined.
 
     Returns
     -------
         texts_str : str
-            A string of the full text with unwanted words removed
+            A string of the full text with unwanted words removed.
     """
     if isinstance(tokens[0], list):
         flat_words = [word for sublist in tokens for word in sublist]
@@ -550,29 +552,29 @@ def _lower_remove_unwanted(args):
     Parameters
     ----------
         args : list of tuples
-            The following arguments zipped
+            The following arguments zipped.
 
         text : list
-            The text to clean
+            The text to clean.
 
         remove_names : bool
-            Whether to remove names
+            Whether to remove names.
 
         words_to_ignore : str or list
-                Strings that should be removed from the text body
+                Strings that should be removed from the text body.
 
         stop_words : str or list
-            Stopwords for the given language
+            Stopwords for the given language.
 
     Returns
     -------
         text_lower : list
-            The text with lowercased tokens and without unwanted tokens
+            The text with lowercased tokens and without unwanted tokens.
     """
     text, remove_names, words_to_ignore, stop_words = args
 
     if remove_names:
-        # Remove names, numbers, words_to_ignore and stop_words after n-grams have been created
+        # Remove names, numbers, words_to_ignore and stop_words after n-grams have been created.
         return [
             token.lower()
             for token in text
@@ -583,7 +585,7 @@ def _lower_remove_unwanted(args):
             and token not in stop_words
         ]
     else:
-        # Or simply lower case tokens and remove non-bigrammed numbers, words_to_ignore and stop_words
+        # Or simply lower case tokens and remove non-bigrammed numbers, words_to_ignore and stop_words.
         return [
             token.lower()
             for token in text
@@ -601,18 +603,18 @@ def _lemmatize(tokens, nlp=None, verbose=True):
     Parameters
     ----------
         tokens : list or list of lists
-            Tokens to be lemmatized
+            Tokens to be lemmatized.
 
         nlp : spacy.load object
-            A spacy language model
+            A spacy language model.
 
         verbose : bool (default=True)
-            Whether to show a tqdm progress bar for the query
+            Whether to show a tqdm progress bar for the query.
 
     Returns
     -------
         lemmatized_tokens : list or list of lists
-            Tokens that have been lemmatized for nlp analysis
+            Tokens that have been lemmatized for nlp analysis.
     """
     allowed_pos_tags = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
 
@@ -643,18 +645,18 @@ def _subset_and_combine_tokens(args):
         Parameters
         ----------
             args : list of tuples
-                The following arguments zipped
+                The following arguments zipped.
 
             text : list
-                The list of tokens to be subsetted for and combined
+                The list of tokens to be subsetted for and combined.
 
             max_token_index : int (default=-1)
-                The maximum allowable length of a tokenized text
+                The maximum allowable length of a tokenized text.
 
         Returns
         -------
             sub_comb_text : tuple
-                An index and its combined text
+                An index and its combined text.
         """
     text, max_token_index = args
 
@@ -684,49 +686,49 @@ def clean(
     Parameters
     ----------
         texts : str or list
-            The texts to be cleaned and tokenized
+            The texts to be cleaned and tokenized.
 
         language : str (default=en)
-            The language of Wikipedia to download
+            The language of Wikipedia to download.
 
         min_token_freq : int (default=2)
-            The minimum allowable frequency of a word inside the corpus
+            The minimum allowable frequency of a word inside the corpus.
 
         min_token_len : int (default=3)
-            The smallest allowable length of a word
+            The smallest allowable length of a word.
 
         min_tokens : int (default=0)
-            The minimum allowable length of a tokenized text
+            The minimum allowable length of a tokenized text.
 
         max_token_index : int (default=-1)
-            The maximum allowable length of a tokenized text
+            The maximum allowable length of a tokenized text.
 
         min_ngram_count : int (default=5)
-            The minimum occurrences for an n-gram to be included
+            The minimum occurrences for an n-gram to be included.
 
         remove_stopwords : bool (default=True)
-            Whether to remove stopwords
+            Whether to remove stopwords.
 
         ignore_words : str or list
-            Strings that should be removed from the text body
+            Strings that should be removed from the text body.
 
         remove_names : bool (default=False)
-            Whether to remove common names
+            Whether to remove common names.
 
         sample_size : float (default=1)
-            The amount of data to be randomly sampled
+            The amount of data to be randomly sampled.
 
         verbose : bool (default=True)
-            Whether to show a tqdm progress bar for the query
+            Whether to show a tqdm progress bar for the query.
 
     Returns
     -------
         text_corpus, selected_idxs : list, list
-            The texts formatted for text analysis as well as the indexes for selected entries
+            The texts formatted for text analysis as well as the indexes for selected entries.
     """
     language = language.lower()
 
-    # Select abbreviation for the lemmatizer, if it's available
+    # Select abbreviation for the lemmatizer, if it's available.
     if language in languages.lem_abbr_dict().keys():
         language = languages.lem_abbr_dict()[language]
 
@@ -743,7 +745,7 @@ def clean(
         if stopwords(language) != set():  # the input language has stopwords
             stop_words = stopwords(language)
 
-        # Stemming and normal stopwords are still full language names
+        # Stemming and normal stopwords are still full language names.
         elif language in languages.stem_abbr_dict().keys():
             stop_words = stopwords(languages.stem_abbr_dict()[language])
 
@@ -753,7 +755,7 @@ def clean(
     pbar = tqdm(
         desc="Cleaning steps complete", total=7, unit="step", disable=not verbose
     )
-    # Remove spaces that are greater that one in length
+    # Remove spaces that are greater that one in length.
     texts_no_large_spaces = []
     for t in texts:
         for i in range(
@@ -774,9 +776,9 @@ def clean(
 
         texts_no_websites.append(t)
 
-    # Remove the references section but maintain the categories if they exist
-    # The reference are in the text, so this just removes the section and external links
-    # References are maintained for references like awards
+    # Remove the references section but maintain the categories if they exist.
+    # The reference are in the text, so this just removes the section and external links.
+    # References are maintained for references like awards.
     texts_no_references = []
     for t in texts_no_websites:
         if "Category:" in t:
@@ -790,7 +792,7 @@ def clean(
     pbar.update()
 
     texts_no_random_punctuation = []
-    # Prevent words from being combined when a user types word/word or word-word or word:word
+    # Prevent words from being combined when a user types word/word or word-word or word:word.
     for t in texts_no_references:
         t = t.replace("/", " ")
         t = t.replace("-", " ")
@@ -805,14 +807,14 @@ def clean(
         for r in texts_no_random_punctuation
     ]
 
-    # We lower case after names are removed to allow for filtering out capitalized words
+    # We lower case after names are removed to allow for filtering out capitalized words.
     tokenized_texts = [text.split() for text in texts_no_punctuation]
 
     gc.collect()
     pbar.update()
 
-    # Add bigrams and trigrams
-    # Half the normal threshold
+    # Add bigrams and trigrams.
+    # Use half the normal threshold.
     if gensim.__version__[0] == "4":
         bigrams = Phrases(
             sentences=tokenized_texts,
@@ -850,12 +852,12 @@ def clean(
     ):
         for token in bigrams[text]:
             if token.count("_") == 1:
-                # Token is a bigram, so add it to the tokens
+                # Token is a bigram, so add it to the tokens.
                 text.insert(0, token)
 
         for token in trigrams[bigrams[text]]:
             if token.count("_") == 2:
-                # Token is a trigram, so add it to the tokens
+                # Token is a trigram, so add it to the tokens.
                 text.insert(0, token)
 
         tokens_with_ngrams.append(text)
@@ -886,7 +888,7 @@ def clean(
     gc.collect()
     pbar.update()
 
-    # Try lemmatization, and if not available stem, and if not available nothing
+    # Try lemmatization, and if not available stem, and if not available nothing.
     try:
         nlp = spacy.load(language)
         base_tokens = _lemmatize(tokens=tokens_lower, nlp=nlp, verbose=verbose)
@@ -901,12 +903,12 @@ def clean(
             nlp = None
 
     if nlp is None:
-        # Lemmatization failed, so try stemming
+        # Lemmatization failed, so try stemming.
         stemmer = None
         if language in SnowballStemmer.languages:
             stemmer = SnowballStemmer(language)
 
-        # Correct if the abbreviations were put in
+        # Correct if the abbreviations were put in.
         elif language == "ar":
             stemmer = SnowballStemmer("arabic")
 
@@ -920,11 +922,11 @@ def clean(
             stemmer = SnowballStemmer("swedish")
 
         if stemmer is None:
-            # We cannot lemmatize or stem
+            # We cannot lemmatize or stem.
             base_tokens = tokens_lower
 
         else:
-            # Stemming instead of lemmatization
+            # Stemming instead of lemmatization.
             base_tokens = []
             for tokens in tqdm(
                 tokens_lower,
@@ -951,10 +953,10 @@ def clean(
 
     assert isinstance(
         min_token_len, int
-    ), "The 'min_token_len' argument must be an integer if used"
+    ), "The 'min_token_len' argument must be an integer if used."
     assert isinstance(
         min_token_freq, int
-    ), "The 'min_token_freq' argument must be an integer if used"
+    ), "The 'min_token_freq' argument must be an integer if used."
 
     min_len_freq_tokens = [
         [
@@ -968,7 +970,7 @@ def clean(
     gc.collect()
     pbar.update()
 
-    # Save original length for sampling
+    # Save original length for sampling.
     original_len = len(min_len_freq_tokens)
     min_sized_texts = [
         [i, t] for i, t in enumerate(min_len_freq_tokens) if len(t) > min_tokens
@@ -989,7 +991,7 @@ def clean(
 
     gc.collect()
 
-    # Sample texts
+    # Sample texts.
     if len(text_corpus) > int(sample_size * original_len):
         idxs = [t[0] for t in text_corpus]
         selected_idxs = np.random.choice(
@@ -1006,7 +1008,9 @@ def clean(
 
 
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
-    """Parse through XML data using SAX."""
+    """
+    Parse through XML data using SAX.
+    """
 
     def __init__(self):
         xml.sax.handler.ContentHandler.__init__(self)
@@ -1017,18 +1021,24 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self._target_articles = []
 
     def characters(self, content):
-        """Characters between opening and closing tags."""
+        """
+        Characters between opening and closing tags.
+        """
         if self._current_tag:
             self._buffer.append(content)
 
     def startElement(self, name, attrs):
-        """Opening tag of element."""
+        """
+        Opening tag of element.
+        """
         if name in ("title", "text"):
             self._current_tag = name
             self._buffer = []
 
     def endElement(self, name):
-        """Closing tag of element."""
+        """
+        Closing tag of element.
+        """
         if name == self._current_tag:
             self._values[name] = " ".join(self._buffer)
 

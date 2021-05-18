@@ -4,7 +4,7 @@ languages
 
 Module for organizing language dependencies for text cleaning.
 
-The following languages have been selected because their stopwords can be removed via https://github.com/stopwords-iso/stopwords-iso/tree/master/python
+The following languages have been selected because their stopwords can be removed via https://github.com/stopwords-iso/stopwords-iso/tree/master/python.
 
 Contents:
     lem_abbr_dict,
@@ -19,14 +19,14 @@ def lem_abbr_dict():
 
     Notes
     -----
-        These languages can be lemmatized via https://spacy.io/usage/models
+        These languages can be lemmatized via https://spacy.io/usage/models.
 
-        They are also those that can have their words ordered by parts of speech
+        They are also those that can have their words ordered by parts of speech.
 
     Returns
     -------
         lem_abbr_dict : dict
-            A dictionary with languages as keys and their abbreviations as items
+            A dictionary with languages as keys and their abbreviations as items.
     """
     return {
         "chinese": "zh",
@@ -53,12 +53,12 @@ def stem_abbr_dict():
 
     Notes
     -----
-        These languages don't have good lemmatizers, and will thus be stemmed via https://www.nltk.org/api/nltk.stem.html
+        These languages don't have good lemmatizers, and will thus be stemmed via https://www.nltk.org/api/nltk.stem.html.
 
     Returns
     -------
         stem_abbr_dict : dict
-            A dictionary with languages as keys and their abbreviations as items
+            A dictionary with languages as keys and their abbreviations as items.
     """
     return {
         "arabic": "ar",
@@ -74,12 +74,12 @@ def sw_abbr_dict():
 
     Notes
     -----
-        These languages can only have their stopwords removed via https://github.com/stopwords-iso/stopwords-iso)
+        These languages can only have their stopwords removed via https://github.com/stopwords-iso/stopwords-iso).
 
     Returns
     -------
         sw_abbr_dict : dict
-            A dictionary with languages as keys and their abbreviations as items
+            A dictionary with languages as keys and their abbreviations as items.
     """
     return {
         "afrikaans": "af",

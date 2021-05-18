@@ -14,7 +14,7 @@ setup_args = dict(
     name="wikirec",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    version="0.2.1",
+    version="0.2.2",
     author="Andrew Tavis McAllister",
     author_email="andrew.t.mcallister@gmail.com",
     classifiers=[
@@ -30,7 +30,7 @@ setup_args = dict(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
     ],
-    description="NLP recommendation engine based on Wikipedia data",
+    description="Recommendation engine framework based on Wikipedia data",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="new BSD",

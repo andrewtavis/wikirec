@@ -51,7 +51,7 @@ def _check_str_args(arguments, valid_args):
         return
 
     elif isinstance(arguments, list):
-        # Check arguments, and remove them if they're invalid
+        # Check arguments, and remove them if they're invalid.
         for a in arguments:
             _check_str_args(arguments=a, valid_args=valid_args)
 
@@ -72,34 +72,34 @@ def graph_lda_topic_evals(
     Parameters
     ----------
         corpus : list of lists (default=None)
-            The text corpus over which analysis should be done
+            The text corpus over which analysis should be done.
 
         num_topic_words : int (default=10)
-            The number of keywords that should be extracted
+            The number of keywords that should be extracted.
 
         topic_nums_to_compare : list (default=None)
-            The number of topics to compare metrics over
+            The number of topics to compare metrics over.
 
-            Note: None selects all numbers from 1 to num_topic_words
+            Note: None selects all numbers from 1 to num_topic_words.
 
         metrics : str or bool (default=True: all metrics)
-            The metrics to include
+            The metrics to include.
 
             Options:
-                stability: model stability based on Jaccard similarity
+                stability: model stability based on Jaccard similarity.
 
-                coherence: how much the words associated with model topics co-occur
+                coherence: how much the words associated with model topics co-occur.
 
         verbose : bool (default=True)
-            Whether to show a tqdm progress bar for the query
+            Whether to show a tqdm progress bar for the query.
 
         **kwargs : keyword arguments
-            Arguments correspoding to gensim.models.ldamulticore.LdaMulticore
+            Arguments correspoding to gensim.models.ldamulticore.LdaMulticore.
 
     Returns
     -------
         ax : matplotlib axis
-            A graph of the given metrics for each of the given models based on each topic number
+            A graph of the given metrics for each of the given models based on each topic number.
     """
     assert (
         metrics == "stability" or metrics == "coherence" or metrics == True
@@ -118,11 +118,11 @@ def graph_lda_topic_evals(
         Notes
         -----
             Jaccard similarity:
-                - A statistic used for comparing the similarity and diversity of sample sets
-                - J(A,B) = (A ∩ B)/(A ∪ B)
-                - Goal is low Jaccard scores for coverage of the diverse elements
+                - A statistic used for comparing the similarity and diversity of sample sets.
+                - J(A,B) = (A ∩ B)/(A ∪ B).
+                - Goal is low Jaccard scores for coverage of the diverse elements.
         """
-        # Fix for cases where there are not enough texts for clustering models
+        # Fix for cases where there are not enough texts for clustering models.
         if topic_1 == [] and topic_2 != []:
             topic_1 = topic_2
         if topic_1 != [] and topic_2 == []:
@@ -137,12 +137,12 @@ def graph_lda_topic_evals(
 
         return num_intersect / num_union
 
-    plt.figure()  # begin figure
+    plt.figure()
 
     dirichlet_dict = corpora.Dictionary(corpus)
     bow_corpus = [dirichlet_dict.doc2bow(text) for text in corpus]
 
-    # Add an extra topic so that metrics can be calculated all inputs
+    # Add an extra topic so that metrics can be calculated all inputs.
     if topic_nums_to_compare == None:
         topic_nums_to_compare = list(range(num_topic_words + 1)[1:])
     else:
@@ -193,15 +193,16 @@ def graph_lda_topic_evals(
         for i in topic_nums_to_compare[:-1]
     ]
 
+    # Limit topic numbers to the number of keywords.
     coh_sta_diffs = [
         coherences[i] - mean_stabilities[i]
         for i in range(len(topic_nums_to_compare))[:-1]
-    ]  # limit topic numbers to the number of keywords
+    ]
     coh_sta_max = max(coh_sta_diffs)
     coh_sta_max_idxs = [i for i, j in enumerate(coh_sta_diffs) if j == coh_sta_max]
-    ideal_topic_num_index = coh_sta_max_idxs[
-        0
-    ]  # choose less topics in case there's more than one max
+
+    # Choose less topics in case there's more than one max.
+    ideal_topic_num_index = coh_sta_max_idxs[0]
     ideal_topic_num = topic_nums_to_compare[ideal_topic_num_index]
 
     ax = sns.lineplot(
@@ -216,7 +217,7 @@ def graph_lda_topic_evals(
         xmin=ideal_topic_num - 1, xmax=ideal_topic_num + 1, alpha=0.5, facecolor="grey"
     )
 
-    # Set plot limits
+    # Set plot limits.
     y_max = max(max(mean_stabilities), max(coherences)) + (
         0.10 * max(max(mean_stabilities), max(coherences))
     )
