@@ -1,3 +1,14 @@
+### wikirec 0.2.2 (May 18, 2021)
+
+Changes include:
+
+- The WikilinkNN model has been added allowing users to derive recommendations based which articles are linked to the same other Wikipedia articles
+- Examples have been updated to reflect this new model
+- books_embedding_model.h5 is provided for quick experimentation
+- enwiki_books.ndjson has been updated with a more recent dump
+- Function docstring grammar fixes
+- Baseline testing for the new model has been added to the CI
+
 ### wikirec 0.2.1 (April 29, 2021)
 
 Changes include:

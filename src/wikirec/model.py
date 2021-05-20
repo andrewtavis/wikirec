@@ -515,8 +515,9 @@ def _wikilink_nn(
             while idx < batch_size:
 
                 # Random selection
-                random_article = random.randrange(len(article_index))
-                random_link = random.randrange(len(link_index))
+                system_random = random.SystemRandom()
+                random_article = system_random.randrange(len(article_index))
+                random_link = system_random.randrange(len(link_index))
 
                 # Check to make sure this is not a positive example.
                 if (random_article, random_link) not in pairs_set:

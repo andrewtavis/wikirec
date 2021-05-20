@@ -97,7 +97,7 @@ with open("./enwiki_books.ndjson", "r") as f:
 
 titles = [b[0] for b in books]
 texts = [b[1] for b in books]
-wikilinks = [b[2] for b in books]  # internal wikipedia links for NN method
+wikilinks = [b[2] for b in books]  # internal wikipedia links for WikilinkNN method
 
 text_corpus, selected_idxs = data_utils.clean(
     texts=texts,
@@ -215,7 +215,7 @@ tfidf_embeddings = model.gen_embeddings(
 <details><summary><strong>WikilinkNN</strong></summary>
 <p>
 
-Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilink neural network method makes the assumption that content will be similar if they are linked to the same Wikipedia articles. A corpus of internal wikilinks per article is passed, and embeddings based on these internal references are then derived.
+Based on this [Towards Data Science article](https://towardsdatascience.com/building-a-recommendation-system-using-neural-network-embeddings-1ef92e5c80c9), the wikilink neural network method makes the assumption that content will be similar if they are linked to the same Wikipedia articles. A corpus of internal wikilinks per article is passed, and embeddings based on these internal references are then derived. Note that model hyperparameters are dramatically more important in this approach than in others.
 
 ```python
 from wikirec import model
@@ -229,8 +229,6 @@ wikilink_embeddings = model.gen_embeddings(
         verbose=True,
 )
 ```
-
-The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) directory has a copy of `books_embedding_model.h5` for testing purposes.
 
 <p>
 </details>
@@ -275,40 +273,40 @@ Sample recommendations for single and multiple inputs are found in the following
 
 ```_output
 Harry Potter and the Philosopher's Stone recommendations:
-[['Harry Potter and the Chamber of Secrets', 0.5974588223913879],
- ['Harry Potter and the Deathly Hallows', 0.5803045645372675],
- ['Harry Potter and the Goblet of Fire', 0.5752151957878091],
- ['Harry Potter and the Half-Blood Prince', 0.5673108963392828],
- ['Harry Potter and the Order of the Phoenix', 0.5662440277414937],
- ['The Magical Worlds of Harry Potter', 0.5098747039144682],
- ['Harry Potter and the Methods of Rationality', 0.5016950079654786],
- ['Harry Potter and the Prisoner of Azkaban', 0.4865186451505909],
- ['Fantastic Beasts and Where to Find Them', 0.4801163347125484],
- ['The Casual Vacancy', 0.44319508498475246]]
+[['Harry Potter and the Deathly Hallows', 0.6046299758645369],
+ ['Harry Potter and the Chamber of Secrets', 0.6006421605504958],
+ ['Harry Potter and the Order of the Phoenix', 0.5965340424789338],
+ ['Harry Potter and the Goblet of Fire', 0.5569541701616842],
+ ['Harry Potter and the Half-Blood Prince', 0.5525197546210491],
+ ['The Magical Worlds of Harry Potter', 0.5328091662536486],
+ ['Harry Potter and the Prisoner of Azkaban', 0.491142269221778],
+ ['Harry, A History', 0.461521032636577],
+ ['Fantastic Beasts and Where to Find Them', 0.458905951118587],
+ ['Harry Potter and the Methods of Rationality', 0.45024337149870786]]
 
 The Hobbit recommendations:
-[['The History of The Hobbit', 0.7744692537347045],
- ['The Annotated Hobbit', 0.6474663216496771],
- ['Mr. Bliss', 0.5774314075304691],
- ['The Lord of the Rings', 0.5626569367072154],
- ['The Road to Middle-Earth', 0.5386365684368313],
- ['The Marvellous Land of Snergs', 0.5165174723722297],
- ['Tolkien: Maker of Middle-earth', 0.5062523572124091],
- ['The Letters of J. R. R. Tolkien', 0.489393850451095],
- ['The Tolkien Reader', 0.4862696945481724],
- ['J. R. R. Tolkien: A Biography', 0.4813258277958349]]
+[['The History of The Hobbit', 0.7654956800395748],
+ ['The Annotated Hobbit', 0.6429102504821168],
+ ['The Lord of the Rings', 0.5373413608301959],
+ ['The Road to Middle-Earth', 0.5306535049915708],
+ ['The Letters of J. R. R. Tolkien', 0.48933976150601666],
+ ['The Marvellous Land of Snergs', 0.48317913980292654],
+ ['Mr. Bliss', 0.4803612654025307],
+ ['J. R. R. Tolkien: A Biography', 0.4801418285780905],
+ ['A Companion to J. R. R. Tolkien', 0.4668405235491576],
+ ['Tolkien: A Look Behind  " The Lord of the Rings "', 0.45164156724562365]]
 
 Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
-[['The History of The Hobbit', 0.4144937936077629],
- ['Harry Potter and the Chamber of Secrets', 0.34888387038976304],
- ['The Lord of the Rings', 0.3461664662907625],
- ['The Annotated Hobbit', 0.3431651523791515],
- ['Harry Potter and the Deathly Hallows', 0.3336208844683567],
- ['Harry Potter and the Goblet of Fire', 0.3323377108209634],
- ['Harry Potter and the Half-Blood Prince', 0.32972615751499673],
- ['Mr. Bliss', 0.3219122094772891],
- ['Harry Potter and the Order of the Phoenix', 0.3160426316664049],
- ['The Magical Worlds of Harry Potter', 0.30770960167033506]]
+[['The History of The Hobbit', 0.39710714157986077],
+ ['The Annotated Hobbit', 0.3339037084669694],
+ ['Harry Potter and the Chamber of Secrets', 0.32972850299980644],
+ ['Harry Potter and the Deathly Hallows', 0.32760681591732854],
+ ['Harry Potter and the Order of the Phoenix', 0.319444468511931],
+ ['The Lord of the Rings', 0.3069697109614444],
+ ['Harry Potter and the Half-Blood Prince', 0.3022894152745786],
+ ['Harry Potter and the Goblet of Fire', 0.3019957448304001],
+ ['The Magical Worlds of Harry Potter', 0.2996981871702149],
+ ['The Road to Middle-Earth', 0.28697680264545045]]
 ```
 
 <p>
@@ -319,40 +317,40 @@ Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
 
 ```_output
 Harry Potter and the Philosopher's Stone recommendations:
-[['Harry Potter and the Prisoner of Azkaban', 0.8625375],
- ['Harry Potter and the Chamber of Secrets', 0.8557441],
- ['Harry Potter and the Half-Blood Prince', 0.8430752],
- ['Harry Potter and the Goblet of Fire', 0.8258302],
- ['The Magical Worlds of Harry Potter', 0.82496],
- ['A Bad Spell in Yurt', 0.82023925],
- ['Harry Potter and the Order of the Phoenix', 0.80546284],
- ['So You Want to Be a Wizard', 0.803981],
- ['The Weirdstone of Brisingamen', 0.8035261],
- ['Harry Potter and the Cursed Child', 0.79987496]]
+[['The Magical Worlds of Harry Potter', 0.88391376],
+ ['Harry Potter and the Chamber of Secrets', 0.8779844],
+ ['Harry Potter and the Order of the Phoenix', 0.8671646],
+ ['Harry Potter and the Prisoner of Azkaban', 0.85335326],
+ ['Harry Potter and the Half-Blood Prince', 0.84942037],
+ ['Harry Potter and the Goblet of Fire', 0.8481754],
+ ['Year of the Griffin', 0.8280591],
+ ['Magyk', 0.8277706],
+ ['Harry Potter and the Deathly Hallows', 0.8257748],
+ ['The Weirdstone of Brisingamen', 0.81287163]]
 
 The Hobbit recommendations:
-[['The Lord of the Rings', 0.8724792],
- ['Beast', 0.8283818],
- ['The Children of Húrin', 0.8261733],
- ['The Foundling and Other Tales of Prydain', 0.82471454],
- ['The Black Cauldron', 0.82060313],
- ['El Deafo', 0.8167627],
- ['The Little Grey Men', 0.8116319],
- ['The Woggle-Bug Book', 0.8109094],
- ['The Amazing Maurice and His Educated Rodents', 0.8089799],
- ['Dark Lord of Derkholm', 0.8068354]]
+[['The Lord of the Rings', 0.8506559],
+ ["The Shepherd's Crown", 0.84309],
+ ['The War That Saved My Life', 0.8352962],
+ ['The Foundling and Other Tales of Prydain', 0.8336451],
+ ["The Inquisitor's Tale", 0.83097416],
+ ['Ruby Holler', 0.8303863],
+ ['Sam and Dave Dig a Hole', 0.82980216],
+ ['Fattypuffs and Thinifers', 0.82704884],
+ ['El Deafo', 0.8226619],
+ ['Beast (Kennen novel)', 0.8221826]]
 
 Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
-[['The Weirdstone of Brisingamen', 0.79162943],
- ['Harry Potter and the Prisoner of Azkaban', 0.7681779],
- ['A Wizard of Earthsea', 0.7566709],
- ["The Magician's Nephew", 0.75540984],
- ["Merlin's Wood", 0.7530513],
- ['Harry Potter and the Half-Blood Prince', 0.7483348],
- ['Charmed Life', 0.74817574],
- ['The Borrowers Avenged', 0.7475477],
- ["The Inquisitor's Tale", 0.74703705],
- ['The Ghost of Thomas Kempe', 0.74537575]]
+[['The Weirdstone of Brisingamen', 0.8108008205890656],
+ ['The Magical Worlds of Harry Potter', 0.7868899703025818],
+ ["The Golem's Eye", 0.7817798852920532],
+ ['Harry Potter and the Prisoner of Azkaban', 0.7784444689750671],
+ ['The Last Battle', 0.7773005664348602],
+ ['Child Christopher and Goldilind the Fair', 0.776639997959137],
+ ["The Inquisitor's Tale", 0.7743396461009979],
+ ['Charmed Life (novel)', 0.7735742926597595],
+ ['A Wizard of Earthsea', 0.7710956037044525],
+ ["Conrad's Fate", 0.770046204328537]]
 ```
 
 <p>
@@ -418,40 +416,40 @@ bert_tfidf_sim_matrix = tfidf_weight * tfidf_sim_matrix + bert_weight * bert_sim
 -- Weighted BERT and TFIDF --
 
 Harry Potter and the Philosopher's Stone recommendations:
-[['Harry Potter and the Chamber of Secrets', 0.7653442323224594],
- ['Harry Potter and the Half-Blood Prince', 0.7465576592959889],
- ['Harry Potter and the Goblet of Fire', 0.7381149146065132],
- ['Harry Potter and the Prisoner of Azkaban', 0.7309308611870757],
- ['Harry Potter and the Order of the Phoenix', 0.7217362181392408],
- ['Harry Potter and the Deathly Hallows', 0.7181677376484684],
- ['The Magical Worlds of Harry Potter', 0.7146800943719254],
- ['Harry Potter and the Cursed Child', 0.6725872668915877],
- ['The Ickabog', 0.6218310147923186],
- ['Fantastic Beasts and Where to Find Them', 0.6161251907593163]]
+[['Harry Potter and the Chamber of Secrets', 0.7809146131987466],
+ ['Harry Potter and the Order of the Phoenix', 0.7724439006273619],
+ ['The Magical Worlds of Harry Potter', 0.7610271015260268],
+ ['Harry Potter and the Deathly Hallows', 0.7483740864279236],
+ ['Harry Potter and the Goblet of Fire', 0.746247955871592],
+ ['Harry Potter and the Half-Blood Prince', 0.7455051626944851],
+ ['Harry Potter and the Prisoner of Azkaban', 0.7265793668098672],
+ ['Harry Potter and the Cursed Child', 0.6773072534713512],
+ ['Harry, A History', 0.6772576164353141],
+ ['Fantastic Beasts and Where to Find Them', 0.626084297475856]]
 
 The Hobbit recommendations:
-[['The History of The Hobbit', 0.78046806361336],
- ['The Lord of the Rings', 0.764041360399863],
- ['The Annotated Hobbit', 0.7444487700381719],
- ['The Marvellous Land of Snergs', 0.6904192459951058],
- ['The Children of Húrin', 0.6804096398917605],
- ['The Road to Middle-Earth', 0.6596135627601877],
- ['Mr. Bliss', 0.6543540064849226],
- ['The Silmarillion', 0.640755416461898],
- ['J. R. R. Tolkien: A Biography', 0.6391232063030203],
- ['Tolkien: Maker of Middle-earth', 0.6309609890944725]]
+[['The Lord of the Rings', 0.7409957782467453],
+ ['The History of The Hobbit', 0.7352996903587457],
+ ['The Annotated Hobbit', 0.7135948210557342],
+ ['The Marvellous Land of Snergs', 0.6838799880927064],
+ ['The Road to Middle-Earth', 0.6447863856578011],
+ ['The Silmarillion', 0.6445419659298917],
+ ['A Companion to J. R. R. Tolkien', 0.6416663828729424],
+ ['J. R. R. Tolkien: A Biography', 0.6347377961302614],
+ ['The Children of Húrin', 0.6261937795502842],
+ ['Mr. Bliss', 0.6217533139998945]]
 
 Harry Potter and the Philosopher's Stone and The Hobbit recommendations:
-[['Harry Potter and the Half-Blood Prince', 0.6018217616032179],
- ['Harry Potter and the Prisoner of Azkaban', 0.5989788027468591],
- ['The Magical Worlds of Harry Potter', 0.5909785871728664],
- ['Harry Potter and the Order of the Phoenix', 0.5889168038270771],
- ['The Lord of the Rings', 0.5881581367207107],
- ['Harry Potter and the Chamber of Secrets', 0.5868542056295735],
- ['Harry Potter and the Deathly Hallows', 0.5805140956814785],
- ['The Weirdstone of Brisingamen', 0.5725139741586933],
- ['The Children of Húrin', 0.5661655486061915],
- ['Harry Potter and the Goblet of Fire', 0.5653645423523244]]
+[['The Magical Worlds of Harry Potter', 0.6163728193841632],
+ ['Harry Potter and the Order of the Phoenix', 0.6098655072975429],
+ ['Harry Potter and the Prisoner of Azkaban', 0.6026408288502743],
+ ['Harry Potter and the Chamber of Secrets', 0.5966943180957163],
+ ['Harry Potter and the Deathly Hallows', 0.5932562267661715],
+ ['The Lord of the Rings', 0.5931736380571248],
+ ['Harry Potter and the Half-Blood Prince', 0.5905134043157909],
+ ['The Weirdstone of Brisingamen', 0.5620134317676433],
+ ['Fantastic Beasts and Where to Find Them', 0.5594706076813922],
+ ['Harry Potter and the Goblet of Fire', 0.556541219039868]]
 ```
 
 The WikilinkNN model can be combined with other models by subsetting the similarity matrix for titles derived in the cleaning process:
