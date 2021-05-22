@@ -21,9 +21,9 @@ dependencies:
   - tqdm=4.59.0
   - pip:
     - beautifulsoup4==4.9.3
-    - gensim==4.0.1
+    - gensim>=3.8.0
     - keras==2.4.3
     - mwparserfromhell==0.6
     - sentence-transformers==0.4.1.2
     - stopwordsiso==0.6.1
-    - tensorflow==2.4.1
+    - tensorflow==2.5.0

@@ -2,7 +2,7 @@ beautifulsoup4==4.9.3
 black==19.10b0
 certifi==2020.12.5
 defusedxml==0.7.1
-gensim==4.0.1
+gensim>=3.8.0
 Keras==2.4.3
 matplotlib==3.3.4
 mwparserfromhell==0.6
@@ -17,5 +17,5 @@ scikit-learn==0.24.1
 sentence-transformers==0.4.1.2
 spacy==2.3.5
 stopwordsiso==0.6.1
-tensorflow==2.4.1
+tensorflow==2.5.0
 tqdm==4.56.1
