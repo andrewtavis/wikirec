@@ -600,5 +600,4 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/master/resources/gh_images/wikipedia_logo.png" alt="Wikipedia"></a>
   <br>
-  <br>
 </div>
