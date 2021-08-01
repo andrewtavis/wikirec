@@ -595,5 +595,10 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 # Powered By
 
 <div align="center">
+  <br>
+  <a href="https://www.wikimedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/master/resources/gh_images/wikimedia_foundation_logo.png" alt="wikimedia"></a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/master/resources/gh_images/wikipedia_logo.png" alt="wikipedia"></a>
+  <br>
+  <br>
 </div>
