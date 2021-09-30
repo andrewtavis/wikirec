@@ -23,9 +23,9 @@ import numpy as np
 from gensim import corpora, similarities
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.ldamulticore import LdaMulticore
-from keras.layers import Dot, Embedding, Input, Reshape
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from tensorflow.keras import layers as tf_layers
 from tensorflow.keras import models as tf_models
 from tqdm.auto import tqdm
 
@@ -347,17 +347,15 @@ def recommend(
                     if ratings:
                         sims = sims * weights[0]
 
+                elif ratings:
+                    sims = [
+                        np.mean([r * s, weights[r] * sim_matrix[i][j]])
+                        for j, s in enumerate(sims)
+                    ]
                 else:
-                    if ratings:
-                        sims = [
-                            np.mean([r * s, weights[r] * sim_matrix[i][j]])
-                            for j, s in enumerate(sims)
-                        ]
-                    else:
-                        sims = [
-                            np.mean([r * s, sim_matrix[i][j]])
-                            for j, s in enumerate(sims)
-                        ]
+                    sims = [
+                        np.mean([r * s, sim_matrix[i][j]]) for j, s in enumerate(sims)
+                    ]
 
             else:
                 checked += 1
@@ -466,29 +464,29 @@ def _wikilink_nn(
 
     # Neural network architecture.
     # Both inputs are 1-dimensional.
-    article_input = Input(name="article", shape=[1])
-    link_input = Input(name="link", shape=[1])
+    article_input = tf_layers.Input(name="article", shape=[1])
+    link_input = tf_layers.Input(name="link", shape=[1])
 
     # Embedding the article (shape will be (None, 1, embedding_size)).
-    article_embedding = Embedding(
+    article_embedding = tf_layers.Embedding(
         name="article_embedding",
         input_dim=len(article_index),
         output_dim=embedding_size,
     )(article_input)
 
     # Embedding the link (shape will be (None, 1, embedding_size)).
-    link_embedding = Embedding(
+    link_embedding = tf_layers.Embedding(
         name="link_embedding", input_dim=len(link_index), output_dim=embedding_size
     )(link_input)
 
     # Merge the layers with a dot product along the second axis
     # (shape will be (None, 1, 1)).
-    merged = Dot(name="dot_product", normalize=True, axes=2)(
+    merged = tf_layers.Dot(name="dot_product", normalize=True, axes=2)(
         [article_embedding, link_embedding]
     )
 
     # Reshape to be a single number (shape will be (None, 1)).
-    merged = Reshape(target_shape=[1])(merged)
+    merged = tf_layers.Reshape(target_shape=[1])(merged)
 
     model = tf_models.Model(inputs=[article_input, link_input], outputs=merged)
     model.compile(optimizer="Adam", loss="mse")
