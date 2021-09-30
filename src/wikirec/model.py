@@ -134,7 +134,7 @@ def gen_embeddings(
 
         v_size = kwargs.get("vector_size") if "vector_size" in kwargs else 100
 
-        if gensim.__version__[0] == "4":
+        if float(gensim.__version__[0]) >= 4:
             model_d2v = Doc2Vec(documents=tagged_data, vector_size=v_size, **kwargs)
 
         else:
