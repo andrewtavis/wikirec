@@ -24,9 +24,9 @@ from gensim import corpora, similarities
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.models.ldamulticore import LdaMulticore
 from keras.layers import Dot, Embedding, Input, Reshape
-from keras.models import Model, load_model
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from tensorflow.keras import models as tf_models
 from tqdm.auto import tqdm
 
 warnings.filterwarnings("ignore", message=r"Passing", category=FutureWarning)
@@ -186,7 +186,7 @@ def gen_embeddings(
             )
 
         print(f"Loading {model_name}.")
-        model = load_model(path_to_embedding_model)
+        model = tf_models.load_model(path_to_embedding_model)
         layer = model.get_layer("article_embedding")
         weights = layer.get_weights()[0]
 
@@ -490,7 +490,7 @@ def _wikilink_nn(
     # Reshape to be a single number (shape will be (None, 1)).
     merged = Reshape(target_shape=[1])(merged)
 
-    model = Model(inputs=[article_input, link_input], outputs=merged)
+    model = tf_models.Model(inputs=[article_input, link_input], outputs=merged)
     model.compile(optimizer="Adam", loss="mse")
 
     # Function that creates a generator for training data.
