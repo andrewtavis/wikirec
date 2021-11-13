@@ -30,7 +30,7 @@ See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full ou
 - [Comparative Results](#comparative-results)
 - [To-Do](#to-do)
 
-# Installation [`↩`](#contents) <a id="installation"></a>
+# Installation [`⇧`](#contents) <a id="installation"></a>
 
 wikirec can be downloaded from PyPI via pip or sourced directly from this repository:
 
@@ -48,7 +48,7 @@ python setup.py install
 import wikirec
 ```
 
-# Data [`↩`](#contents) <a id="data"></a>
+# Data [`⇧`](#contents) <a id="data"></a>
 
 [wikirec.data_utils](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py) allows a user to download Wikipedia articles of a given topic including movies, TV shows, books, music, and countless other classes of information. These texts then serve as the basis to recommend similar content given an input of what the user is interested in.
 
@@ -117,7 +117,7 @@ From here `text_corpus` would be used to derive article similarities that are th
 <p>
 </details>
 
-# Methods [`↩`](#contents) <a id="methods"></a>
+# Methods [`⇧`](#contents) <a id="methods"></a>
 
 Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) include:
 
@@ -232,7 +232,7 @@ wikilink_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-# Recommendations [`↩`](#contents) <a id="recommendations"></a>
+# Recommendations [`⇧`](#contents) <a id="recommendations"></a>
 
 After embeddings have been generated we can then create matrices that represent article-article `cosine` or `euclidean` similarities. These can then be sorted and selected from, with the recommendation process being as simple as the following:
 
@@ -255,7 +255,7 @@ recs = model.recommend(
 )
 ```
 
-# Comparative Results [`↩`](#contents) <a id="comparative-results"></a>
+# Comparative Results [`⇧`](#contents) <a id="comparative-results"></a>
 
 - TFIDF generally outperformed all other NLP methods in terms of providing what the user would expect, with the results being all the more striking considering its runtime is by far the shortest.
 - The other strong performing NLP model is BERT, as it does the best job of providing novel but sensible recommendations.
@@ -552,7 +552,7 @@ model.recommend(
 <p>
 </details>
 
-# To-Do [`↩`](#contents) <a id="to-do"></a>
+# To-Do [`⇧`](#contents) <a id="to-do"></a>
 
 Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/blob/main/.github/CONTRIBUTING.md) if you are interested in contributing to this project. Work that is in progress or could be implemented includes:
 
