@@ -1,4 +1,16 @@
-### wikirec 0.2.2 (May 20, 2021)
+# Changelog
+
+wikirec tries to follow [semantic versioning](https://semver.org/), a MAJOR.MINOR.PATCH version where increments are made of the:
+
+- MAJOR version when we make incompatible API changes
+- MINOR version when we add functionality in a backwards compatible manner
+- PATCH version when we make backwards compatible bug fixes
+
+# wikirec 1.0.0 (December 28th, 2021)
+
+- Release switches wikirec over to [semantic versioning](https://semver.org/) and indicates that it is stable
+
+# wikirec 0.2.2 (May 20th, 2021)
 
 Changes include:
 
@@ -9,7 +21,7 @@ Changes include:
 - Function docstring grammar fixes
 - Baseline testing for the new model has been added to the CI
 
-### wikirec 0.2.1 (April 29, 2021)
+# wikirec 0.2.1 (April 29th, 2021)
 
 Changes include:
 
@@ -17,7 +29,7 @@ Changes include:
 - Wikipedia links are now an output of data_utils.parse_to_ndjson
 - Dependencies in requirement and environment files are now condensed
 
-### wikirec 0.2.0 (April 16, 2021)
+# wikirec 0.2.0 (April 16th, 2021)
 
 Changes include:
 
@@ -29,7 +41,7 @@ Changes include:
 - Bug fixes and a more explicit use of exceptions
 - More extensive contributing guidelines
 
-### wikirec 0.1.1.7 (March 14, 2021)
+# wikirec 0.1.1.7 (March 14th, 2021)
 
 Changes include:
 
@@ -39,7 +51,7 @@ Changes include:
 - The workflow for all models has been improved and explained
 - Methods have been developed to combine modeling techniques for better results
 
-### wikirec 0.1.0 (March 8, 2021)
+# wikirec 0.1.0 (March 8th, 2021)
 
 First stable release of wikirec
 
