@@ -25,7 +25,14 @@ See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full ou
 
 - [Installation](#installation)
 - [Data](#data)
+  - [Download](#downloading)
+  - [Cleaning](#cleaning)
 - [Methods](#methods)
+  - [BERT](#bert)
+  - [Doc2Vec](#doc2vec)
+  - [LDA](#lda)
+  - [TFIDF](#tfidf)
+  - [WikilinkNN](#wikilinknn)
 - [Recommendations](#recommendations)
 - [Comparative Results](#comparative-results)
 - [To-Do](#to-do)
@@ -56,6 +63,8 @@ Article topics are derived from infobox types found on Wikipedia articles. The [
 
 Data processing in wikirec involves the following steps:
 
+<a id="downloading"></a>
+
 <details><summary><strong>Downloading and Parsing Articles</strong></summary>
 <p>
 
@@ -82,6 +91,8 @@ The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) direct
 
 <p>
 </details>
+
+<a id="cleaning"></a>
 
 <details><summary><strong>Cleaning Parsed Articles</strong></summary>
 <p>
@@ -121,6 +132,8 @@ From here `text_corpus` would be used to derive article similarities that are th
 
 Recommendations in wikirec are generated from similarity matrices derived from trained model embeddings. Implemented NLP modeling methods within [wikirec.model](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/model.py) include:
 
+<a id="bert"></a>
+
 <details><summary><strong>BERT</strong></summary>
 <p>
 
@@ -149,6 +162,8 @@ bert_embeddings = model.gen_embeddings(
 <p>
 </details>
 
+<a id="doc2vec"></a>
+
 <details><summary><strong>Doc2vec</strong></summary>
 <p>
 
@@ -169,6 +184,8 @@ d2v_embeddings = model.gen_embeddings(
 
 <p>
 </details>
+
+<a id="lda"></a>
 
 <details><summary><strong>LDA</strong></summary>
 <p>
@@ -191,6 +208,8 @@ lda_embeddings = model.gen_embeddings(
 <p>
 </details>
 
+<a id="tfidf"></a>
+
 <details><summary><strong>TFIDF</strong></summary>
 <p>
 
@@ -210,6 +229,8 @@ tfidf_embeddings = model.gen_embeddings(
 
 <p>
 </details>
+
+<a id="wikilinknn"></a>
 
 <details><summary><strong>WikilinkNN</strong></summary>
 <p>
