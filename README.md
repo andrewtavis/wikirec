@@ -587,6 +587,10 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 - Adding embeddings visualization methods to wikirec [(see issue)](https://github.com/andrewtavis/wikirec/issues/35)
 
+- Allowing a user to use article topics to further express preferences in recommendations [(see issue)](https://github.com/andrewtavis/wikirec/issues/54)
+
+- Integrating metadata from Wikidata [(see issue)](https://github.com/andrewtavis/wikirec/issues/55)
+
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
 - Compiling other sources of open-source data that can be used to augment input data
