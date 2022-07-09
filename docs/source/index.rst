@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png
+.. image:: https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/logo/wikirec_logo_transparent.png
     :width: 529
     :height: 169
     :align: center

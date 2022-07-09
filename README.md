@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://github.com/andrewtavis/wikirec"><img src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/wikirec_logo_transparent.png" width="529" height="169"></a>
+  <a href="https://github.com/andrewtavis/wikirec"><img src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/logo/wikirec_logo_transparent.png" width="529" height="169"></a>
 </div>
 
 ---
@@ -635,6 +635,6 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 <div align="center">
   <br>
-  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/resources/gh_images/wikipedia_logo.png" alt="Wikipedia"></a>
+  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/images/wikipedia_logo.png" alt="Wikipedia"></a>
   <br>
 </div>
