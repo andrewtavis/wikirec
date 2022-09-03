@@ -1,6 +1,6 @@
 """
-data
-----
+data_utils
+----------
 
 Module for downloading and preparing data.
 
@@ -95,7 +95,7 @@ def input_conversion_dict():
 
 def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=False):
     """
-    Downloads the most recent stable dump of the English Wikipedia if it is not already in the specified pwd directory.
+    Downloads the most recent stable dump of Wikipedia of the given language if it is not already in the specified pwd directory.
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     file_info = []
 
     file_present_bools = [
-        os.path.exists(target_dir + "/" + f) for f in files_to_download
+        os.path.exists(f"{target_dir}/{f}") for f in files_to_download
     ]
     if len(list(set(file_present_bools))) == 1 and file_present_bools[0] == True:
         dl_files = False
@@ -167,7 +167,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
 
     if dl_files:
         for f in files_to_download:
-            file_path = target_dir + "/" + f
+            file_path = f"{target_dir}/{f}"
             if not os.path.exists(file_path):
                 print(f"DL file to {file_path}")
                 saved_file_path = tf.keras.utils.get_file(
@@ -189,7 +189,7 @@ def download_wiki(language="en", target_dir="wiki_dump", file_limit=-1, dump_id=
     else:
         print(f"Files already available in the {target_dir} directory.")
         for f in files_to_download:
-            file_path = target_dir + "/" + f
+            file_path = f"{target_dir}/{f}"
 
             file_size = os.stat(file_path).st_size / 1e6
             total_articles = int(f.split("p")[-1].split(".")[-2]) - int(
@@ -297,7 +297,7 @@ def iterate_and_parse_file(args):
 
     file_name = input_path.split("/")[-1].split("-")[-1].split(".")[-2]
     file_name = f"{file_name}.ndjson"
-    output_path = partitions_dir + "/" + file_name
+    output_path = f"{partitions_dir}/{file_name}"
 
     if not os.path.exists(output_path):
         if limit is None:
@@ -412,7 +412,7 @@ def parse_to_ndjson(
             Whether to delete the separate parsed files after combining them.
 
         multicore : bool (default=True)
-            Whether to use multicore processesing.
+            Whether to use multicore processing.
 
         verbose : bool (default=True)
             Whether to show a tqdm progress bar for the processes.
@@ -421,7 +421,7 @@ def parse_to_ndjson(
     -------
         Wikipedia dump files parsed for the given template types and converted to json files.
     """
-    output_dir = "/".join([i for i in output_path.split("/")[:-1]])
+    output_dir = "/".join(list(output_path.split("/")[:-1]))
     if not os.path.exists(output_dir):
         print(f"Making {output_dir} directory for the output")
         os.makedirs(output_dir)
@@ -430,9 +430,11 @@ def parse_to_ndjson(
         topics = [topics]
 
     for i, t in enumerate(topics):
-        if language in input_conversion_dict().keys():
-            if t in input_conversion_dict()[language].keys():
-                topics[i] = input_conversion_dict()[language][t]
+        if (
+            language in input_conversion_dict().keys()
+            and t in input_conversion_dict()[language].keys()
+        ):
+            topics[i] = input_conversion_dict()[language][t]
 
     if multicore == True:
         num_cores = os.cpu_count()
@@ -441,14 +443,14 @@ def parse_to_ndjson(
     elif isinstance(multicore, int):
         num_cores = multicore
 
-    if output_path == None:
+    if output_path is None:
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        output_path = "parsed_data" + timestr
-        output_file_name = output_path + ".ndjson"
+        output_path = f"parsed_data{timestr}"
+        output_file_name = f"{output_path}.ndjson"
 
     else:
         if output_path[-len(".ndjson") :] != ".ndjson":
-            output_file_name = output_path + ".ndjson"
+            output_file_name = f"{output_path}.ndjson"
         else:
             output_file_name = output_path
 
@@ -458,7 +460,7 @@ def parse_to_ndjson(
             os.makedirs(partitions_dir)
 
         target_files = [
-            input_dir + "/" + f for f in os.listdir(input_dir) if "pages-articles" in f
+            f"{input_dir}/{f}" for f in os.listdir(input_dir) if "pages-articles" in f
         ]
 
         parse_inputs = zip(
@@ -495,7 +497,7 @@ def parse_to_ndjson(
 
         threadpool = Threadpool(processes=num_cores)
         partition_files = [
-            partitions_dir + "/" + f
+            f"{partitions_dir}/{f}"
             for f in os.listdir(partitions_dir)
             if f[-len(".ndjson") :] == ".ndjson"
         ]
@@ -515,10 +517,9 @@ def parse_to_ndjson(
             f"File {output_file_name} with articles for the given topics already exists"
         )
 
-    if delete_parsed_files:
-        if os.path.exists(partitions_dir):
-            print(f"Deleting {partitions_dir} directory")
-            os.system(f"rm -rf {partitions_dir}")
+    if delete_parsed_files and os.path.exists(partitions_dir):
+        print(f"Deleting {partitions_dir} directory")
+        os.system(f"rm -rf {partitions_dir}")
 
     return
 
@@ -640,24 +641,24 @@ def _lemmatize(tokens, nlp=None, verbose=True):
 
 def _subset_and_combine_tokens(args):
     """
-        Subsets a text by a maximum length and combines it to a string.
+    Subsets a text by a maximum length and combines it to a string.
 
-        Parameters
-        ----------
-            args : list of tuples
-                The following arguments zipped.
+    Parameters
+    ----------
+        args : list of tuples
+            The following arguments zipped.
 
-            text : list
-                The list of tokens to be subsetted for and combined.
+        text : list
+            The list of tokens to be subsetted for and combined.
 
-            max_token_index : int (default=-1)
-                The maximum allowable length of a tokenized text.
+        max_token_index : int (default=-1)
+            The maximum allowable length of a tokenized text.
 
-        Returns
-        -------
-            sub_comb_text : tuple
-                An index and its combined text.
-        """
+    Returns
+    -------
+        sub_comb_text : tuple
+            An index and its combined text.
+    """
     text, max_token_index = args
 
     return [

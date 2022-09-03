@@ -86,7 +86,7 @@ def gen_embeddings(
         corpus : list of lists (default=None)
             The text corpus over which analysis should be done.
 
-        bert_st_model : str (deafault=xlm-r-bert-base-nli-stsb-mean-tokens)
+        bert_st_model : str (default=xlm-r-bert-base-nli-stsb-mean-tokens)
             The BERT model to use.
 
         path_to_json : str (default=None)
@@ -105,7 +105,7 @@ def gen_embeddings(
             Whether to show a tqdm progress bar for the model creation.
 
         **kwargs : keyword arguments
-            Arguments correspoding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer.
+            Arguments corresponding to sentence_transformers.SentenceTransformer.encode, gensim.models.doc2vec.Doc2Vec, gensim.models.ldamulticore.LdaMulticore, or sklearn.feature_extraction.text.TfidfVectorizer.
 
     Returns
     -------

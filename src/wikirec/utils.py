@@ -8,7 +8,6 @@ Contents:
     _check_str_similarity,
     _check_str_args,
     graph_lda_topic_evals,
-    english_names_list
 """
 
 from difflib import SequenceMatcher
@@ -94,7 +93,7 @@ def graph_lda_topic_evals(
             Whether to show a tqdm progress bar for the query.
 
         **kwargs : keyword arguments
-            Arguments correspoding to gensim.models.ldamulticore.LdaMulticore.
+            Arguments corresponding to gensim.models.ldamulticore.LdaMulticore.
 
     Returns
     -------
@@ -143,7 +142,7 @@ def graph_lda_topic_evals(
     bow_corpus = [dirichlet_dict.doc2bow(text) for text in corpus]
 
     # Add an extra topic so that metrics can be calculated all inputs.
-    if topic_nums_to_compare == None:
+    if topic_nums_to_compare is None:
         topic_nums_to_compare = list(range(num_topic_words + 1)[1:])
     else:
         topic_nums_to_compare.append(topic_nums_to_compare[-1] + 1)
@@ -164,7 +163,7 @@ def graph_lda_topic_evals(
         LDA_topics[i] = [[word[0] for word in topic[1]] for topic in shown_topics]
 
     LDA_stability = {}
-    for i in range(0, len(topic_nums_to_compare) - 1):
+    for i in range(len(topic_nums_to_compare) - 1):
         jaccard_sims = []
         for t1, topic1 in enumerate(  # pylint: disable=unused-variable
             LDA_topics[topic_nums_to_compare[i]]
