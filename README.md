@@ -635,6 +635,7 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 
 <div align="center">
   <br>
-  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/images/wikipedia_logo.png" alt="Wikipedia"></a>
+  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/images/wikipedia_logo_dark.png#gh-dark-mode-only" alt="Wikipedia logo"></a>
+  <a href="https://www.wikipedia.org/"><img height="150" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/images/wikipedia_logo_light.png#gh-light-mode-only" alt="Wikipedia logo"></a>
   <br>
 </div>
