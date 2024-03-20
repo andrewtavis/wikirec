@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.3
-black==19.10b0
+black==24.3.0
 defusedxml==0.7.1
 gensim>=3.8.0
 Keras==2.4.3
