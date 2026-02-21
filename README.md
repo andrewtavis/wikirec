@@ -1,3 +1,5 @@
+<a id="top"></a>
+
 <div align="center">
   <a href="https://github.com/andrewtavis/wikirec"><img src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/logo/wikirec_logo_transparent.png" width="529" height="169"></a>
 </div>
@@ -15,15 +17,13 @@
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![colab](https://img.shields.io/badge/%20-Open%20in%20Colab-097ABB.svg?logo=google-colab&color=097ABB&labelColor=525252)](https://colab.research.google.com/github/andrewtavis/wikirec)
 
-## Recommendation engine framework based on Wikipedia data
+### Recommendation engine framework based on Wikipedia data
 
 **wikirec** is a framework that allows users to parse Wikipedia in any language for entries of a given type and then seamlessly generate recommendations for the given content. Recommendations are based on unsupervised natural language processing over article texts, with ratings being leveraged to weigh inputs and indicate preferences. The goal is for wikirec to both refine and deploy models that provide accurate content recommendations with only open-source data.
 
 See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full outline of the package including models and data preparation.
 
-<a id="contents"></a>
-
-# **Contents**
+# Contents
 
 - [Installation](#installation)
 - [Data](#data)
@@ -38,8 +38,6 @@ See the [documentation](https://wikirec.readthedocs.io/en/latest/) for a full ou
 - [Recommendations](#recommendations)
 - [Comparative Results](#comparative-results)
 - [To-Do](#to-do)
-
-<a id="installation"></a>
 
 # Installation [`⇧`](#contents)
 
@@ -59,7 +57,7 @@ python setup.py install
 import wikirec
 ```
 
-<a id="data"></a>
+<sub><a href="#top">Back to top.</a></sub>
 
 # Data [`⇧`](#contents)
 
@@ -68,8 +66,6 @@ import wikirec
 Article topics are derived from infobox types found on Wikipedia articles. The [article on infoboxes](https://en.wikipedia.org/wiki/Wikipedia:List_of_infoboxes) (and its translations) contains all the allowed arguments to subset the data by. Simply passing `"Infobox chosen_type"` to the `topics` argument of `data_utils.parse_to_ndjson()` in the following example will subset all Wikipedia articles for the given type. Lists can also be passed if more than one topic is desired. For the English Wikipedia, wikirec also provides concise arguments for data that commonly serve as recommendation inputs including: `books`, `songs`, `albums`, `movies`, `tv_series`, `video_games`, as well as various categories of `people` such as `athletes`, `musicians` and `authors` (see [data_utils.input_conversion_dict()](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/data_utils.py)).
 
 Data processing in wikirec involves the following steps:
-
-<a id="downloading"></a>
 
 <details><summary><strong>Downloading and Parsing Articles</strong></summary>
 <p>
@@ -97,8 +93,6 @@ The [examples](https://github.com/andrewtavis/wikirec/tree/main/examples) direct
 
 <p>
 </details>
-
-<a id="cleaning"></a>
 
 <details><summary><strong>Cleaning Parsed Articles</strong></summary>
 <p>
@@ -134,7 +128,7 @@ From here `text_corpus` would be used to derive article similarities that are th
 <p>
 </details>
 
-<a id="methods"></a>
+<sub><a href="#top">Back to top.</a></sub>
 
 # Methods [`⇧`](#contents)
 
@@ -261,7 +255,7 @@ wikilink_embeddings = model.gen_embeddings(
 <p>
 </details>
 
-<a id="recommendations"></a>
+<sub><a href="#top">Back to top.</a></sub>
 
 # Recommendations [`⇧`](#contents)
 
@@ -286,7 +280,7 @@ recs = model.recommend(
 )
 ```
 
-<a id="comparative-results"></a>
+<sub><a href="#top">Back to top.</a></sub>
 
 # Comparative Results [`⇧`](#contents)
 
@@ -585,7 +579,7 @@ model.recommend(
 <p>
 </details>
 
-<a id="to-do"></a>
+<sub><a href="#top">Back to top.</a></sub>
 
 # To-Do [`⇧`](#contents)
 
@@ -608,7 +602,6 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 - Creating, improving and sharing [examples](https://github.com/andrewtavis/wikirec/tree/main/examples)
 
 - Compiling other sources of open-source data that can be used to augment input data
-
   - Potentially writing scripts to load this data for significant topics
 
 - Updates to [wikirec.languages](https://github.com/andrewtavis/wikirec/blob/main/src/wikirec/languages.py) as lemmatization and other linguistic package dependencies evolve
@@ -618,6 +611,8 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 - Expanding the [documentation](https://wikirec.readthedocs.io/en/latest/)
 
 - Improving [tests](https://github.com/andrewtavis/wikirec/tree/main/tests) for greater [code coverage](https://codecov.io/gh/andrewtavis/wikirec)
+
+<sub><a href="#top">Back to top.</a></sub>
 
 # References
 
@@ -631,6 +626,8 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
 </p>
 </details>
 
+<sub><a href="#top">Back to top.</a></sub>
+
 # Powered By
 
 <div align="center">
@@ -638,3 +635,5 @@ Please see the [contribution guidelines](https://github.com/andrewtavis/wikirec/
   <a href="https://www.wikipedia.org/"><img height="200" src="https://raw.githubusercontent.com/andrewtavis/wikirec/main/.github/resources/images/wikipedia_logo.png" alt="Wikipedia"></a>
   <br>
 </div>
+
+<sub><a href="#top">Back to top.</a></sub>
